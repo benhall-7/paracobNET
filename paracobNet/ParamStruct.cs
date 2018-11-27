@@ -13,6 +13,7 @@ namespace paracobNet
 
         public void Read(BinaryReader reader)
         {
+            uint startPos = (uint)reader.BaseStream.Position - 1;
             Nodes = new StructNode[reader.ReadUInt32()];
             uint reference = reader.ReadUInt32() + ParamFile.RefStart;
             for (int i = 0; i < Nodes.Length; i++)
@@ -26,7 +27,7 @@ namespace paracobNet
                 uint len = reader.ReadUInt32();
                 reader.BaseStream.Seek(returnTo, SeekOrigin.Begin);
                 //go to the node offset and read the param
-                reader.BaseStream.Seek(ParamFile.ParamStart + reader.ReadUInt32(), SeekOrigin.Begin);
+                reader.BaseStream.Seek(startPos + reader.ReadUInt32(), SeekOrigin.Begin);
 
                 Nodes[i] = new StructNode(hash, len, reader);
             }
