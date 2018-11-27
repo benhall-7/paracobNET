@@ -25,7 +25,7 @@ namespace paracobNet
             for (int i = 0; i < Nodes.Length; i++)
             {
                 reader.BaseStream.Seek(startPos + offsets[i], SeekOrigin.Begin);
-                Nodes[i] = Util.ReadParam();
+                Nodes[i] = Util.ReadParam(reader);
             }
         }
     }
