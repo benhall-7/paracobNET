@@ -11,27 +11,21 @@ namespace paracobNet
             if (!Enum.IsDefined(typeof(ParamType), key))
                 throw new NotImplementedException($"Unimplemented param type '{key}' at {reader.BaseStream.Position}");
             ParamType type = (ParamType)key;
+            IParam param;
             switch (type)
             {
                 case ParamType.array:
-                    {
-                        ParamArray array = new ParamArray();
-                        array.Read(reader);
-                        return array;
-                    }
+                    param = new ParamArray();
+                    break;
                 case ParamType.structure:
-                    {
-                        ParamStruct structure = new ParamStruct();
-                        structure.Read(reader);
-                        return structure;
-                    }
+                    param = new ParamStruct();
+                    break;
                 default:
-                    {
-                        ParamValue value = new ParamValue(type);
-                        value.Read(reader);
-                        return value;
-                    }
+                    param = new ParamValue(type);
+                    break;
             }
+            param.Read(reader);
+            return param;
         }
         public static string ReadStringDirect(BinaryReader reader, uint len)
         {
