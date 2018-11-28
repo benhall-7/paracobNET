@@ -9,14 +9,25 @@ namespace Param2Txt
     {
         static void Main(string[] args)
         {
+            string input = "";
+            string output = "output.txt";
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (File.Exists(args[i]))
+                    input = args[i];
+                else if (args[i] == "-o")
+                    output = args[++i];
+                else
+                {
+                    Console.WriteLine("usage: Param2Txt.exe [input]");
+                    Console.WriteLine("  optional: -o [output]");
+                    return;
+                }
+            }
             Console.WriteLine("Initializing...");
-            ParamFile file = new ParamFile(@"C:\Users\Breakfast\Documents\_Ultimate\0x8fccd588.prm");
+            ParamFile file = new ParamFile(input);
             Console.WriteLine("Writing...");
-            File.WriteAllLines(
-                @"C:\Users\Breakfast\Documents\_Ultimate\0x8fccd588.txt",
-                RepresentParam(file.Root as ParamStruct).ToArray());
-            Console.WriteLine("Press any key to exit");
-            Console.ReadKey();
+            File.WriteAllLines(output, RepresentParam(file.Root as ParamStruct).ToArray());
         }
 
         static List<string> RepresentStruct(ParamStruct param)
