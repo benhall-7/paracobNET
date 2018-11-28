@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.28010.2016
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "paracobNet", "paracobNet\paracobNet.csproj", "{1569462A-2568-426E-8A04-290A0F74BD9A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Param2Tree", "Param2Tree\Param2Tree.csproj", "{01860593-0D74-48B3-8E27-0B9AD049184E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Param2Txt", "Param2Tree\Param2Txt.csproj", "{01860593-0D74-48B3-8E27-0B9AD049184E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

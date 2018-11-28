@@ -5,7 +5,7 @@ using System.IO;
 
 namespace paracobNet
 {
-    class ParamArray : IParam
+    public class ParamArray : IParam
     {
         public ParamType TypeKey { get; } = ParamType.array;
         
