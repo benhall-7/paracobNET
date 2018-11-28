@@ -22,6 +22,9 @@ namespace paracobNet
                 case ParamType.boolean:
                     Value = reader.ReadByte() != 0;
                     break;
+                case ParamType.int8:
+                    Value = reader.ReadSByte();
+                    break;
                 case ParamType.uint8:
                     Value = reader.ReadByte();
                     break;

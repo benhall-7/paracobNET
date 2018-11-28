@@ -7,6 +7,7 @@ namespace paracobNet
     public enum ParamType : byte
     {
         boolean = 1,
+        int8 = 2,
         uint8 = 3,
         int16 = 4,
         uint16 = 5,

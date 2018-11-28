@@ -82,6 +82,9 @@ namespace Param2Txt
                 case ParamType.boolean:
                     str += (bool)param.Value;
                     break;
+                case ParamType.int8:
+                    str += (sbyte)param.Value;
+                    break;
                 case ParamType.uint8:
                     str += (byte)param.Value;
                     break;
