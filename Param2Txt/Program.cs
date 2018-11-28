@@ -1,6 +1,7 @@
-﻿using System;
-using paracobNet;
+﻿using paracobNet;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace Param2Txt
@@ -9,25 +10,39 @@ namespace Param2Txt
     {
         static void Main(string[] args)
         {
-            string input = "";
+            Stopwatch timer = new Stopwatch();
+            string input = null;
             string output = "output.txt";
             for (int i = 0; i < args.Length; i++)
             {
-                if (File.Exists(args[i]))
-                    input = args[i];
-                else if (args[i] == "-o")
+                if (args[i] == "-o")
                     output = args[++i];
+                else if (File.Exists(args[i]))
+                    input = args[i];
                 else
                 {
-                    Console.WriteLine("usage: Param2Txt.exe [input]");
-                    Console.WriteLine("  optional: -o [output]");
+                    HelpText();
                     return;
                 }
             }
+            if (input == null)
+            {
+                Console.WriteLine("No target file specified");
+                HelpText();
+                return;
+            }
             Console.WriteLine("Initializing...");
+            timer.Start();
             ParamFile file = new ParamFile(input);
             Console.WriteLine("Writing...");
             File.WriteAllLines(output, RepresentParam(file.Root as ParamStruct).ToArray());
+            timer.Stop();
+            Console.WriteLine("Operation finished in {0} seconds", timer.Elapsed.TotalSeconds);
+        }
+        static void HelpText()
+        {
+            Console.WriteLine("usage: Param2Txt.exe [input]");
+            Console.WriteLine("  optional: -o [output]");
         }
 
         static List<string> RepresentStruct(ParamStruct param)
