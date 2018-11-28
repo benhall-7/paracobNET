@@ -74,7 +74,7 @@ namespace Param2Txt
             return list;
         }
 
-        static string RepresentValue(ParamValue param)
+        static List<string> RepresentValue(ParamValue param)
         {
             string str = "(" + param.TypeKey.ToString() + ")";
             switch (param.TypeKey)
@@ -101,13 +101,13 @@ namespace Param2Txt
                     str += (string)param.Value;
                     break;
             }
-            return str;
+            return new List<string> { str };
         }
 
         static List<string> RepresentParam(IParam param)
         {
             if (param is ParamValue)
-                return new List<string> { RepresentValue(param as ParamValue) };
+                return RepresentValue(param as ParamValue);
 
             List<string> list;
             if (param is ParamArray)
