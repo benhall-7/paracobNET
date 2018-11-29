@@ -9,7 +9,7 @@ namespace paracobNet
         {
             byte key = reader.ReadByte();
             if (!Enum.IsDefined(typeof(ParamType), key))
-                throw new NotImplementedException($"Unimplemented param type '{key}' at {reader.BaseStream.Position}");
+                throw new NotImplementedException($"Unimplemented param type '{key}' at {reader.BaseStream.Position - 1}");
             ParamType type = (ParamType)key;
             IParam param;
             switch (type)

@@ -10,7 +10,6 @@ namespace paracobNet
         public ParamType TypeKey { get; } = ParamType.array;
         
         public IParam[] Nodes { get; private set; }
-        public Type NodeType { get; private set; }
 
         public void Read(BinaryReader reader)
         {

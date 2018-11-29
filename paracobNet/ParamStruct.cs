@@ -33,6 +33,15 @@ namespace paracobNet
             }
         }
 
+        public StructNode[] GetNodes(ParamType type)
+        {
+            List<StructNode> list = new List<StructNode>();
+            foreach (var node in Nodes)
+                if (node.Node.TypeKey == type)
+                    list.Add(node);
+            return list.ToArray();
+        }
+
         public class StructNode
         {
             public string Name { get; set; } = "";//allows user setting in case no matching name is found
