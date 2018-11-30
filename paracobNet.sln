@@ -5,7 +5,9 @@ VisualStudioVersion = 15.0.28010.2016
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Param2Txt", "Param2Txt\Param2Txt.csproj", "{14F4ADFB-5EAC-4B10-9B0B-A446A3F1F97A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "paracobNET", "paracobNET\paracobNET.csproj", "{353F9F36-DF0C-40FE-ACA9-760B0913FB2B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "paracobNET", "paracobNET\paracobNET.csproj", "{353F9F36-DF0C-40FE-ACA9-760B0913FB2B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Param2Form", "Param2Form\Param2Form.csproj", "{627EBE7F-DE21-4988-895A-9DEC335895AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{353F9F36-DF0C-40FE-ACA9-760B0913FB2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{353F9F36-DF0C-40FE-ACA9-760B0913FB2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{353F9F36-DF0C-40FE-ACA9-760B0913FB2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{627EBE7F-DE21-4988-895A-9DEC335895AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{627EBE7F-DE21-4988-895A-9DEC335895AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{627EBE7F-DE21-4988-895A-9DEC335895AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{627EBE7F-DE21-4988-895A-9DEC335895AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
