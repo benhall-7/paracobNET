@@ -34,12 +34,15 @@
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.param_TreeView = new System.Windows.Forms.TreeView();
             this.param_DataGridView = new System.Windows.Forms.DataGridView();
+            this.statusStrip = new System.Windows.Forms.StatusStrip();
+            this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
             this.splitContainer.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.param_DataGridView)).BeginInit();
+            this.statusStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -48,7 +51,7 @@
             this.fileToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(800, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(784, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -69,7 +72,9 @@
             // 
             // splitContainer
             // 
-            this.splitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.splitContainer.Location = new System.Drawing.Point(0, 24);
             this.splitContainer.Name = "splitContainer";
             // 
@@ -80,8 +85,8 @@
             // splitContainer.Panel2
             // 
             this.splitContainer.Panel2.Controls.Add(this.param_DataGridView);
-            this.splitContainer.Size = new System.Drawing.Size(800, 426);
-            this.splitContainer.SplitterDistance = 266;
+            this.splitContainer.Size = new System.Drawing.Size(784, 362);
+            this.splitContainer.SplitterDistance = 188;
             this.splitContainer.TabIndex = 1;
             // 
             // param_TreeView
@@ -90,8 +95,9 @@
             this.param_TreeView.Location = new System.Drawing.Point(0, 0);
             this.param_TreeView.MinimumSize = new System.Drawing.Size(100, 50);
             this.param_TreeView.Name = "param_TreeView";
-            this.param_TreeView.Size = new System.Drawing.Size(266, 426);
+            this.param_TreeView.Size = new System.Drawing.Size(188, 362);
             this.param_TreeView.TabIndex = 0;
+            this.param_TreeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.param_TreeView_AfterSelect);
             // 
             // param_DataGridView
             // 
@@ -99,20 +105,37 @@
             this.param_DataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.param_DataGridView.Location = new System.Drawing.Point(0, 0);
             this.param_DataGridView.Name = "param_DataGridView";
-            this.param_DataGridView.Size = new System.Drawing.Size(530, 426);
+            this.param_DataGridView.Size = new System.Drawing.Size(592, 362);
             this.param_DataGridView.TabIndex = 0;
+            // 
+            // statusStrip
+            // 
+            this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripStatusLabel});
+            this.statusStrip.Location = new System.Drawing.Point(0, 389);
+            this.statusStrip.Name = "statusStrip";
+            this.statusStrip.Size = new System.Drawing.Size(784, 22);
+            this.statusStrip.TabIndex = 2;
+            this.statusStrip.Text = "statusStrip";
+            // 
+            // toolStripStatusLabel
+            // 
+            this.toolStripStatusLabel.Name = "toolStripStatusLabel";
+            this.toolStripStatusLabel.Size = new System.Drawing.Size(149, 17);
+            this.toolStripStatusLabel.Text = "Default text pls do not read";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(784, 411);
+            this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.splitContainer);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.MinimumSize = new System.Drawing.Size(200, 100);
             this.Name = "MainForm";
-            this.Text = "Form1";
+            this.Text = "Param2Form";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.splitContainer.Panel1.ResumeLayout(false);
@@ -120,6 +143,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).EndInit();
             this.splitContainer.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.param_DataGridView)).EndInit();
+            this.statusStrip.ResumeLayout(false);
+            this.statusStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -133,6 +158,8 @@
         private System.Windows.Forms.SplitContainer splitContainer;
         private System.Windows.Forms.TreeView param_TreeView;
         private System.Windows.Forms.DataGridView param_DataGridView;
+        private System.Windows.Forms.StatusStrip statusStrip;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel;
     }
 }
 
