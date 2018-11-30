@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace paracobNet
+namespace paracobNET
 {
     public enum ParamType : byte
     {

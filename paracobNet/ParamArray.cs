@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace paracobNet
+namespace paracobNET
 {
     public class ParamArray : IParam
     {

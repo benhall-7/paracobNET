@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace paracobNet
+namespace paracobNET
 {
     static class Util
     {
