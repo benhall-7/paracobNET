@@ -117,6 +117,7 @@ namespace Param2Form
                         break;
                     }
             }
+            param_DataGridView.AutoResizeColumns();
         }
     }
 }
