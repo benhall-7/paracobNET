@@ -43,7 +43,7 @@ namespace paracobNET
                 case ParamType.float32:
                     Value = reader.ReadSingle();
                     break;
-                case ParamType.uint32_2:
+                case ParamType.hash:
                     Value = reader.ReadUInt32();
                     break;
                 case ParamType.str:

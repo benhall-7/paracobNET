@@ -102,9 +102,9 @@ namespace Param2Form
                         foreach (var node in structure.Nodes)
                         {
                             DataRow row = param_tbl.NewRow();
-                            row["Hash"] = "0x" + node.Hash.ToString("x8");
-                            row["Length"] = node.StrLength;
-                            row["Name"] = node.Name;
+                            row["Hash"] = "0x" + file.HashData[node.HashIndex].Hash.ToString("x8");
+                            row["Length"] = file.HashData[node.HashIndex].Length;
+                            row["Name"] = file.HashData[node.HashIndex].Name;
                             row["Type"] = node.Node.TypeKey.ToString();
                             if (node.Node is ParamValue)
                                 row["Value"] = (node.Node as ParamValue).Value;
@@ -124,9 +124,10 @@ namespace Param2Form
                         if (isParentStruct)
                             nodeInfo = (e.Node.Parent.Tag as ParamStruct).Nodes[e.Node.Index];
                         DataRow row = param_tbl.NewRow();
-                        row["Hash"] = isParentStruct ? "0x" + nodeInfo.Hash.ToString("x8") : "";
-                        row["Length"] = isParentStruct ? nodeInfo.StrLength.ToString() : "";
-                        row["Name"] = isParentStruct ? nodeInfo.Name : "";
+                        HashEntry hashData = file.HashData[nodeInfo.HashIndex];
+                        row["Hash"] = isParentStruct ? "0x" + hashData.Hash.ToString("x8") : "";
+                        row["Length"] = isParentStruct ? hashData.Length.ToString() : "";
+                        row["Name"] = isParentStruct ? hashData.Name : "";
                         row["Type"] = param.TypeKey.ToString();
                         if (param is ParamValue)
                             row["Value"] = (param as ParamValue).Value;

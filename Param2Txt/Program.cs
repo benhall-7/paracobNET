@@ -8,6 +8,8 @@ namespace Param2Txt
 {
     class Program
     {
+        static ParamFile file;
+
         static void Main(string[] args)
         {
             Stopwatch timer = new Stopwatch();
@@ -33,7 +35,7 @@ namespace Param2Txt
             }
             Console.WriteLine("Initializing...");
             timer.Start();
-            ParamFile file = new ParamFile(input);
+            file = new ParamFile(input);
             Console.WriteLine("Writing...");
             File.WriteAllLines(output, RepresentParam(file.Root as ParamStruct).ToArray());
             timer.Stop();
@@ -52,7 +54,7 @@ namespace Param2Txt
             foreach (var node in param.Nodes)
             {
                 List<string> nodeRep = RepresentParam(node.Node);
-                nodeRep[0] = "<0x" + node.Hash.ToString("x8") + ">" + nodeRep[0];
+                nodeRep[0] = "<0x" + file.HashData[node.HashIndex].Hash.ToString("x8") + ">" + nodeRep[0];
                 nodeRep[nodeRep.Count - 1] += ",";
                 foreach (var line in nodeRep)
                     list.Add(line);
@@ -103,7 +105,7 @@ namespace Param2Txt
                 case ParamType.float32:
                     str += (float)param.Value;
                     break;
-                case ParamType.uint32_2:
+                case ParamType.hash:
                     str += (uint)param.Value;
                     break;
                 case ParamType.str:

@@ -14,7 +14,7 @@ namespace paracobNET
         int32 = 6,
         uint32 = 7,
         float32 = 8,
-        uint32_2 = 9,
+        hash = 9,
         str = 10,
         array = 11,
         structure = 12
