@@ -19,7 +19,7 @@ namespace Param2Form
         public MainForm()
         {
             InitializeComponent();
-            toolStripStatusLabel.Text = "";
+            groupBoxRight.Visible = false;
             param_tbl = new DataTable();
             param_tbl.Columns.Add("Hash");
             param_tbl.Columns.Add("Length");
@@ -30,6 +30,7 @@ namespace Param2Form
             param_DataGridView.AllowUserToAddRows = false;
             param_DataGridView.AllowUserToDeleteRows = false;
             param_DataGridView.AllowUserToOrderColumns = false;
+            param_DataGridView.AutoResizeColumns();
             SetStatus("Idle");
         }
 
@@ -70,7 +71,7 @@ namespace Param2Form
             return node;
         }
 
-        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        private void openParamFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
             dialog.Filter = "param files|*";
@@ -82,6 +83,11 @@ namespace Param2Form
                 SetupTreeView();
                 SetStatus("Idle");
             }
+        }
+
+        private void openParamDatabaseToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
 
         private void param_TreeView_AfterSelect(object sender, TreeViewEventArgs e)
