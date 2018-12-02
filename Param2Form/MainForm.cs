@@ -73,10 +73,11 @@ namespace Param2Form
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
-            dialog.Filter = "param files|*.*";
+            dialog.Filter = "param files|*";
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 SetStatus("Opening " + dialog.FileName);
+                param_tbl.Clear();
                 file = new ParamFile(dialog.FileName);
                 SetupTreeView();
                 SetStatus("Idle");
@@ -88,8 +89,6 @@ namespace Param2Form
             IParam param = (IParam)e.Node.Tag;
             switch (param.TypeKey)
             {
-                default:
-                    return;
                 case ParamType.structure:
                     {
                         param_tbl.Clear();
@@ -109,6 +108,25 @@ namespace Param2Form
                                 row["Value"] = (node.Node as ParamStruct).Nodes.Length;
                             param_tbl.Rows.Add(row);
                         }
+                        break;
+                    }
+                default:
+                    {
+                        param_tbl.Clear();
+                        bool isParentStruct = e.Node.Parent != null && e.Node.Parent.Tag is ParamStruct;
+                        ParamStruct.StructNode nodeInfo = null;
+                        if (isParentStruct)
+                            nodeInfo = (e.Node.Parent.Tag as ParamStruct).Nodes[e.Node.Index];
+                        DataRow row = param_tbl.NewRow();
+                        row["Hash"] = isParentStruct ? "0x" + nodeInfo.Hash.ToString("x8") : "";
+                        row["Length"] = isParentStruct ? nodeInfo.StrLength.ToString() : "";
+                        row["Name"] = isParentStruct ? nodeInfo.Name : "";
+                        row["Type"] = param.TypeKey.ToString();
+                        if (param is ParamValue)
+                            row["Value"] = (param as ParamValue).Value;
+                        else
+                            row["Value"] = (param as ParamArray).Nodes.Length;
+                        param_tbl.Rows.Add(row);
                         break;
                     }
             }
