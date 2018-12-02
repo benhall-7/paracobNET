@@ -8,7 +8,7 @@ namespace paracobNET
     {
         public uint Hash { get; internal set; }
         public uint Length { get; internal set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
 
         public bool IsNameReal
         {

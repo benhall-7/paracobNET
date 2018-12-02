@@ -8,24 +8,45 @@ namespace Param2Form
 {
     public partial class MainForm : Form
     {
-        ParamFile file;
-        DataTable param_tbl;
+        ParamFile paramFile;
+        string paramFileName;
+        DataTable paramTbl;
+        string labelFileName;
+        const string defLabelFile = "ParamLabels.csv";
+        DataTable labelTbl;
 
         public MainForm()
         {
             InitializeComponent();
-            groupBoxRight.Visible = false;
-            param_tbl = new DataTable();
-            param_tbl.Columns.Add("Hash");
-            param_tbl.Columns.Add("Length");
-            param_tbl.Columns.Add("Name");
-            param_tbl.Columns.Add("Type");
-            param_tbl.Columns.Add("Value");
-            param_DataGridView.DataSource = param_tbl;
+
+            paramFileName = null;
+            paramTbl = new DataTable();
+            paramTbl.Columns.Add("Hash");
+            paramTbl.Columns.Add("Length");
+            paramTbl.Columns.Add("Name");
+            paramTbl.Columns.Add("Type");
+            paramTbl.Columns.Add("Value");
+            param_DataGridView.DataSource = paramTbl;
             param_DataGridView.AllowUserToAddRows = false;
             param_DataGridView.AllowUserToDeleteRows = false;
             param_DataGridView.AllowUserToOrderColumns = false;
-            param_DataGridView.AutoResizeColumns();
+            //param_DataGridView.AutoResizeColumns();
+
+            labelFileName = null;
+            labelTbl = new DataTable();
+            labelTbl.Columns.Add("Index");
+            labelTbl.Columns.Add("Hash");
+            labelTbl.Columns.Add("Length");
+            labelTbl.Columns.Add("Name");
+            label_DataGridView.DataSource = labelTbl;
+            label_DataGridView.AllowUserToAddRows = false;
+            label_DataGridView.AllowUserToDeleteRows = false;
+            label_DataGridView.AllowUserToOrderColumns = false;
+            //label_DataGridView.AutoResizeColumns();
+
+            //groupBoxRight.Visible = false;
+            openParamDatabaseToolStripMenuItem.Enabled = false;
+
             SetStatus("Idle");
         }
 
@@ -38,7 +59,7 @@ namespace Param2Form
         private void SetupTreeView()
         {
             param_TreeView.Nodes.Clear();
-            param_TreeView.Nodes.Add(Param2TreeNode(file.Root));
+            param_TreeView.Nodes.Add(Param2TreeNode(paramFile.Root));
             param_TreeView.Nodes[0].Expand();
         }
 
@@ -66,6 +87,15 @@ namespace Param2Form
             return node;
         }
 
+        private void OpenParamLabels(string filename)
+        {
+            labelFileName = filename;
+            SetStatus("Opening Labels: " + filename);
+            paramFile.ReadLabels(filename);
+            for (int i = 0; i < paramFile.HashData.Length; i++)
+                labelTbl.Rows[i]["Name"] = paramFile.HashData[i].Name;
+        }
+
         private void openParamFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog dialog = new OpenFileDialog();
@@ -73,8 +103,24 @@ namespace Param2Form
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 SetStatus("Opening Params: " + dialog.FileName);
-                param_tbl.Clear();
-                file = new ParamFile(dialog.FileName);
+                paramTbl.Clear();
+                labelTbl.Clear();
+                paramFile = new ParamFile(dialog.FileName);
+                for (int i = 0; i < paramFile.HashData.Length; i++)
+                {
+                    var hash = paramFile.HashData[i];
+                    DataRow row = labelTbl.NewRow();
+                    row["Index"] = i;
+                    row["Hash"] = "0x" + hash.Hash.ToString("x8");
+                    row["Length"] = hash.Length;
+                    row["Name"] = "";
+                    labelTbl.Rows.Add(row);
+                }
+                openParamDatabaseToolStripMenuItem.Enabled = true;
+                if (File.Exists(defLabelFile))
+                    OpenParamLabels(defLabelFile);
+                param_DataGridView.AutoResizeColumns();
+                label_DataGridView.AutoResizeColumns();
                 SetupTreeView();
                 SetStatus("Idle");
             }
@@ -86,8 +132,9 @@ namespace Param2Form
             dialog.Filter = "csv files|*.csv";
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                SetStatus("Opening Labels: " + dialog.FileName);
-                file.ReadLabels(dialog.FileName);
+                labelFileName = dialog.FileName;
+                OpenParamLabels(dialog.FileName);
+                SetStatus("Idle");
             }
         }
 
@@ -98,14 +145,14 @@ namespace Param2Form
             {
                 case ParamType.structure:
                     {
-                        param_tbl.Clear();
+                        paramTbl.Clear();
                         var structure = (ParamStruct)param;
                         foreach (var node in structure.Nodes)
                         {
-                            DataRow row = param_tbl.NewRow();
-                            row["Hash"] = "0x" + file.HashData[node.HashIndex].Hash.ToString("x8");
-                            row["Length"] = file.HashData[node.HashIndex].Length;
-                            row["Name"] = file.HashData[node.HashIndex].Name;
+                            DataRow row = paramTbl.NewRow();
+                            row["Hash"] = "0x" + paramFile.HashData[node.HashIndex].Hash.ToString("x8");
+                            row["Length"] = paramFile.HashData[node.HashIndex].Length;
+                            row["Name"] = paramFile.HashData[node.HashIndex].Name;
                             row["Type"] = node.Node.TypeKey.ToString();
                             if (node.Node is ParamValue)
                                 row["Value"] = (node.Node as ParamValue).Value;
@@ -113,31 +160,36 @@ namespace Param2Form
                                 row["Value"] = (node.Node as ParamArray).Nodes.Length;
                             else
                                 row["Value"] = (node.Node as ParamStruct).Nodes.Length;
-                            param_tbl.Rows.Add(row);
+                            paramTbl.Rows.Add(row);
                         }
                         break;
                     }
                 default:
                     {
-                        param_tbl.Clear();
-                        bool isParentStruct = e.Node.Parent != null && e.Node.Parent.Tag is ParamStruct;
+                        paramTbl.Clear();
                         ParamStruct.StructNode nodeInfo = null;
                         HashEntry hashData = null;
-                        if (isParentStruct)
+                        DataRow row = paramTbl.NewRow();
+                        if (e.Node.Parent != null && e.Node.Parent.Tag is ParamStruct)
                         {
                             nodeInfo = (e.Node.Parent.Tag as ParamStruct).Nodes[e.Node.Index];
-                            hashData = file.HashData[nodeInfo.HashIndex];
+                            hashData = paramFile.HashData[nodeInfo.HashIndex];
+                            row["Hash"] = "0x" + hashData.Hash.ToString("x8");
+                            row["Length"] = hashData.Length.ToString();
+                            row["Name"] = hashData.Name;
                         }
-                        DataRow row = param_tbl.NewRow();
-                        row["Hash"] = isParentStruct ? "0x" + hashData.Hash.ToString("x8") : "";
-                        row["Length"] = isParentStruct ? hashData.Length.ToString() : "";
-                        row["Name"] = isParentStruct ? hashData.Name : "";
+                        else
+                        {
+                            row["Hash"] = "NA";
+                            row["Length"] = "NA";
+                            row["Name"] = "NA";
+                        }
                         row["Type"] = param.TypeKey.ToString();
                         if (param is ParamValue)
                             row["Value"] = (param as ParamValue).Value;
                         else
                             row["Value"] = (param as ParamArray).Nodes.Length;
-                        param_tbl.Rows.Add(row);
+                        paramTbl.Rows.Add(row);
                         break;
                     }
             }

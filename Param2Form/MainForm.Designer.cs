@@ -31,21 +31,21 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openParamFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openParamDatabaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.groupBoxLeft = new System.Windows.Forms.GroupBox();
             this.param_TreeView = new System.Windows.Forms.TreeView();
             this.groupBoxRight = new System.Windows.Forms.GroupBox();
             this.label_DataGridView = new System.Windows.Forms.DataGridView();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.groupBoxMiddle = new System.Windows.Forms.GroupBox();
             this.param_DataGridView = new System.Windows.Forms.DataGridView();
-            this.openParamDatabaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip.SuspendLayout();
             this.groupBoxLeft.SuspendLayout();
             this.groupBoxRight.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.label_DataGridView)).BeginInit();
-            this.groupBox1.SuspendLayout();
+            this.groupBoxMiddle.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.param_DataGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -55,7 +55,7 @@
             this.fileToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(834, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(884, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -71,9 +71,16 @@
             // openParamFileToolStripMenuItem
             // 
             this.openParamFileToolStripMenuItem.Name = "openParamFileToolStripMenuItem";
-            this.openParamFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openParamFileToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
             this.openParamFileToolStripMenuItem.Text = "Open Param File";
             this.openParamFileToolStripMenuItem.Click += new System.EventHandler(this.openParamFileToolStripMenuItem_Click);
+            // 
+            // openParamDatabaseToolStripMenuItem
+            // 
+            this.openParamDatabaseToolStripMenuItem.Name = "openParamDatabaseToolStripMenuItem";
+            this.openParamDatabaseToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
+            this.openParamDatabaseToolStripMenuItem.Text = "Open Param Database";
+            this.openParamDatabaseToolStripMenuItem.Click += new System.EventHandler(this.openParamDatabaseToolStripMenuItem_Click);
             // 
             // statusStrip
             // 
@@ -81,7 +88,7 @@
             this.toolStripStatusLabel});
             this.statusStrip.Location = new System.Drawing.Point(0, 389);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(834, 22);
+            this.statusStrip.Size = new System.Drawing.Size(884, 22);
             this.statusStrip.TabIndex = 2;
             this.statusStrip.Text = "statusStrip";
             // 
@@ -115,9 +122,9 @@
             // 
             this.groupBoxRight.Controls.Add(this.label_DataGridView);
             this.groupBoxRight.Dock = System.Windows.Forms.DockStyle.Right;
-            this.groupBoxRight.Location = new System.Drawing.Point(634, 24);
+            this.groupBoxRight.Location = new System.Drawing.Point(534, 24);
             this.groupBoxRight.Name = "groupBoxRight";
-            this.groupBoxRight.Size = new System.Drawing.Size(200, 365);
+            this.groupBoxRight.Size = new System.Drawing.Size(350, 365);
             this.groupBoxRight.TabIndex = 5;
             this.groupBoxRight.TabStop = false;
             this.groupBoxRight.Text = "Labels";
@@ -128,19 +135,20 @@
             this.label_DataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label_DataGridView.Location = new System.Drawing.Point(3, 16);
             this.label_DataGridView.Name = "label_DataGridView";
-            this.label_DataGridView.Size = new System.Drawing.Size(194, 346);
+            this.label_DataGridView.Size = new System.Drawing.Size(344, 346);
             this.label_DataGridView.TabIndex = 0;
             // 
-            // groupBox1
+            // groupBoxMiddle
             // 
-            this.groupBox1.Controls.Add(this.param_DataGridView);
-            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox1.Location = new System.Drawing.Point(200, 24);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(434, 365);
-            this.groupBox1.TabIndex = 4;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Param Data";
+            this.groupBoxMiddle.Controls.Add(this.param_DataGridView);
+            this.groupBoxMiddle.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupBoxMiddle.Location = new System.Drawing.Point(200, 24);
+            this.groupBoxMiddle.MinimumSize = new System.Drawing.Size(50, 0);
+            this.groupBoxMiddle.Name = "groupBoxMiddle";
+            this.groupBoxMiddle.Size = new System.Drawing.Size(334, 365);
+            this.groupBoxMiddle.TabIndex = 4;
+            this.groupBoxMiddle.TabStop = false;
+            this.groupBoxMiddle.Text = "Param Data";
             // 
             // param_DataGridView
             // 
@@ -148,28 +156,21 @@
             this.param_DataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.param_DataGridView.Location = new System.Drawing.Point(3, 16);
             this.param_DataGridView.Name = "param_DataGridView";
-            this.param_DataGridView.Size = new System.Drawing.Size(428, 346);
+            this.param_DataGridView.Size = new System.Drawing.Size(328, 346);
             this.param_DataGridView.TabIndex = 0;
-            // 
-            // openParamDatabaseToolStripMenuItem
-            // 
-            this.openParamDatabaseToolStripMenuItem.Name = "openParamDatabaseToolStripMenuItem";
-            this.openParamDatabaseToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
-            this.openParamDatabaseToolStripMenuItem.Text = "Open Param Database";
-            this.openParamDatabaseToolStripMenuItem.Click += new System.EventHandler(this.openParamDatabaseToolStripMenuItem_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(834, 411);
-            this.Controls.Add(this.groupBox1);
+            this.ClientSize = new System.Drawing.Size(884, 411);
+            this.Controls.Add(this.groupBoxMiddle);
             this.Controls.Add(this.groupBoxRight);
             this.Controls.Add(this.groupBoxLeft);
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
-            this.MinimumSize = new System.Drawing.Size(500, 100);
+            this.MinimumSize = new System.Drawing.Size(100, 100);
             this.Name = "MainForm";
             this.Text = "Param2Form";
             this.menuStrip1.ResumeLayout(false);
@@ -179,7 +180,7 @@
             this.groupBoxLeft.ResumeLayout(false);
             this.groupBoxRight.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.label_DataGridView)).EndInit();
-            this.groupBox1.ResumeLayout(false);
+            this.groupBoxMiddle.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.param_DataGridView)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -197,7 +198,7 @@
         private System.Windows.Forms.GroupBox groupBoxRight;
         private System.Windows.Forms.TreeView param_TreeView;
         private System.Windows.Forms.DataGridView label_DataGridView;
-        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox groupBoxMiddle;
         private System.Windows.Forms.DataGridView param_DataGridView;
         private System.Windows.Forms.ToolStripMenuItem openParamDatabaseToolStripMenuItem;
     }

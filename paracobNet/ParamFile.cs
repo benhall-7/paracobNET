@@ -71,6 +71,8 @@ namespace paracobNET
             {
                 if (labels.ContainsKey(hash.Hash))
                     hash.Name = labels[hash.Hash];
+                else
+                    hash.Name = "";
             }
         }
     }
