@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using paracobNET;
+using System;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows.Forms;
-using paracobNET;
 
 namespace Param2Form
 {
@@ -77,7 +72,7 @@ namespace Param2Form
             dialog.Filter = "param files|*";
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                SetStatus("Opening " + dialog.FileName);
+                SetStatus("Opening Params: " + dialog.FileName);
                 param_tbl.Clear();
                 file = new ParamFile(dialog.FileName);
                 SetupTreeView();
@@ -87,7 +82,13 @@ namespace Param2Form
 
         private void openParamDatabaseToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Filter = "csv files|*.csv";
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                SetStatus("Opening Labels: " + dialog.FileName);
+                file.ReadLabels(dialog.FileName);
+            }
         }
 
         private void param_TreeView_AfterSelect(object sender, TreeViewEventArgs e)
@@ -121,10 +122,13 @@ namespace Param2Form
                         param_tbl.Clear();
                         bool isParentStruct = e.Node.Parent != null && e.Node.Parent.Tag is ParamStruct;
                         ParamStruct.StructNode nodeInfo = null;
+                        HashEntry hashData = null;
                         if (isParentStruct)
+                        {
                             nodeInfo = (e.Node.Parent.Tag as ParamStruct).Nodes[e.Node.Index];
+                            hashData = file.HashData[nodeInfo.HashIndex];
+                        }
                         DataRow row = param_tbl.NewRow();
-                        HashEntry hashData = file.HashData[nodeInfo.HashIndex];
                         row["Hash"] = isParentStruct ? "0x" + hashData.Hash.ToString("x8") : "";
                         row["Length"] = isParentStruct ? hashData.Length.ToString() : "";
                         row["Name"] = isParentStruct ? hashData.Name : "";

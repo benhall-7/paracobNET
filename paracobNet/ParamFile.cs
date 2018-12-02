@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Collections.Generic;
 
 namespace paracobNET
 {
@@ -48,6 +49,28 @@ namespace paracobNET
                 }
                 else
                     throw new InvalidDataException("File does not have a root");
+            }
+        }
+
+        public void ReadLabels(string filepath)
+        {
+            Dictionary<uint, string> labels = new Dictionary<uint, string>();
+            foreach (var line in File.ReadAllLines(filepath))
+            {
+                string[] splits = line.Split(',');
+                try
+                {
+                    if (splits[0].Substring(0, 2) == "0x")
+                        labels.Add(uint.Parse(splits[0].Substring(2), System.Globalization.NumberStyles.HexNumber),
+                            splits[1]);
+                    else throw new InvalidDataException();
+                }
+                catch { Console.WriteLine($"Parse error in {filepath}, \"{line}\""); }
+            }
+            foreach (var hash in HashData)
+            {
+                if (labels.ContainsKey(hash.Hash))
+                    hash.Name = labels[hash.Hash];
             }
         }
     }
