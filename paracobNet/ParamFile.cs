@@ -9,8 +9,9 @@ namespace paracobNET
         const string magic = "paracobn";
 
         public ParamStruct Root { get; private set; }
-        public HashEntry[] HashData { get; private set; }
 
+        static internal HashEntry[] HashData { get; private set; }
+        static internal bool sortStruct { get; set; } = false;
         static internal uint HashTableSize { get; set; }
         static internal uint RefTableSize { get; set; }
         static internal uint HashStart
@@ -26,7 +27,16 @@ namespace paracobNET
             get { return 0x10 + HashTableSize + RefTableSize; }
         }
 
+        public ParamFile(string filepath, bool sortStruct)
+        {
+            ParamFile.sortStruct = sortStruct;
+            Initialize(filepath);
+        }
         public ParamFile(string filepath)
+        {
+            Initialize(filepath);
+        }
+        public void Initialize(string filepath)
         {
             using (BinaryReader reader = new BinaryReader(File.OpenRead(filepath)))
             {
@@ -36,11 +46,7 @@ namespace paracobNET
                 RefTableSize = reader.ReadUInt32();
                 HashData = new HashEntry[HashTableSize / 8];
                 for (int i = 0; i < HashData.Length; i++)
-                    HashData[i] = new HashEntry()
-                    {
-                        Hash = reader.ReadUInt32(),
-                        Length = reader.ReadUInt32()
-                    };
+                    HashData[i] = new HashEntry(reader.ReadUInt64());
                 reader.BaseStream.Seek(ParamStart, SeekOrigin.Begin);
                 if ((ParamType)reader.ReadByte() == ParamType.structure)
                 {

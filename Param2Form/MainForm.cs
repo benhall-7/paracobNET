@@ -89,11 +89,11 @@ namespace Param2Form
 
         private void OpenParamLabels(string filename)
         {
-            labelFileName = filename;
             SetStatus("Opening Labels: " + filename);
             paramFile.ReadLabels(filename);
             for (int i = 0; i < paramFile.HashData.Length; i++)
                 labelTbl.Rows[i]["Name"] = paramFile.HashData[i].Name;
+            labelFileName = filename;
         }
 
         private void openParamFileToolStripMenuItem_Click(object sender, EventArgs e)
@@ -105,7 +105,7 @@ namespace Param2Form
                 SetStatus("Opening Params: " + dialog.FileName);
                 paramTbl.Clear();
                 labelTbl.Clear();
-                paramFile = new ParamFile(dialog.FileName);
+                paramFile = new ParamFile(dialog.FileName, true);
                 for (int i = 0; i < paramFile.HashData.Length; i++)
                 {
                     var hash = paramFile.HashData[i];

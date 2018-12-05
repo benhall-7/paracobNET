@@ -43,8 +43,8 @@ namespace paracobNET
                 case ParamType.float32:
                     Value = reader.ReadSingle();
                     break;
-                case ParamType.hash:
-                    Value = reader.ReadUInt32();
+                case ParamType.hash40:
+                    Value = ParamFile.HashData[reader.ReadUInt32()];
                     break;
                 case ParamType.str:
                     Value = Util.ReadStringAsync(reader, ParamFile.RefStart + reader.ReadUInt32());
