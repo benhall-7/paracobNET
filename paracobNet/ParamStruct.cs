@@ -21,12 +21,11 @@ namespace paracobNET
             for (int i = 0; i < Nodes.Length; i++)
                 pairs.Add(reader.ReadUInt32(), reader.ReadUInt32());
             var hashIndeces = pairs.Keys.ToList();
-            if (ParamFile.sortStruct)
-                hashIndeces.Sort();
+            hashIndeces.Sort();
             for (int i = 0; i < Nodes.Length; i++)
             {
                 reader.BaseStream.Seek(startPos + pairs[hashIndeces[i]], SeekOrigin.Begin);
-                Nodes[i] = new StructNode(ParamFile.HashData[hashIndeces[i]], reader);
+                Nodes[i] = new StructNode(ParamFile.AllHashes[hashIndeces[i]], reader);
             }
         }
 
@@ -41,12 +40,12 @@ namespace paracobNET
 
         public class StructNode
         {
-            public HashEntry Hash { get; private set; }
+            public HashEntry HashEntry { get; private set; }
             public IParam Node { get; private set; }
 
             public StructNode(HashEntry hash, BinaryReader reader)
             {
-                Hash = hash;
+                HashEntry = hash;
                 Node = Util.ReadParam(reader);
             }
         }

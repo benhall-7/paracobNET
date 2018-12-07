@@ -44,12 +44,19 @@ namespace paracobNET
                     Value = reader.ReadSingle();
                     break;
                 case ParamType.hash40:
-                    Value = ParamFile.HashData[reader.ReadUInt32()];
+                    Value = ParamFile.AllHashes[reader.ReadUInt32()];
                     break;
                 case ParamType.str:
                     Value = Util.ReadStringAsync(reader, ParamFile.RefStart + reader.ReadUInt32());
                     break;
             }
+        }
+
+        public string ToString(Dictionary<uint, string> labels)
+        {
+            if (TypeKey == ParamType.hash40)
+                return ((HashEntry)Value).ToString(labels);
+            return Value.ToString();
         }
     }
 }

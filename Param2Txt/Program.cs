@@ -54,7 +54,7 @@ namespace Param2Txt
             foreach (var node in param.Nodes)
             {
                 List<string> nodeRep = RepresentParam(node.Node);
-                nodeRep[0] = "<0x" + node.Hash.ToString() + ">" + nodeRep[0];
+                nodeRep[0] = "<0x" + node.HashEntry.ToString() + ">" + nodeRep[0];
                 nodeRep[nodeRep.Count - 1] += ",";
                 foreach (var line in nodeRep)
                     list.Add(line);
