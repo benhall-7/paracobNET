@@ -29,14 +29,13 @@ namespace paracobNET
             }
         }
 
-        //public StructNode[] GetNodes(ParamType type)
-        //{
-        //    List<StructNode> list = new List<StructNode>();
-        //    foreach (var node in Nodes)
-        //        if (node.Node.TypeKey == type)
-        //            list.Add(node);
-        //    return list.ToArray();
-        //}
+        public IParam GetNode(uint hash)
+        {
+            foreach (var node in Nodes)
+                if (node.HashEntry.Hash == hash)
+                    return node.Node;
+            return null;
+        }
 
         public class StructNode
         {

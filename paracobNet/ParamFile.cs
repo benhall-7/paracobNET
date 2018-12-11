@@ -10,28 +10,29 @@ namespace paracobNET
 
         public ParamStruct Root { get; private set; }
 
+        #region global_disasm
         static internal HashEntry[] AllHashes { get; private set; }
         static internal uint HashTableSize { get; set; }
         static internal uint RefTableSize { get; set; }
-        static internal uint HashStart
-        {
-            get { return 0x10; }
-        }
-        static internal uint RefStart
-        {
-            get { return 0x10 + HashTableSize; }
-        }
-        static internal uint ParamStart
-        {
-            get { return 0x10 + HashTableSize + RefTableSize; }
-        }
-        
+        static internal uint HashStart { get { return 0x10; } }
+        static internal uint RefStart { get { return 0x10 + HashTableSize; } }
+        static internal uint ParamStart { get { return 0x10 + HashTableSize + RefTableSize; } }
+        #endregion
+
+        #region global_asm
+        //once each is finished being written, append to each other and write to file
+        static internal MemoryStream writerHeader;//header stream
+        static internal MemoryStream writerTable;//hash table and reference table stream
+        static internal MemoryStream writerParam;//param stream
+        #endregion
+
         public ParamFile(string filepath)
         {
             using (BinaryReader reader = new BinaryReader(File.OpenRead(filepath)))
             {
-                if (Util.ReadStringDirect(reader, 8) != magic)
-                    throw new InvalidDataException("File contains an invalid header");
+                for (int i = 0; i < magic.Length; i++)
+                    if (reader.ReadByte() != (byte)magic[i])
+                        throw new InvalidDataException("File contains an invalid header");
                 HashTableSize = reader.ReadUInt32();
                 RefTableSize = reader.ReadUInt32();
                 AllHashes = new HashEntry[HashTableSize / 8];
@@ -45,6 +46,18 @@ namespace paracobNET
                 }
                 else
                     throw new InvalidDataException("File does not have a root");
+            }
+            AllHashes = null;
+        }
+
+        public void Save(string filepath)
+        {
+            using (writerHeader = new MemoryStream())
+            using (writerTable = new MemoryStream())
+            using (writerParam = new MemoryStream())
+            {
+                for (int i = 0; i < 8; i++)
+                    writerHeader.WriteByte((byte)magic[i]);
             }
         }
     }

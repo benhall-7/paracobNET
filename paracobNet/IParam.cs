@@ -8,7 +8,5 @@ namespace paracobNET
     public interface IParam
     {
         ParamType TypeKey { get; }
-        
-        void Read(BinaryReader reader);
     }
 }

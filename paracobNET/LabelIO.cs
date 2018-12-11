@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Globalization;
 using System.IO;
 
 namespace paracobNET
@@ -16,13 +16,20 @@ namespace paracobNET
                 try
                 {
                     if (splits[0].Substring(0, 2) == "0x")
-                        labels.Add(uint.Parse(splits[0].Substring(2), System.Globalization.NumberStyles.HexNumber),
-                            splits[1]);
+                        labels.Add(uint.Parse(splits[0].Substring(2), NumberStyles.HexNumber), splits[1]);
                     else throw new InvalidDataException();
                 }
                 catch { Console.WriteLine($"Parse error in {filepath}, \"{line}\""); }
             }
             return labels;
+        }
+
+        public static void WriteLabels(string filepath, Dictionary<uint, string> labels)
+        {
+            List<string> lines = new List<string>();
+            foreach (var label in labels)
+                lines.Add($"0x{label.Key.ToString("x8")},{label.Value}");
+            File.WriteAllLines(filepath, lines);
         }
     }
 }

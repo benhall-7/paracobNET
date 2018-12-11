@@ -16,23 +16,18 @@ namespace paracobNET
             {
                 case ParamType.array:
                     param = new ParamArray();
+                    (param as ParamArray).Read(reader);
                     break;
                 case ParamType.structure:
                     param = new ParamStruct();
+                    (param as ParamStruct).Read(reader);
                     break;
                 default:
                     param = new ParamValue(type);
+                    (param as ParamValue).Read(reader);
                     break;
             }
-            param.Read(reader);
             return param;
-        }
-        public static string ReadStringDirect(BinaryReader reader, uint len)
-        {
-            string s = "";
-            for (int i = 0; i < len; i++)
-                s += reader.ReadChar();
-            return s;
         }
         public static string ReadStringAsync(BinaryReader reader, uint position)
         {
