@@ -12,8 +12,9 @@ namespace paracobNET
         
         public StructNode[] Nodes { get; private set; }
 
-        public void Read(BinaryReader reader)
+        internal void Read()
         {
+            var reader = ParamFile.reader;
             uint startPos = (uint)reader.BaseStream.Position - 1;
             Nodes = new StructNode[reader.ReadUInt32()];
             reader.BaseStream.Seek(reader.ReadUInt32() + ParamFile.RefStart, SeekOrigin.Begin);

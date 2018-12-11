@@ -16,15 +16,15 @@ namespace paracobNET
             {
                 case ParamType.array:
                     param = new ParamArray();
-                    (param as ParamArray).Read(reader);
+                    (param as ParamArray).Read();
                     break;
                 case ParamType.structure:
                     param = new ParamStruct();
-                    (param as ParamStruct).Read(reader);
+                    (param as ParamStruct).Read();
                     break;
                 default:
                     param = new ParamValue(type);
-                    (param as ParamValue).Read(reader);
+                    (param as ParamValue).Read();
                     break;
             }
             return param;
@@ -38,6 +38,12 @@ namespace paracobNET
                 s += c;
             reader.BaseStream.Seek(returnTo, SeekOrigin.Begin);
             return s;
+        }
+        public static void WriteString(MemoryStream writer, string word)
+        {
+            for (int i = 0; i < word.Length; i++)
+                writer.WriteByte((byte)word[i]);
+            writer.WriteByte(0);
         }
         public static uint CRC32(string word)
         {

@@ -11,6 +11,7 @@ namespace paracobNET
         public ParamStruct Root { get; private set; }
 
         #region global_disasm
+        static internal BinaryReader reader { get; set; }
         static internal HashEntry[] AllHashes { get; private set; }
         static internal uint HashTableSize { get; set; }
         static internal uint RefTableSize { get; set; }
@@ -21,14 +22,14 @@ namespace paracobNET
 
         #region global_asm
         //once each is finished being written, append to each other and write to file
-        static internal MemoryStream writerHeader;//header stream
-        static internal MemoryStream writerTable;//hash table and reference table stream
-        static internal MemoryStream writerParam;//param stream
+        static internal MemoryStream writerHeader { get; set; }//header stream
+        static internal MemoryStream writerTable { get; set; }//hash table and reference table stream
+        static internal MemoryStream writerParam { get; set; }//param stream
         #endregion
 
         public ParamFile(string filepath)
         {
-            using (BinaryReader reader = new BinaryReader(File.OpenRead(filepath)))
+            using (reader = new BinaryReader(File.OpenRead(filepath)))
             {
                 for (int i = 0; i < magic.Length; i++)
                     if (reader.ReadByte() != (byte)magic[i])
@@ -42,7 +43,7 @@ namespace paracobNET
                 if ((ParamType)reader.ReadByte() == ParamType.structure)
                 {
                     Root = new ParamStruct();
-                    Root.Read(reader);
+                    Root.Read();
                 }
                 else
                     throw new InvalidDataException("File does not have a root");

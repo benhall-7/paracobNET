@@ -11,8 +11,9 @@ namespace paracobNET
         
         public IParam[] Nodes { get; private set; }
 
-        public void Read(BinaryReader reader)
+        internal void Read()
         {
+            var reader = ParamFile.reader;
             uint startPos = (uint)reader.BaseStream.Position - 1;
             Nodes = new IParam[reader.ReadUInt32()];
             uint[] offsets = new uint[Nodes.Length];
@@ -26,6 +27,10 @@ namespace paracobNET
                 reader.BaseStream.Seek(startPos + offsets[i], SeekOrigin.Begin);
                 Nodes[i] = Util.ReadParam(reader);
             }
+        }
+        internal void Write()
+        {
+
         }
     }
 }

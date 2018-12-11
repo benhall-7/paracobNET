@@ -15,8 +15,9 @@ namespace paracobNET
             TypeKey = type;
         }
 
-        public void Read(BinaryReader reader)
+        internal void Read()
         {
+            var reader = ParamFile.reader;
             switch (TypeKey)
             {
                 case ParamType.boolean:
