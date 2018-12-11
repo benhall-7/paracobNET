@@ -14,7 +14,7 @@ namespace paracobNET
 
         internal void Read()
         {
-            var reader = ParamFile.reader;
+            var reader = ParamFile.Reader;
             uint startPos = (uint)reader.BaseStream.Position - 1;
             Nodes = new StructNode[reader.ReadUInt32()];
             reader.BaseStream.Seek(reader.ReadUInt32() + ParamFile.RefStart, SeekOrigin.Begin);
@@ -26,7 +26,25 @@ namespace paracobNET
             for (int i = 0; i < Nodes.Length; i++)
             {
                 reader.BaseStream.Seek(startPos + pairs[hashIndeces[i]], SeekOrigin.Begin);
-                Nodes[i] = new StructNode(ParamFile.AllHashes[hashIndeces[i]], reader);
+                Nodes[i] = new StructNode(ParamFile.DisasmHashTable[hashIndeces[i]], reader);
+            }
+        }
+        internal void Write()
+        {
+            uint startPos = (uint)ParamFile.WriterParam.BaseStream.Position - 1;
+            //hashes are written in order of the nodes appearance in the class
+            foreach (var node in Nodes)
+            {
+                Util.WriteHash(node.HashEntry);
+                Util.WriteParam(node.Node);
+            }
+            SortedDictionary<HashEntry, IParam> sortedNodes = new SortedDictionary<HashEntry, IParam>();
+            foreach (var node in Nodes)
+                sortedNodes.Add(node.HashEntry, node.Node);
+            //nodes are written in order of their hash40 values
+            foreach (var node in sortedNodes)
+            {
+
             }
         }
 
@@ -46,7 +64,7 @@ namespace paracobNET
             public StructNode(HashEntry hash, BinaryReader reader)
             {
                 HashEntry = hash;
-                Node = Util.ReadParam(reader);
+                Node = Util.ReadParam();
             }
         }
     }

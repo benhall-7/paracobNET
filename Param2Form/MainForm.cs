@@ -153,5 +153,10 @@ namespace Param2Form
             }
             param_DataGridView.AutoResizeColumns();
         }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            paramFile.Save();
+        }
     }
 }

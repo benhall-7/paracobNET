@@ -13,7 +13,7 @@ namespace paracobNET
 
         internal void Read()
         {
-            var reader = ParamFile.reader;
+            var reader = ParamFile.Reader;
             uint startPos = (uint)reader.BaseStream.Position - 1;
             Nodes = new IParam[reader.ReadUInt32()];
             uint[] offsets = new uint[Nodes.Length];
@@ -25,12 +25,16 @@ namespace paracobNET
             for (int i = 0; i < Nodes.Length; i++)
             {
                 reader.BaseStream.Seek(startPos + offsets[i], SeekOrigin.Begin);
-                Nodes[i] = Util.ReadParam(reader);
+                Nodes[i] = Util.ReadParam();
             }
         }
         internal void Write()
         {
-
+            uint startPos = (uint)ParamFile.WriterParam.BaseStream.Position - 1;
+            foreach (var node in Nodes)
+            {
+                Util.WriteParam(node);
+            }
         }
     }
 }

@@ -5,8 +5,9 @@ namespace paracobNET
 {
     static class Util
     {
-        public static IParam ReadParam(BinaryReader reader)
+        public static IParam ReadParam()
         {
+            var reader = ParamFile.Reader;
             byte key = reader.ReadByte();
             if (!Enum.IsDefined(typeof(ParamType), key))
                 throw new NotImplementedException($"Unimplemented param type '{key}' at {reader.BaseStream.Position - 1}");
@@ -14,13 +15,13 @@ namespace paracobNET
             IParam param;
             switch (type)
             {
-                case ParamType.array:
-                    param = new ParamArray();
-                    (param as ParamArray).Read();
-                    break;
                 case ParamType.structure:
                     param = new ParamStruct();
                     (param as ParamStruct).Read();
+                    break;
+                case ParamType.array:
+                    param = new ParamArray();
+                    (param as ParamArray).Read();
                     break;
                 default:
                     param = new ParamValue(type);
@@ -39,11 +40,37 @@ namespace paracobNET
             reader.BaseStream.Seek(returnTo, SeekOrigin.Begin);
             return s;
         }
-        public static void WriteString(MemoryStream writer, string word)
+        public static void WriteParam(IParam param)
         {
+            var writer = ParamFile.WriterParam;
+            writer.Write((byte)param.TypeKey);
+            switch (param.TypeKey)
+            {
+                case ParamType.structure:
+                    (param as ParamStruct).Write();
+                    break;
+                case ParamType.array:
+                    (param as ParamArray).Write();
+                    break;
+                default:
+                    (param as ParamValue).Write();
+                    break;
+            }
+        }
+        public static void WriteHash(HashEntry hash)
+        {
+            if (!ParamFile.AsmHashTable.Contains(hash))
+            {
+                ParamFile.WriterHash.Write(hash.Hash40);
+                ParamFile.AsmHashTable.Add(hash);
+            }
+        }
+        public static void WriteString(string word)
+        {
+            var writer = ParamFile.WriterRef;
             for (int i = 0; i < word.Length; i++)
-                writer.WriteByte((byte)word[i]);
-            writer.WriteByte(0);
+                writer.Write((byte)word[i]);
+            writer.Write((byte)0);
         }
         public static uint CRC32(string word)
         {

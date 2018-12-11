@@ -39,6 +39,7 @@
             this.param_TreeView = new System.Windows.Forms.TreeView();
             this.groupBoxRight = new System.Windows.Forms.GroupBox();
             this.param_DataGridView = new System.Windows.Forms.DataGridView();
+            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -64,7 +65,8 @@
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openParamFileToolStripMenuItem,
-            this.openParamLabelsToolStripMenuItem});
+            this.openParamLabelsToolStripMenuItem,
+            this.saveToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
@@ -72,14 +74,14 @@
             // openParamFileToolStripMenuItem
             // 
             this.openParamFileToolStripMenuItem.Name = "openParamFileToolStripMenuItem";
-            this.openParamFileToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.openParamFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.openParamFileToolStripMenuItem.Text = "Open Param File";
             this.openParamFileToolStripMenuItem.Click += new System.EventHandler(this.openParamFileToolStripMenuItem_Click);
             // 
             // openParamLabelsToolStripMenuItem
             // 
             this.openParamLabelsToolStripMenuItem.Name = "openParamLabelsToolStripMenuItem";
-            this.openParamLabelsToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.openParamLabelsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.openParamLabelsToolStripMenuItem.Text = "Open Param Labels";
             this.openParamLabelsToolStripMenuItem.Click += new System.EventHandler(this.openParamLabelsToolStripMenuItem_Click);
             // 
@@ -156,6 +158,13 @@
             this.param_DataGridView.Size = new System.Drawing.Size(524, 346);
             this.param_DataGridView.TabIndex = 0;
             // 
+            // saveToolStripMenuItem
+            // 
+            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveToolStripMenuItem.Text = "Save";
+            this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -197,6 +206,7 @@
         private System.Windows.Forms.GroupBox groupBoxRight;
         private System.Windows.Forms.TreeView param_TreeView;
         private System.Windows.Forms.DataGridView param_DataGridView;
+        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
     }
 }
 

@@ -11,8 +11,8 @@ namespace paracobNET
         public ParamStruct Root { get; private set; }
 
         #region global_disasm
-        static internal BinaryReader reader { get; set; }
-        static internal HashEntry[] AllHashes { get; private set; }
+        static internal BinaryReader Reader { get; set; }
+        static internal HashEntry[] DisasmHashTable { get; private set; }
         static internal uint HashTableSize { get; set; }
         static internal uint RefTableSize { get; set; }
         static internal uint HashStart { get { return 0x10; } }
@@ -21,26 +21,30 @@ namespace paracobNET
         #endregion
 
         #region global_asm
-        //once each is finished being written, append to each other and write to file
-        static internal MemoryStream writerHeader { get; set; }//header stream
-        static internal MemoryStream writerTable { get; set; }//hash table and reference table stream
-        static internal MemoryStream writerParam { get; set; }//param stream
+        //once each is finished being written, append each to the stream and write to file
+        static internal MemoryStream FileStream { get; set; }
+
+        static internal BinaryWriter WriterHeader { get; set; }//header stream
+        static internal List<HashEntry> AsmHashTable { get; set; }//list of hashes appended to
+        static internal BinaryWriter WriterHash { get; set; }//hash table stream
+        static internal BinaryWriter WriterRef { get; set; }//reference table stream
+        static internal BinaryWriter WriterParam { get; set; }//param stream
         #endregion
 
         public ParamFile(string filepath)
         {
-            using (reader = new BinaryReader(File.OpenRead(filepath)))
+            using (Reader = new BinaryReader(File.OpenRead(filepath)))
             {
                 for (int i = 0; i < magic.Length; i++)
-                    if (reader.ReadByte() != (byte)magic[i])
+                    if (Reader.ReadByte() != (byte)magic[i])
                         throw new InvalidDataException("File contains an invalid header");
-                HashTableSize = reader.ReadUInt32();
-                RefTableSize = reader.ReadUInt32();
-                AllHashes = new HashEntry[HashTableSize / 8];
-                for (int i = 0; i < AllHashes.Length; i++)
-                    AllHashes[i] = new HashEntry(reader.ReadUInt64());
-                reader.BaseStream.Seek(ParamStart, SeekOrigin.Begin);
-                if ((ParamType)reader.ReadByte() == ParamType.structure)
+                HashTableSize = Reader.ReadUInt32();
+                RefTableSize = Reader.ReadUInt32();
+                DisasmHashTable = new HashEntry[HashTableSize / 8];
+                for (int i = 0; i < DisasmHashTable.Length; i++)
+                    DisasmHashTable[i] = new HashEntry(Reader.ReadUInt64());
+                Reader.BaseStream.Seek(ParamStart, SeekOrigin.Begin);
+                if ((ParamType)Reader.ReadByte() == ParamType.structure)
                 {
                     Root = new ParamStruct();
                     Root.Read();
@@ -48,18 +52,23 @@ namespace paracobNET
                 else
                     throw new InvalidDataException("File does not have a root");
             }
-            AllHashes = null;
+            DisasmHashTable = null;
         }
 
-        public void Save(string filepath)
+        public void Save(/*string filepath*/)
         {
-            using (writerHeader = new MemoryStream())
-            using (writerTable = new MemoryStream())
-            using (writerParam = new MemoryStream())
+            AsmHashTable = new List<HashEntry>();
+            using (WriterHeader = new BinaryWriter(new MemoryStream()))
+            using (WriterHash = new BinaryWriter(new MemoryStream()))
+            using (WriterRef = new BinaryWriter(new MemoryStream()))
+            using (WriterParam = new BinaryWriter(new MemoryStream()))
             {
                 for (int i = 0; i < 8; i++)
-                    writerHeader.WriteByte((byte)magic[i]);
+                    WriterHeader.Write((byte)magic[i]);
+                Util.WriteHash(new HashEntry(0));
+                Util.WriteParam(Root);
             }
+            AsmHashTable = null;
         }
     }
 }

@@ -17,7 +17,7 @@ namespace paracobNET
 
         internal void Read()
         {
-            var reader = ParamFile.reader;
+            var reader = ParamFile.Reader;
             switch (TypeKey)
             {
                 case ParamType.boolean:
@@ -45,10 +45,49 @@ namespace paracobNET
                     Value = reader.ReadSingle();
                     break;
                 case ParamType.hash40:
-                    Value = ParamFile.AllHashes[reader.ReadUInt32()];
+                    Value = ParamFile.DisasmHashTable[reader.ReadUInt32()];
                     break;
                 case ParamType.str:
                     Value = Util.ReadStringAsync(reader, ParamFile.RefStart + reader.ReadUInt32());
+                    break;
+            }
+        }
+        internal void Write()
+        {
+            var writer = ParamFile.WriterParam;
+            switch (TypeKey)
+            {
+                case ParamType.boolean:
+                    writer.Write((bool)Value ? (byte)1 : (byte)0);
+                    break;
+                case ParamType.int8:
+                    writer.Write((sbyte)Value);
+                    break;
+                case ParamType.uint8:
+                    writer.Write((byte)Value);
+                    break;
+                case ParamType.int16:
+                    writer.Write((short)Value);
+                    break;
+                case ParamType.uint16:
+                    writer.Write((ushort)Value);
+                    break;
+                case ParamType.int32:
+                    writer.Write((int)Value);
+                    break;
+                case ParamType.uint32:
+                    writer.Write((uint)Value);
+                    break;
+                case ParamType.float32:
+                    writer.Write((float)Value);
+                    break;
+                case ParamType.hash40:
+                    Util.WriteHash((HashEntry)Value);
+                    writer.Write(ParamFile.AsmHashTable.IndexOf((HashEntry)Value));
+                    break;
+                case ParamType.str:
+                    writer.Write((uint)ParamFile.WriterRef.BaseStream.Position);
+                    Util.WriteString((string)Value);
                     break;
             }
         }

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace paracobNET
 {
-    public struct HashEntry
+    public struct HashEntry : IComparable<HashEntry>
     {
         public ulong Hash40 { get; internal set; }
 
@@ -31,6 +31,13 @@ namespace paracobNET
             if (labels.ContainsKey(Hash))
                 return labels[Hash];
             else return ToString();
+        }
+
+        public int CompareTo(HashEntry other)
+        {
+            if (Hash40 > other.Hash40) return 1;
+            if (Hash40 == other.Hash40) return 0;
+            return -1;
         }
     }
 }
