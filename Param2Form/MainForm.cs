@@ -156,7 +156,11 @@ namespace Param2Form
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            paramFile.Save();
+            SaveFileDialog sfd = new SaveFileDialog();
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                paramFile.Save(sfd.FileName);
+            }
         }
     }
 }

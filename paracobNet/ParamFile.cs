@@ -22,7 +22,7 @@ namespace paracobNET
 
         #region global_asm
         //once each is finished being written, append each to the stream and write to file
-        static internal MemoryStream FileStream { get; set; }
+        static internal FileStream FileStream { get; set; }
 
         static internal BinaryWriter WriterHeader { get; set; }//header stream
         static internal List<HashEntry> AsmHashTable { get; set; }//list of hashes appended to
@@ -55,9 +55,10 @@ namespace paracobNET
             DisasmHashTable = null;
         }
 
-        public void Save(/*string filepath*/)
+        public void Save(string filepath)
         {
             AsmHashTable = new List<HashEntry>();
+            using (FileStream = File.OpenWrite(filepath))
             using (WriterHeader = new BinaryWriter(new MemoryStream()))
             using (WriterHash = new BinaryWriter(new MemoryStream()))
             using (WriterRef = new BinaryWriter(new MemoryStream()))
@@ -67,6 +68,18 @@ namespace paracobNET
                     WriterHeader.Write((byte)magic[i]);
                 Util.WriteHash(new HashEntry(0));
                 Util.WriteParam(Root);
+                WriterHeader.Write((uint)WriterHash.BaseStream.Length);
+                WriterHeader.Write((uint)WriterRef.BaseStream.Length);
+
+                WriterHeader.BaseStream.Position = 0;
+                WriterHash.BaseStream.Position = 0;
+                WriterRef.BaseStream.Position = 0;
+                WriterParam.BaseStream.Position = 0;
+
+                WriterHeader.BaseStream.CopyTo(FileStream);
+                WriterHash.BaseStream.CopyTo(FileStream);
+                WriterRef.BaseStream.CopyTo(FileStream);
+                WriterParam.BaseStream.CopyTo(FileStream);
             }
             AsmHashTable = null;
         }
