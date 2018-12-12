@@ -67,6 +67,7 @@ namespace paracobNET
                 for (int i = 0; i < 8; i++)
                     WriterHeader.Write((byte)magic[i]);
                 Util.WriteHash(new HashEntry(0));
+                Util.IterateHashes(Root);
                 Util.WriteParam(Root);
                 WriterHeader.Write((uint)WriterHash.BaseStream.Length);
                 WriterHeader.Write((uint)WriterRef.BaseStream.Length);

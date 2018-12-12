@@ -30,11 +30,24 @@ namespace paracobNET
         }
         internal void Write()
         {
-            uint startPos = (uint)ParamFile.WriterParam.BaseStream.Position - 1;
-            foreach (var node in Nodes)
+            var writer = ParamFile.WriterParam;
+            uint startPos = (uint)writer.BaseStream.Position - 1;
+            writer.Write(Nodes.Length);
+
+            uint[] offsets = new uint[Nodes.Length];
+            long ptrStartPos = writer.BaseStream.Position;
+            writer.BaseStream.Seek(4 * Nodes.Length, SeekOrigin.Current);
+            for (int i = 0; i < Nodes.Length; i++)
             {
+                var node = Nodes[i];
+                offsets[i] = (uint)(writer.BaseStream.Position - startPos);
                 Util.WriteParam(node);
             }
+            long endPos = writer.BaseStream.Position;
+            writer.BaseStream.Seek(ptrStartPos, SeekOrigin.Begin);
+            foreach (var offset in offsets)
+                writer.Write(offset);
+            writer.BaseStream.Seek(endPos, SeekOrigin.Begin);
         }
     }
 }

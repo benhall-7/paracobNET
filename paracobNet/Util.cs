@@ -40,6 +40,26 @@ namespace paracobNET
             reader.BaseStream.Seek(returnTo, SeekOrigin.Begin);
             return s;
         }
+        public static void IterateHashes(IParam param)
+        {
+            switch (param.TypeKey)
+            {
+                case ParamType.structure:
+                    foreach (var item in (param as ParamStruct).Nodes)
+                    {
+                        WriteHash(item.Key);
+                        IterateHashes(item.Value);
+                    }
+                    break;
+                case ParamType.array:
+                    foreach (var item in (param as ParamArray).Nodes)
+                        IterateHashes(item);
+                    break;
+                case ParamType.hash40:
+                    WriteHash((HashEntry)(param as ParamValue).Value);
+                    break;
+            }
+        }
         public static void WriteParam(IParam param)
         {
             var writer = ParamFile.WriterParam;

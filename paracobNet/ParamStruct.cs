@@ -10,62 +10,77 @@ namespace paracobNET
     {
         public ParamType TypeKey { get; } = ParamType.structure;
         
-        public StructNode[] Nodes { get; private set; }
+        public Dictionary<HashEntry, IParam> Nodes { get; private set; }
 
         internal void Read()
         {
             var reader = ParamFile.Reader;
             uint startPos = (uint)reader.BaseStream.Position - 1;
-            Nodes = new StructNode[reader.ReadUInt32()];
+            uint size = reader.ReadUInt32();
+            Nodes = new Dictionary<HashEntry, IParam>();
+
             reader.BaseStream.Seek(reader.ReadUInt32() + ParamFile.RefStart, SeekOrigin.Begin);
             Dictionary<uint, uint> pairs = new Dictionary<uint, uint>();
-            for (int i = 0; i < Nodes.Length; i++)
+            for (int i = 0; i < size; i++)
                 pairs.Add(reader.ReadUInt32(), reader.ReadUInt32());
             var hashIndeces = pairs.Keys.ToList();
             hashIndeces.Sort();
-            for (int i = 0; i < Nodes.Length; i++)
+            for (int i = 0; i < size; i++)
             {
-                reader.BaseStream.Seek(startPos + pairs[hashIndeces[i]], SeekOrigin.Begin);
-                Nodes[i] = new StructNode(ParamFile.DisasmHashTable[hashIndeces[i]], reader);
+                var key = hashIndeces[i];
+                reader.BaseStream.Seek(startPos + pairs[key], SeekOrigin.Begin);
+                Nodes.Add(ParamFile.DisasmHashTable[key], Util.ReadParam());
             }
         }
         internal void Write()
         {
-            uint startPos = (uint)ParamFile.WriterParam.BaseStream.Position - 1;
-            //hashes are written in order of the nodes appearance in the class
-            foreach (var node in Nodes)
-            {
-                Util.WriteHash(node.HashEntry);
-                Util.WriteParam(node.Node);
-            }
-            SortedDictionary<HashEntry, IParam> sortedNodes = new SortedDictionary<HashEntry, IParam>();
-            foreach (var node in Nodes)
-                sortedNodes.Add(node.HashEntry, node.Node);
-            //nodes are written in order of their hash40 values
-            foreach (var node in sortedNodes)
-            {
+            var paramWriter = ParamFile.WriterParam;
+            var refWriter = ParamFile.WriterRef;
+            uint[] offsets = new uint[Nodes.Count];
+            long paramStartPos = paramWriter.BaseStream.Position - 1;
+            long refStartPos = refWriter.BaseStream.Position;
 
+            paramWriter.Write(Nodes.Count);
+            paramWriter.Write((uint)refWriter.BaseStream.Position);
+
+            List<HashEntry> sortedHashes = Nodes.Keys.ToList();
+            sortedHashes.Sort();
+
+            //allocate space for the entire node's contents first
+            //so we can generate offsets when each one is assembled
+            refWriter.BaseStream.Seek(Nodes.Count * 8, SeekOrigin.Current);
+            for (int i = 0; i < Nodes.Count; i++)
+            {
+                offsets[i] = (uint)(paramWriter.BaseStream.Position - paramStartPos);
+                Util.WriteParam(Nodes[sortedHashes[i]]);
+            }
+            refWriter.BaseStream.Seek(refStartPos, SeekOrigin.Begin);
+            for (int i = 0; i < Nodes.Count; i++)
+            {
+                refWriter.Write(ParamFile.AsmHashTable.IndexOf(sortedHashes[i]));
+                refWriter.Write(offsets[i]);
             }
         }
 
         public IParam GetNode(uint hash)
         {
             foreach (var node in Nodes)
-                if (node.HashEntry.Hash == hash)
-                    return node.Node;
+                if (node.Key.Hash == hash)
+                    return node.Value;
             return null;
         }
 
-        public class StructNode
-        {
-            public HashEntry HashEntry { get; private set; }
-            public IParam Node { get; private set; }
+        //replace this with a dictionary later?
+        //public class StructNode
+        //{
+        //    public HashEntry HashEntry { get; private set; }
+        //    public IParam Node { get; private set; }
 
-            public StructNode(HashEntry hash, BinaryReader reader)
-            {
-                HashEntry = hash;
-                Node = Util.ReadParam();
-            }
-        }
+        //    public StructNode(HashEntry hash, BinaryReader reader)
+        //    {
+        //        HashEntry = hash;
+        //        Node = Util.ReadParam();
+        //    }
+        //}
     }
 }

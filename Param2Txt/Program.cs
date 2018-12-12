@@ -50,11 +50,11 @@ namespace Param2Txt
         static List<string> RepresentStruct(ParamStruct param)
         {
             List<string> list = new List<string>();
-            list.Add("(" + param.TypeKey.ToString() + ")[" + param.Nodes.Length + "]");
+            list.Add("(" + param.TypeKey.ToString() + ")[" + param.Nodes.Count + "]");
             foreach (var node in param.Nodes)
             {
-                List<string> nodeRep = RepresentParam(node.Node);
-                nodeRep[0] = "<0x" + node.HashEntry.ToString() + ">" + nodeRep[0];
+                List<string> nodeRep = RepresentParam(node.Value);
+                nodeRep[0] = "<0x" + node.Key.ToString() + ">" + nodeRep[0];
                 nodeRep[nodeRep.Count - 1] += ",";
                 foreach (var line in nodeRep)
                     list.Add(line);

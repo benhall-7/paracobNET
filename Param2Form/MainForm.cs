@@ -61,7 +61,7 @@ namespace Param2Form
                     {
                         ParamStruct paramStruct = (ParamStruct)param;
                         foreach (var sub_node in paramStruct.Nodes)
-                            node.Nodes.Add(Param2TreeNode(sub_node.Node));
+                            node.Nodes.Add(Param2TreeNode(sub_node.Value));
                         break;
                     }
             }
@@ -117,14 +117,14 @@ namespace Param2Form
                         foreach (var node in structure.Nodes)
                         {
                             DataRow row = paramTbl.NewRow();
-                            row["Hash"] = node.HashEntry.ToString(labels);
-                            row["Type"] = node.Node.TypeKey.ToString();
-                            if (node.Node is ParamValue)
-                                row["Value"] = (node.Node as ParamValue).ToString(labels);
-                            else if (node.Node is ParamArray)
-                                row["Value"] = (node.Node as ParamArray).Nodes.Length;
+                            row["Hash"] = node.Key.ToString(labels);
+                            row["Type"] = node.Value.TypeKey.ToString();
+                            if (node.Value is ParamValue)
+                                row["Value"] = (node.Value as ParamValue).ToString(labels);
+                            else if (node.Value is ParamArray)
+                                row["Value"] = (node.Value as ParamArray).Nodes.Length;
                             else
-                                row["Value"] = (node.Node as ParamStruct).Nodes.Length;
+                                row["Value"] = (node.Value as ParamStruct).Nodes.Count;
                             paramTbl.Rows.Add(row);
                         }
                         break;
@@ -135,8 +135,8 @@ namespace Param2Form
                         DataRow row = paramTbl.NewRow();
                         if (e.Node.Parent != null && e.Node.Parent.Tag is ParamStruct)
                         {
-                            var paramNode = (e.Node.Parent.Tag as ParamStruct).Nodes[e.Node.Index];
-                            row["Hash"] = paramNode.HashEntry.ToString(labels);
+                            //var paramNode = (e.Node.Parent.Tag as ParamStruct).Nodes[e.Node.Index];
+                            //row["Hash"] = paramNode.HashEntry.ToString(labels);
                         }
                         else
                         {

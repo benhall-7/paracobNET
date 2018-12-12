@@ -82,7 +82,6 @@ namespace paracobNET
                     writer.Write((float)Value);
                     break;
                 case ParamType.hash40:
-                    Util.WriteHash((HashEntry)Value);
                     writer.Write(ParamFile.AsmHashTable.IndexOf((HashEntry)Value));
                     break;
                 case ParamType.str:
