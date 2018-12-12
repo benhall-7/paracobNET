@@ -69,18 +69,5 @@ namespace paracobNET
                     return node.Value;
             return null;
         }
-
-        //replace this with a dictionary later?
-        //public class StructNode
-        //{
-        //    public HashEntry HashEntry { get; private set; }
-        //    public IParam Node { get; private set; }
-
-        //    public StructNode(HashEntry hash, BinaryReader reader)
-        //    {
-        //        HashEntry = hash;
-        //        Node = Util.ReadParam();
-        //    }
-        //}
     }
 }
