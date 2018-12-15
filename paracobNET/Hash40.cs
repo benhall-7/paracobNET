@@ -4,27 +4,27 @@ using System.Text;
 
 namespace paracobNET
 {
-    public struct HashEntry : IComparable<HashEntry>
+    public struct Hash40 : IComparable<Hash40>
     {
-        public ulong Hash40 { get; internal set; }
+        public ulong Value { get; internal set; }
 
-        public HashEntry(ulong hash40)
+        public Hash40(ulong hash40)
         {
-            Hash40 = hash40;
+            Value = hash40;
         }
 
         public uint Hash
         {
-            get { return (uint)Hash40; }
+            get { return (uint)Value; }
         }
         public byte Length
         {
-            get { return (byte)(Hash >> 32); }
+            get { return (byte)(Value >> 32); }
         }
 
         public override string ToString()
         {
-            return "0x" + Hash40.ToString("x10");
+            return "0x" + Value.ToString("x10");
         }
         public string ToString(Dictionary<uint, string> labels)
         {
@@ -33,10 +33,10 @@ namespace paracobNET
             else return ToString();
         }
 
-        public int CompareTo(HashEntry other)
+        public int CompareTo(Hash40 other)
         {
-            if (Hash40 > other.Hash40) return 1;
-            if (Hash40 == other.Hash40) return 0;
+            if (Value > other.Value) return 1;
+            if (Value == other.Value) return 0;
             return -1;
         }
     }

@@ -9,15 +9,15 @@ namespace paracobNET
     public class ParamStruct : IParam
     {
         public ParamType TypeKey { get; } = ParamType.structure;
-        
-        public Dictionary<HashEntry, IParam> Nodes { get; private set; }
+        //public uint ID { get; set; }
+        public Dictionary<Hash40, IParam> Nodes { get; set; }
 
         internal void Read()
         {
             var reader = ParamFile.Reader;
             uint startPos = (uint)reader.BaseStream.Position - 1;
             uint size = reader.ReadUInt32();
-            Nodes = new Dictionary<HashEntry, IParam>();
+            Nodes = new Dictionary<Hash40, IParam>();
 
             reader.BaseStream.Seek(reader.ReadUInt32() + ParamFile.RefStart, SeekOrigin.Begin);
             Dictionary<uint, uint> pairs = new Dictionary<uint, uint>();
@@ -43,11 +43,12 @@ namespace paracobNET
             paramWriter.Write(Nodes.Count);
             paramWriter.Write((uint)refWriter.BaseStream.Position);
 
-            List<HashEntry> sortedHashes = Nodes.Keys.ToList();
+            List<Hash40> sortedHashes = Nodes.Keys.ToList();
             sortedHashes.Sort();
 
             //allocate space for the entire node's contents first
             //so we can generate offsets when each one is assembled
+            //THIS LEAVES NO ROOM FOR STRINGS
             refWriter.BaseStream.Seek(Nodes.Count * 8, SeekOrigin.Current);
             for (int i = 0; i < Nodes.Count; i++)
             {

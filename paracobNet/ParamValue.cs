@@ -58,7 +58,7 @@ namespace paracobNET
             switch (TypeKey)
             {
                 case ParamType.boolean:
-                    writer.Write((bool)Value ? (byte)1 : (byte)0);
+                    writer.Write((bool)Value);
                     break;
                 case ParamType.int8:
                     writer.Write((sbyte)Value);
@@ -82,7 +82,7 @@ namespace paracobNET
                     writer.Write((float)Value);
                     break;
                 case ParamType.hash40:
-                    writer.Write(ParamFile.AsmHashTable.IndexOf((HashEntry)Value));
+                    writer.Write(ParamFile.AsmHashTable.IndexOf((Hash40)Value));
                     break;
                 case ParamType.str:
                     writer.Write((uint)ParamFile.WriterRef.BaseStream.Position);
@@ -94,7 +94,7 @@ namespace paracobNET
         public string ToString(Dictionary<uint, string> labels)
         {
             if (TypeKey == ParamType.hash40)
-                return ((HashEntry)Value).ToString(labels);
+                return ((Hash40)Value).ToString(labels);
             return Value.ToString();
         }
     }

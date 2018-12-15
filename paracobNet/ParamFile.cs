@@ -12,7 +12,7 @@ namespace paracobNET
 
         #region global_disasm
         static internal BinaryReader Reader { get; set; }
-        static internal HashEntry[] DisasmHashTable { get; private set; }
+        static internal Hash40[] DisasmHashTable { get; private set; }
         static internal uint HashTableSize { get; set; }
         static internal uint RefTableSize { get; set; }
         static internal uint HashStart { get { return 0x10; } }
@@ -25,7 +25,7 @@ namespace paracobNET
         static internal FileStream FileStream { get; set; }
 
         static internal BinaryWriter WriterHeader { get; set; }//header stream
-        static internal List<HashEntry> AsmHashTable { get; set; }//list of hashes appended to
+        static internal List<Hash40> AsmHashTable { get; set; }//list of hashes appended to
         static internal BinaryWriter WriterHash { get; set; }//hash table stream
         static internal BinaryWriter WriterRef { get; set; }//reference table stream
         static internal BinaryWriter WriterParam { get; set; }//param stream
@@ -40,9 +40,9 @@ namespace paracobNET
                         throw new InvalidDataException("File contains an invalid header");
                 HashTableSize = Reader.ReadUInt32();
                 RefTableSize = Reader.ReadUInt32();
-                DisasmHashTable = new HashEntry[HashTableSize / 8];
+                DisasmHashTable = new Hash40[HashTableSize / 8];
                 for (int i = 0; i < DisasmHashTable.Length; i++)
-                    DisasmHashTable[i] = new HashEntry(Reader.ReadUInt64());
+                    DisasmHashTable[i] = new Hash40(Reader.ReadUInt64());
                 Reader.BaseStream.Seek(ParamStart, SeekOrigin.Begin);
                 if ((ParamType)Reader.ReadByte() == ParamType.structure)
                 {
@@ -57,7 +57,7 @@ namespace paracobNET
 
         public void Save(string filepath)
         {
-            AsmHashTable = new List<HashEntry>();
+            AsmHashTable = new List<Hash40>();
             using (FileStream = File.OpenWrite(filepath))
             using (WriterHeader = new BinaryWriter(new MemoryStream()))
             using (WriterHash = new BinaryWriter(new MemoryStream()))
@@ -66,7 +66,7 @@ namespace paracobNET
             {
                 for (int i = 0; i < 8; i++)
                     WriterHeader.Write((byte)magic[i]);
-                Util.WriteHash(new HashEntry(0));
+                Util.WriteHash(new Hash40(0));
                 Util.IterateHashes(Root);
                 Util.WriteParam(Root);
                 WriterHeader.Write((uint)WriterHash.BaseStream.Length);

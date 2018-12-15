@@ -56,7 +56,7 @@ namespace paracobNET
                         IterateHashes(item);
                     break;
                 case ParamType.hash40:
-                    WriteHash((HashEntry)(param as ParamValue).Value);
+                    WriteHash((Hash40)(param as ParamValue).Value);
                     break;
             }
         }
@@ -77,11 +77,11 @@ namespace paracobNET
                     break;
             }
         }
-        public static void WriteHash(HashEntry hash)
+        public static void WriteHash(Hash40 hash)
         {
             if (!ParamFile.AsmHashTable.Contains(hash))
             {
-                ParamFile.WriterHash.Write(hash.Hash40);
+                ParamFile.WriterHash.Write(hash.Value);
                 ParamFile.AsmHashTable.Add(hash);
             }
         }
