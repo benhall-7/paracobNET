@@ -20,34 +20,34 @@ namespace paracobNET
             var reader = ParamFile.Reader;
             switch (TypeKey)
             {
-                case ParamType.boolean:
+                case ParamType.@bool:
                     Value = reader.ReadByte() != 0;
                     break;
-                case ParamType.int8:
+                case ParamType.@sbyte:
                     Value = reader.ReadSByte();
                     break;
-                case ParamType.uint8:
+                case ParamType.@byte:
                     Value = reader.ReadByte();
                     break;
-                case ParamType.int16:
+                case ParamType.@short:
                     Value = reader.ReadInt16();
                     break;
-                case ParamType.uint16:
+                case ParamType.@ushort:
                     Value = reader.ReadUInt16();
                     break;
-                case ParamType.int32:
+                case ParamType.@int:
                     Value = reader.ReadInt32();
                     break;
-                case ParamType.uint32:
+                case ParamType.@uint:
                     Value = reader.ReadUInt32();
                     break;
-                case ParamType.float32:
+                case ParamType.@float:
                     Value = reader.ReadSingle();
                     break;
                 case ParamType.hash40:
                     Value = ParamFile.DisasmHashTable[reader.ReadUInt32()];
                     break;
-                case ParamType.str:
+                case ParamType.@string:
                     Value = Util.ReadStringAsync(reader, ParamFile.RefStart + reader.ReadUInt32());
                     break;
             }
@@ -57,34 +57,34 @@ namespace paracobNET
             var writer = ParamFile.WriterParam;
             switch (TypeKey)
             {
-                case ParamType.boolean:
+                case ParamType.@bool:
                     writer.Write((bool)Value);
                     break;
-                case ParamType.int8:
+                case ParamType.@sbyte:
                     writer.Write((sbyte)Value);
                     break;
-                case ParamType.uint8:
+                case ParamType.@byte:
                     writer.Write((byte)Value);
                     break;
-                case ParamType.int16:
+                case ParamType.@short:
                     writer.Write((short)Value);
                     break;
-                case ParamType.uint16:
+                case ParamType.@ushort:
                     writer.Write((ushort)Value);
                     break;
-                case ParamType.int32:
+                case ParamType.@int:
                     writer.Write((int)Value);
                     break;
-                case ParamType.uint32:
+                case ParamType.@uint:
                     writer.Write((uint)Value);
                     break;
-                case ParamType.float32:
+                case ParamType.@float:
                     writer.Write((float)Value);
                     break;
                 case ParamType.hash40:
                     writer.Write(ParamFile.AsmHashTable.IndexOf((Hash40)Value));
                     break;
-                case ParamType.str:
+                case ParamType.@string:
                     writer.Write((uint)ParamFile.WriterRef.BaseStream.Position);
                     Util.WriteString((string)Value);
                     break;

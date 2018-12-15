@@ -81,34 +81,34 @@ namespace Param2Txt
             string str = "(" + param.TypeKey.ToString() + ")";
             switch (param.TypeKey)
             {
-                case ParamType.boolean:
+                case ParamType.@bool:
                     str += (bool)param.Value;
                     break;
-                case ParamType.int8:
+                case ParamType.@sbyte:
                     str += (sbyte)param.Value;
                     break;
-                case ParamType.uint8:
+                case ParamType.@byte:
                     str += (byte)param.Value;
                     break;
-                case ParamType.int16:
+                case ParamType.@short:
                     str += (short)param.Value;
                     break;
-                case ParamType.uint16:
+                case ParamType.@ushort:
                     str += (ushort)param.Value;
                     break;
-                case ParamType.int32:
+                case ParamType.@int:
                     str += (int)param.Value;
                     break;
-                case ParamType.uint32:
+                case ParamType.@uint:
                     str += (uint)param.Value;
                     break;
-                case ParamType.float32:
+                case ParamType.@float:
                     str += (float)param.Value;
                     break;
                 case ParamType.hash40:
                     str += param.Value.ToString();
                     break;
-                case ParamType.str:
+                case ParamType.@string:
                     str += (string)param.Value;
                     break;
             }

@@ -8,7 +8,7 @@ namespace paracobNET
 {
     public class ParamStruct : IParam
     {
-        public ParamType TypeKey { get; } = ParamType.structure;
+        public ParamType TypeKey { get; } = ParamType.@struct;
         //public uint ID { get; set; }
         public Dictionary<Hash40, IParam> Nodes { get; set; }
 

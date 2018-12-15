@@ -44,7 +44,7 @@ namespace paracobNET
                 for (int i = 0; i < DisasmHashTable.Length; i++)
                     DisasmHashTable[i] = new Hash40(Reader.ReadUInt64());
                 Reader.BaseStream.Seek(ParamStart, SeekOrigin.Begin);
-                if ((ParamType)Reader.ReadByte() == ParamType.structure)
+                if ((ParamType)Reader.ReadByte() == ParamType.@struct)
                 {
                     Root = new ParamStruct();
                     Root.Read();

@@ -6,17 +6,17 @@ namespace paracobNET
 {
     public enum ParamType : byte
     {
-        boolean = 1,
-        int8 = 2,
-        uint8 = 3,
-        int16 = 4,
-        uint16 = 5,
-        int32 = 6,
-        uint32 = 7,
-        float32 = 8,
+        @bool = 1,
+        @sbyte = 2,
+        @byte = 3,
+        @short = 4,
+        @ushort = 5,
+        @int = 6,
+        @uint = 7,
+        @float = 8,
         hash40 = 9,
-        str = 10,
+        @string = 10,
         array = 11,
-        structure = 12
+        @struct = 12
     }
 }

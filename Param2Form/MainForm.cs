@@ -57,7 +57,7 @@ namespace Param2Form
                             node.Nodes.Add(Param2TreeNode(sub_node));
                         break;
                     }
-                case ParamType.structure:
+                case ParamType.@struct:
                     {
                         ParamStruct paramStruct = (ParamStruct)param;
                         foreach (var sub_node in paramStruct.Nodes)
@@ -110,7 +110,7 @@ namespace Param2Form
             IParam param = (IParam)e.Node.Tag;
             switch (param.TypeKey)
             {
-                case ParamType.structure:
+                case ParamType.@struct:
                     {
                         paramTbl.Clear();
                         var structure = (ParamStruct)param;

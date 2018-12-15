@@ -15,7 +15,7 @@ namespace paracobNET
             IParam param;
             switch (type)
             {
-                case ParamType.structure:
+                case ParamType.@struct:
                     param = new ParamStruct();
                     (param as ParamStruct).Read();
                     break;
@@ -44,7 +44,7 @@ namespace paracobNET
         {
             switch (param.TypeKey)
             {
-                case ParamType.structure:
+                case ParamType.@struct:
                     foreach (var item in (param as ParamStruct).Nodes)
                     {
                         WriteHash(item.Key);
@@ -66,7 +66,7 @@ namespace paracobNET
             writer.Write((byte)param.TypeKey);
             switch (param.TypeKey)
             {
-                case ParamType.structure:
+                case ParamType.@struct:
                     (param as ParamStruct).Write();
                     break;
                 case ParamType.array:
