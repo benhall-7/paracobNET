@@ -11,7 +11,8 @@ namespace ParamXML
         static string HelpText = "ParamXML: Convert Ultimate param (.prc) files to XML format or back.\n" +
             "required: [input]\n" +
             "optional: -h ; -help ; -o [output] ; -l [label file]";
-        Dictionary<uint, string> labels = new Dictionary<uint, string>();
+        static XmlDocument xml;
+        static Dictionary<uint, string> labels = new Dictionary<uint, string>();
 
         static void Main(string[] args)
         {
@@ -33,18 +34,28 @@ namespace ParamXML
                         case "-o":
                             output = args[++i];
                             break;
+                        case "-l":
+                            labels = LabelIO.Read(args[++i]);
+                            break;
                         default:
                             input = args[i];
                             break;
                     }
                 }
+                if (input == null)
+                {
+                    Console.WriteLine(HelpText);
+                    return;
+                }
                 if (output == null)
                     output = Path.GetFileNameWithoutExtension(input) + ".xml";
-
+                Console.WriteLine("Initializing...");
                 file = new ParamFile(input);
-
-                XmlDocument xml = new XmlDocument();
+                Console.WriteLine("Converting...");
+                xml = new XmlDocument();
                 xml.AppendChild(ParamStruct2Node(file.Root));
+                xml.Save(output);
+                Console.WriteLine("Done");
             }
             catch (Exception e)
             {
@@ -70,17 +81,41 @@ namespace ParamXML
 
         static XmlNode ParamStruct2Node(ParamStruct structure)
         {
-
+            XmlNode xmlNode = xml.CreateElement(ParamType.@struct.ToString());
+            foreach (var node in structure.Nodes)
+            {
+                XmlNode childNode = Param2Node(node.Value);
+                XmlAttribute attr = xml.CreateAttribute("hash");
+                attr.Value = node.Key.ToString(labels);
+                childNode.Attributes.Append(attr);
+                xmlNode.AppendChild(childNode);
+            }
+            return xmlNode;
         }
 
         static XmlNode ParamArray2Node(ParamArray array)
         {
-
+            XmlNode xmlNode = xml.CreateElement(ParamType.array.ToString());
+            XmlAttribute mainAttr = xml.CreateAttribute("size");
+            mainAttr.Value = array.Nodes.Length.ToString();
+            xmlNode.Attributes.Append(mainAttr);
+            for (int i = 0; i < array.Nodes.Length; i++)
+            {
+                XmlNode childNode = Param2Node(array.Nodes[i]);
+                //XmlAttribute attr = xml.CreateAttribute("index");
+                //attr.Value = i.ToString();
+                //childNode.Attributes.Append(attr);
+                xmlNode.AppendChild(childNode);
+            }
+            return xmlNode;
         }
 
         static XmlNode ParamValue2Node(ParamValue value)
         {
-
+            XmlNode xmlNode = xml.CreateElement(value.TypeKey.ToString());
+            XmlText text = xml.CreateTextNode(value.ToString(labels));
+            xmlNode.AppendChild(text);
+            return xmlNode;
         }
     }
 }
