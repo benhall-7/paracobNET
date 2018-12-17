@@ -1,6 +1,7 @@
 ﻿using paracobNET;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Xml;
 
@@ -12,15 +13,17 @@ namespace ParamXML
             "ParamXML: Convert Ultimate param (.prc) files to XML format or back.\n" +
             "required: [input]\n" +
             "optional: -h ; -help ; -o [output] ; -l [label file]";
+        static ParamFile file;
         static XmlDocument xml;
         static Dictionary<uint, string> labels = new Dictionary<uint, string>();
+        static Stopwatch stopwatch;
 
         static void Main(string[] args)
         {
+            stopwatch = new Stopwatch();
             bool helpPrinted = false;
             string input = null;
             string output = null;
-            ParamFile file;
             try
             {
                 for (int i = 0; i < args.Length; i++)
@@ -51,13 +54,15 @@ namespace ParamXML
                 if (output == null)
                     output = Path.GetFileNameWithoutExtension(input) + ".xml";
                 Console.WriteLine("Initializing...");
+                stopwatch.Start();
                 file = new ParamFile(input);
                 Console.WriteLine("Converting...");
                 xml = new XmlDocument();
-                xml.CreateXmlDeclaration("1.0", "UTF-8", null);
+                xml.AppendChild(xml.CreateXmlDeclaration("1.0", "UTF-8", null));
                 xml.AppendChild(ParamStruct2Node(file.Root));
                 xml.Save(output);
-                Console.WriteLine("Done");
+                stopwatch.Stop();
+                Console.WriteLine("Finished in {0} seconds", stopwatch.Elapsed.TotalSeconds);
             }
             catch (Exception e)
             {
@@ -84,7 +89,7 @@ namespace ParamXML
         static XmlNode ParamStruct2Node(ParamStruct structure)
         {
             XmlNode xmlNode = xml.CreateElement(ParamType.@struct.ToString());
-            XmlAttribute mainAttr = xml.CreateAttribute("id");
+            XmlAttribute mainAttr = xml.CreateAttribute("type");
             mainAttr.Value = structure.ID.ToString();
             xmlNode.Attributes.Append(mainAttr);
             foreach (var node in structure.Nodes)
