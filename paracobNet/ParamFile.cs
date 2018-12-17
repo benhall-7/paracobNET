@@ -17,6 +17,7 @@ namespace paracobNET
         static internal uint HashStart { get { return 0x10; } }
         static internal uint RefStart { get { return 0x10 + HashTableSize; } }
         static internal uint ParamStart { get { return 0x10 + HashTableSize + RefTableSize; } }
+        static internal List<uint> StructOffsets { get; set; }
         #endregion
 
         #region global_asm
@@ -32,56 +33,70 @@ namespace paracobNET
 
         public ParamFile(string filepath)
         {
-            using (Reader = new BinaryReader(File.OpenRead(filepath)))
+            try
             {
-                for (int i = 0; i < magic.Length; i++)
-                    if (Reader.ReadByte() != (byte)magic[i])
-                        throw new InvalidDataException("File contains an invalid header");
-                HashTableSize = Reader.ReadUInt32();
-                RefTableSize = Reader.ReadUInt32();
-                DisasmHashTable = new Hash40[HashTableSize / 8];
-                for (int i = 0; i < DisasmHashTable.Length; i++)
-                    DisasmHashTable[i] = new Hash40(Reader.ReadUInt64());
-                Reader.BaseStream.Seek(ParamStart, SeekOrigin.Begin);
-                if ((ParamType)Reader.ReadByte() == ParamType.@struct)
+                using (Reader = new BinaryReader(File.OpenRead(filepath)))
                 {
-                    Root = new ParamStruct();
-                    Root.Read();
+                    for (int i = 0; i < magic.Length; i++)
+                        if (Reader.ReadByte() != (byte)magic[i])
+                            throw new InvalidDataException("File contains an invalid header");
+                    HashTableSize = Reader.ReadUInt32();
+                    RefTableSize = Reader.ReadUInt32();
+                    DisasmHashTable = new Hash40[HashTableSize / 8];
+                    for (int i = 0; i < DisasmHashTable.Length; i++)
+                        DisasmHashTable[i] = new Hash40(Reader.ReadUInt64());
+                    StructOffsets = new List<uint>();
+                    Reader.BaseStream.Seek(ParamStart, SeekOrigin.Begin);
+                    if ((ParamType)Reader.ReadByte() == ParamType.@struct)
+                    {
+                        Root = new ParamStruct();
+                        Root.Read();
+                    }
+                    else
+                        throw new InvalidDataException("File does not have a root");
                 }
-                else
-                    throw new InvalidDataException("File does not have a root");
             }
-            DisasmHashTable = null;
+            finally
+            {
+                DisasmHashTable = null;
+                StructOffsets = null;
+            }
         }
 
         public void Save(string filepath)
         {
-            AsmHashTable = new List<Hash40>();
-            using (FileStream = File.OpenWrite(filepath))
-            using (WriterHeader = new BinaryWriter(new MemoryStream()))
-            using (WriterHash = new BinaryWriter(new MemoryStream()))
-            using (WriterRef = new BinaryWriter(new MemoryStream()))
-            using (WriterParam = new BinaryWriter(new MemoryStream()))
+            try
             {
-                for (int i = 0; i < 8; i++)
-                    WriterHeader.Write((byte)magic[i]);
-                Util.WriteHash(new Hash40(0));
-                Util.IterateHashes(Root);
-                Util.WriteParam(Root);
-                WriterHeader.Write((uint)WriterHash.BaseStream.Length);
-                WriterHeader.Write((uint)WriterRef.BaseStream.Length);
+                AsmHashTable = new List<Hash40>();
+                using (FileStream = File.OpenWrite(filepath))
+                using (WriterHeader = new BinaryWriter(new MemoryStream()))
+                using (WriterHash = new BinaryWriter(new MemoryStream()))
+                using (WriterRef = new BinaryWriter(new MemoryStream()))
+                using (WriterParam = new BinaryWriter(new MemoryStream()))
+                {
+                    for (int i = 0; i < 8; i++)
+                        WriterHeader.Write((byte)magic[i]);
+                    Util.WriteHash(new Hash40(0));
+                    Util.IterateHashes(Root);
+                    Util.WriteParam(Root);
+                    WriterHeader.Write((uint)WriterHash.BaseStream.Length);
+                    WriterHeader.Write((uint)WriterRef.BaseStream.Length);
 
-                WriterHeader.BaseStream.Position = 0;
-                WriterHash.BaseStream.Position = 0;
-                WriterRef.BaseStream.Position = 0;
-                WriterParam.BaseStream.Position = 0;
+                    WriterHeader.BaseStream.Position = 0;
+                    WriterHash.BaseStream.Position = 0;
+                    WriterRef.BaseStream.Position = 0;
+                    WriterParam.BaseStream.Position = 0;
 
-                WriterHeader.BaseStream.CopyTo(FileStream);
-                WriterHash.BaseStream.CopyTo(FileStream);
-                WriterRef.BaseStream.CopyTo(FileStream);
-                WriterParam.BaseStream.CopyTo(FileStream);
+                    WriterHeader.BaseStream.CopyTo(FileStream);
+                    WriterHash.BaseStream.CopyTo(FileStream);
+                    WriterRef.BaseStream.CopyTo(FileStream);
+                    WriterParam.BaseStream.CopyTo(FileStream);
+                }
             }
-            AsmHashTable = null;
+            finally
+            {
+                AsmHashTable = null;
+            }
         }
     }
 }

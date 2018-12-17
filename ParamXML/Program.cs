@@ -8,7 +8,8 @@ namespace ParamXML
 {
     class Program
     {
-        static string HelpText = "ParamXML: Convert Ultimate param (.prc) files to XML format or back.\n" +
+        static string HelpText = 
+            "ParamXML: Convert Ultimate param (.prc) files to XML format or back.\n" +
             "required: [input]\n" +
             "optional: -h ; -help ; -o [output] ; -l [label file]";
         static XmlDocument xml;
@@ -53,6 +54,7 @@ namespace ParamXML
                 file = new ParamFile(input);
                 Console.WriteLine("Converting...");
                 xml = new XmlDocument();
+                xml.CreateXmlDeclaration("1.0", "UTF-8", null);
                 xml.AppendChild(ParamStruct2Node(file.Root));
                 xml.Save(output);
                 Console.WriteLine("Done");
@@ -82,6 +84,9 @@ namespace ParamXML
         static XmlNode ParamStruct2Node(ParamStruct structure)
         {
             XmlNode xmlNode = xml.CreateElement(ParamType.@struct.ToString());
+            XmlAttribute mainAttr = xml.CreateAttribute("id");
+            mainAttr.Value = structure.ID.ToString();
+            xmlNode.Attributes.Append(mainAttr);
             foreach (var node in structure.Nodes)
             {
                 XmlNode childNode = Param2Node(node.Value);
@@ -102,9 +107,9 @@ namespace ParamXML
             for (int i = 0; i < array.Nodes.Length; i++)
             {
                 XmlNode childNode = Param2Node(array.Nodes[i]);
-                //XmlAttribute attr = xml.CreateAttribute("index");
-                //attr.Value = i.ToString();
-                //childNode.Attributes.Append(attr);
+                XmlAttribute attr = xml.CreateAttribute("index");
+                attr.Value = i.ToString();
+                childNode.Attributes.Append(attr);
                 xmlNode.AppendChild(childNode);
             }
             return xmlNode;

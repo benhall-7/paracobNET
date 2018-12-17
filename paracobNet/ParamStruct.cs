@@ -7,7 +7,7 @@ namespace paracobNET
     public class ParamStruct : IParam
     {
         public ParamType TypeKey { get; } = ParamType.@struct;
-        //public uint ID { get; set; }
+        public uint ID { get; set; }
         public Dictionary<Hash40, IParam> Nodes { get; set; }
 
         internal void Read()
@@ -17,7 +17,15 @@ namespace paracobNET
             uint size = reader.ReadUInt32();
             Nodes = new Dictionary<Hash40, IParam>();
 
-            reader.BaseStream.Seek(reader.ReadUInt32() + ParamFile.RefStart, SeekOrigin.Begin);
+            uint StructRefOffset = reader.ReadUInt32();
+            if (ParamFile.StructOffsets.Contains(StructRefOffset))
+                ID = (uint)ParamFile.StructOffsets.IndexOf(StructRefOffset);
+            else
+            {
+                ID = (uint)ParamFile.StructOffsets.Count;
+                ParamFile.StructOffsets.Add(StructRefOffset);
+            }
+            reader.BaseStream.Seek(StructRefOffset + ParamFile.RefStart, SeekOrigin.Begin);
             Dictionary<uint, uint> pairs = new Dictionary<uint, uint>();
             for (int i = 0; i < size; i++)
                 pairs.Add(reader.ReadUInt32(), reader.ReadUInt32());
