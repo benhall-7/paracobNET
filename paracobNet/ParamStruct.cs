@@ -68,13 +68,5 @@ namespace paracobNET
                 refWriter.Write(offsets[i]);
             }
         }
-
-        public IParam GetNode(uint hash)
-        {
-            foreach (var node in Nodes)
-                if (node.Key.Hash == hash)
-                    return node.Value;
-            return null;
-        }
     }
 }

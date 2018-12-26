@@ -10,13 +10,13 @@ namespace ParamXML
     class Program
     {
         static string HelpText = 
-            "ParamXML: Convert Ultimate param (.prc) files to XML format or back.\n" +
+            "ParamXML: Convert Ultimate param (.prc) files to XML format or (TODO) back.\n" +
             "required: [input]\n" +
             "optional: -h ; -help ; -o [output] ; -l [label file]";
         static ParamFile file;
         static XmlDocument xml;
         static Dictionary<uint, string> labels = new Dictionary<uint, string>();
-        static Stopwatch stopwatch;
+        static Stopwatch stopwatch { get; set; }
 
         static void Main(string[] args)
         {
@@ -48,7 +48,8 @@ namespace ParamXML
                 }
                 if (input == null)
                 {
-                    Console.WriteLine(HelpText);
+                    if (!helpPrinted)
+                        Console.WriteLine(HelpText);
                     return;
                 }
                 if (output == null)
