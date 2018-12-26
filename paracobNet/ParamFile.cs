@@ -27,6 +27,7 @@ namespace paracobNET
         static internal BinaryWriter WriterHeader { get; set; }//header stream
         static internal List<Hash40> AsmHashTable { get; set; }//list of hashes appended to
         static internal BinaryWriter WriterHash { get; set; }//hash table stream
+        static internal List<RefTableEntry> RefEntries { get; set; }
         static internal BinaryWriter WriterRef { get; set; }//reference table stream
         static internal BinaryWriter WriterParam { get; set; }//param stream
         #endregion
@@ -68,6 +69,7 @@ namespace paracobNET
             try
             {
                 AsmHashTable = new List<Hash40>();
+                RefEntries = new List<RefTableEntry>();
                 using (FileStream = File.OpenWrite(filepath))
                 using (WriterHeader = new BinaryWriter(new MemoryStream()))
                 using (WriterHash = new BinaryWriter(new MemoryStream()))
@@ -78,6 +80,7 @@ namespace paracobNET
                         WriterHeader.Write((byte)magic[i]);
                     Util.WriteHash(new Hash40(0));
                     Util.IterateHashes(Root);
+                    Util.SetupRefTables(Root);
                     Util.WriteParam(Root);
                     WriterHeader.Write((uint)WriterHash.BaseStream.Length);
                     WriterHeader.Write((uint)WriterRef.BaseStream.Length);
@@ -96,6 +99,7 @@ namespace paracobNET
             finally
             {
                 AsmHashTable = null;
+                RefEntries = null;
             }
         }
     }

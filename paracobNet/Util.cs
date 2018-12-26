@@ -92,6 +92,83 @@ namespace paracobNET
                 writer.Write((byte)word[i]);
             writer.Write((byte)0);
         }
+        public static void SetupRefTables(ParamStruct paramStruct)
+        {
+            RefTableEntry entry = new RefTableEntry(paramStruct);
+            int refIndex = ParamFile.RefEntries.IndexOf(entry);
+            if (refIndex < 0)
+            {
+                paramStruct.ID = (uint)ParamFile.RefEntries.Count;
+                ParamFile.RefEntries.Add(entry);
+            }
+            else
+            {
+                paramStruct.ID = (uint)refIndex;
+            }
+            entry = ParamFile.RefEntries[(int)paramStruct.ID];
+
+            foreach (var node in paramStruct.Nodes)
+            {
+                if (node.Value.TypeKey == ParamType.@string)
+                    entry.AppendString((string)(node.Value as ParamValue).Value);
+                ParseParamForRefTables(node.Value);
+            }
+        }
+        public static void ParseParamForRefTables(IParam param)
+        {
+            switch (param.TypeKey)
+            {
+                case ParamType.array:
+                    foreach (var node in (param as ParamArray).Nodes)
+                        ParseParamForRefTables(node);
+                    break;
+                case ParamType.@struct:
+                    SetupRefTables(param as ParamStruct);
+                    break;
+            }
+        }
+        public static uint GetRefSize()
+        {
+            uint local = 0;
+            foreach (var entry in ParamFile.RefEntries)
+                local += entry.localStringOffset;//after all strings are written, this equals size
+            return local;
+        }
+        public static uint GetParamSize(IParam param)
+        {
+            switch (param.TypeKey)
+            {
+                case ParamType.@bool:
+                case ParamType.@sbyte:
+                case ParamType.@byte:
+                    return 2;
+                case ParamType.@short:
+                case ParamType.@ushort:
+                    return 3;
+                case ParamType.@int:
+                case ParamType.@uint:
+                case ParamType.@float:
+                case ParamType.hash40:
+                case ParamType.@string:
+                    return 5;
+                case ParamType.array:
+                    {
+                        ParamArray array = param as ParamArray;
+                        uint local = 5 + (uint)array.Nodes.Length * 4;
+                        foreach (var node in array.Nodes)
+                            local += GetParamSize(node);
+                        return local;
+                    }
+                default:
+                    {
+                        ParamStruct str = param as ParamStruct;
+                        uint local = 9;
+                        foreach (var pair in str.Nodes)
+                            local += GetParamSize(pair.Value);
+                        return local;
+                    }
+            }
+        }
         public static uint CRC32(string word)
         {
             uint hash = 0xffffffff;
