@@ -36,8 +36,8 @@ namespace paracobNET
         }
         public string ToString(Dictionary<ulong, string> labels)
         {
-            if (labels.ContainsKey(Hash))
-                return labels[Hash];
+            if (labels.ContainsKey(Value))
+                return labels[Value];
             else return ToString();
         }
 
