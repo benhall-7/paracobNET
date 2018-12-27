@@ -65,11 +65,14 @@ namespace ParamXML
                 {
                     if (output == null)
                         output = Path.GetFileNameWithoutExtension(input) + ".xml";
-                    hashToStringLabels = LabelIO.GetHashStringDict(labelName);
+                    hashToStringLabels = new Dictionary<ulong, string>();
+                    if (!string.IsNullOrEmpty(labelName))
+                        hashToStringLabels = LabelIO.GetHashStringDict(labelName);
+
                     Console.WriteLine("Initializing...");
                     stopwatch.Start();
                     file = new ParamFile(input);
-                    Console.WriteLine("Converting...");
+                    Console.WriteLine("Disassembling...");
                     xml = new XmlDocument();
                     xml.AppendChild(xml.CreateXmlDeclaration("1.0", "UTF-8", null));
                     xml.AppendChild(ParamStruct2Node(file.Root));
@@ -81,13 +84,17 @@ namespace ParamXML
                 {
                     if (output == null)
                         output = Path.GetFileNameWithoutExtension(input) + ".prc";
-                    stringToHashLabels = LabelIO.GetStringHashDict(labelName);
+                    stringToHashLabels = new Dictionary<string, ulong>();
+                    if (!string.IsNullOrEmpty(labelName))
+                        stringToHashLabels = LabelIO.GetStringHashDict(labelName);
+
                     Console.WriteLine("Initializing...");
                     stopwatch.Start();
-                    //stuff
                     xml = new XmlDocument();
                     xml.Load(input);
                     file = new ParamFile(Node2ParamStruct(xml.DocumentElement));
+                    Console.WriteLine("Assembling...");
+                    file.Save(output);
                     stopwatch.Stop();
                     Console.WriteLine("Finished in {0} seconds", stopwatch.Elapsed.TotalSeconds);
                 }
@@ -218,7 +225,7 @@ namespace ParamXML
                     value = float.Parse(node.InnerText);
                     break;
                 case ParamType.hash40:
-                    value = bool.Parse(node.InnerText);
+                    value = new Hash40(node.InnerText, stringToHashLabels);
                     break;
                 case ParamType.@string:
                     value = node.InnerText;

@@ -15,7 +15,7 @@ namespace paracobNET
         {
             if (hash40.StartsWith("0x"))
                 Value = ulong.Parse(hash40.Substring(2), System.Globalization.NumberStyles.HexNumber);
-            else if (labels != null && labels.ContainsKey(hash40))
+            else if (labels.ContainsKey(hash40))
                 Value = labels[hash40];
             else
                 throw new Exception("The string " + hash40 + " does not represent a hexadecimal value and no matching label was found");
