@@ -76,6 +76,7 @@ namespace paracobNET
                 if (node.Value.TypeKey == ParamType.@string)
                 {
                     var entry = ParamFile.RefEntries[(int)ID];
+                    paramWriter.Write((byte)ParamType.@string);
                     paramWriter.Write(entry.stringOffsetPairs[(string)(node.Value as ParamValue).Value] + entry.offset);
                 }
                 else

@@ -71,7 +71,7 @@ namespace paracobNET
             {
                 AsmHashTable = new List<Hash40>();
                 RefEntries = new List<RefTableEntry>();
-                using (FileStream = File.OpenWrite(filepath))
+                using (FileStream = File.Create(filepath))
                 using (WriterHeader = new BinaryWriter(new MemoryStream()))
                 using (WriterHash = new BinaryWriter(new MemoryStream()))
                 using (WriterRef = new BinaryWriter(new MemoryStream()))
