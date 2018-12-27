@@ -20,7 +20,7 @@ namespace ParamCLI
         static ParamFile paramFile { get; set; }
         static string paramInput { get; set; }
         static string paramOutput { get; set; }
-        static Dictionary<uint, string> labels { get; set; }
+        static Dictionary<ulong, string> labels { get; set; }
         static Stopwatch stopwatch { get; set; }
 
         static Stack<IParam> stack { get; set; }
@@ -45,7 +45,7 @@ namespace ParamCLI
                             paramOutput = args[++i];
                             break;
                         case "-l":
-                            labels = LabelIO.Read(args[++i]);
+                            labels = LabelIO.GetHashStringDict(args[++i]);
                             break;
                         default:
                             paramInput = args[i];

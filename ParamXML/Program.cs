@@ -14,9 +14,11 @@ namespace ParamXML
             "required: [input] ; -d / -a (disassemble/assemble)\n" +
             "optional: -h ; -help ; -o [output] ; -l [label file]";
         static BuildMode mode = BuildMode.Invalid;
-        static ParamFile file;
-        static XmlDocument xml;
-        static Dictionary<uint, string> labels = new Dictionary<uint, string>();
+        static ParamFile file { get; set; }
+        static XmlDocument xml { get; set; }
+        static string labelName { get; set; }
+        static Dictionary<ulong, string> hashToStringLabels { get; set; }
+        static Dictionary<string, ulong> stringToHashLabels { get; set; }
         static Stopwatch stopwatch { get; set; }
 
         static void Main(string[] args)
@@ -46,7 +48,7 @@ namespace ParamXML
                             output = args[++i];
                             break;
                         case "-l":
-                            labels = LabelIO.Read(args[++i]);
+                            labelName = args[++i];
                             break;
                         default:
                             input = args[i];
@@ -63,6 +65,7 @@ namespace ParamXML
                 {
                     if (output == null)
                         output = Path.GetFileNameWithoutExtension(input) + ".xml";
+                    hashToStringLabels = LabelIO.GetHashStringDict(labelName);
                     Console.WriteLine("Initializing...");
                     stopwatch.Start();
                     file = new ParamFile(input);
@@ -78,6 +81,7 @@ namespace ParamXML
                 {
                     if (output == null)
                         output = Path.GetFileNameWithoutExtension(input) + ".prc";
+                    stringToHashLabels = LabelIO.GetStringHashDict(labelName);
                     Console.WriteLine("Initializing...");
                     stopwatch.Start();
                     //stuff
@@ -120,7 +124,7 @@ namespace ParamXML
             {
                 XmlNode childNode = Param2Node(node.Value);
                 XmlAttribute attr = xml.CreateAttribute("hash");
-                attr.Value = node.Key.ToString(labels);
+                attr.Value = node.Key.ToString(hashToStringLabels);
                 childNode.Attributes.Append(attr);
                 xmlNode.AppendChild(childNode);
             }
@@ -147,14 +151,82 @@ namespace ParamXML
         static XmlNode ParamValue2Node(ParamValue value)
         {
             XmlNode xmlNode = xml.CreateElement(value.TypeKey.ToString());
-            XmlText text = xml.CreateTextNode(value.ToString(labels));
+            XmlText text = xml.CreateTextNode(value.ToString(hashToStringLabels));
             xmlNode.AppendChild(text);
             return xmlNode;
         }
 
+        static IParam Node2Param(XmlNode node)
+        {
+            if (!Enum.IsDefined(typeof(ParamType), node.Name))
+                throw new FormatException(node.Name + " is not a valid param type");
+            ParamType type = (ParamType)Enum.Parse(typeof(ParamType), node.Name);
+            switch (type)
+            {
+                case ParamType.@struct:
+                    return Node2ParamStruct(node);
+                case ParamType.array:
+                    return Node2ParamArray(node);
+                default:
+                    return Node2ParamValue(node, type);
+            }
+        }
+
         static ParamStruct Node2ParamStruct(XmlNode node)
         {
+            Dictionary<Hash40, IParam> childParams = new Dictionary<Hash40, IParam>();
+            foreach (XmlNode child in node.ChildNodes)
+                childParams.Add(new Hash40(child.Attributes["hash"].Value, stringToHashLabels), Node2Param(child));
+            return new ParamStruct(childParams);
+        }
 
+        static ParamArray Node2ParamArray(XmlNode node)
+        {
+            IParam[] children = new IParam[node.ChildNodes.Count];
+            for (int i = 0; i < children.Length; i++)
+                children[i] = Node2Param(node.ChildNodes[i]);
+            return new ParamArray(children);
+        }
+
+        static ParamValue Node2ParamValue(XmlNode node, ParamType type)
+        {
+            object value;
+            switch (type)
+            {
+                case ParamType.@bool:
+                    value = bool.Parse(node.InnerText);
+                    break;
+                case ParamType.@sbyte:
+                    value = sbyte.Parse(node.InnerText);
+                    break;
+                case ParamType.@byte:
+                    value = byte.Parse(node.InnerText);
+                    break;
+                case ParamType.@short:
+                    value = short.Parse(node.InnerText);
+                    break;
+                case ParamType.@ushort:
+                    value = ushort.Parse(node.InnerText);
+                    break;
+                case ParamType.@int:
+                    value = int.Parse(node.InnerText);
+                    break;
+                case ParamType.@uint:
+                    value = uint.Parse(node.InnerText);
+                    break;
+                case ParamType.@float:
+                    value = float.Parse(node.InnerText);
+                    break;
+                case ParamType.hash40:
+                    value = bool.Parse(node.InnerText);
+                    break;
+                case ParamType.@string:
+                    value = node.InnerText;
+                    break;
+                default:
+                    throw new Exception("This exception isn't designed to be possible");
+            }
+            return new ParamValue(type, value);
         }
 
         enum BuildMode

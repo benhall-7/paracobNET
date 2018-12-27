@@ -89,7 +89,7 @@ namespace paracobNET
             }
         }
 
-        public string ToString(Dictionary<uint, string> labels)
+        public string ToString(Dictionary<ulong, string> labels)
         {
             if (TypeKey == ParamType.hash40)
                 return ((Hash40)Value).ToString(labels);

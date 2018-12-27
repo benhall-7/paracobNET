@@ -13,7 +13,7 @@ namespace Param2Form
 
         DataTable paramTbl;
 
-        Dictionary<uint, string> labels = new Dictionary<uint, string>();
+        Dictionary<ulong, string> labels = new Dictionary<ulong, string>();
         const string defaultLabels = "ParamLabels.csv";
 
         public MainForm()
@@ -72,7 +72,7 @@ namespace Param2Form
         private void OpenParamLabels(string filename)
         {
             SetStatus("Opening Labels: " + filename);
-            labels = LabelIO.Read(filename);
+            labels = LabelIO.GetHashStringDict(filename);
         }
 
         private void openParamFileToolStripMenuItem_Click(object sender, EventArgs e)

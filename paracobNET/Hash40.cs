@@ -11,6 +11,15 @@ namespace paracobNET
         {
             Value = hash40;
         }
+        public Hash40(string hash40, Dictionary<string, ulong> labels)
+        {
+            if (hash40.StartsWith("0x"))
+                Value = ulong.Parse(hash40.Substring(2), System.Globalization.NumberStyles.HexNumber);
+            else if (labels != null && labels.ContainsKey(hash40))
+                Value = labels[hash40];
+            else
+                throw new Exception("The string " + hash40 + " does not represent a hexadecimal value and no matching label was found");
+        }
 
         public uint Hash
         {
@@ -25,7 +34,7 @@ namespace paracobNET
         {
             return "0x" + Value.ToString("x10");
         }
-        public string ToString(Dictionary<uint, string> labels)
+        public string ToString(Dictionary<ulong, string> labels)
         {
             if (labels.ContainsKey(Hash))
                 return labels[Hash];
