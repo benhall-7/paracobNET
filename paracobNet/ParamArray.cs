@@ -8,6 +8,12 @@ namespace paracobNET
         
         public IParam[] Nodes { get; private set; }
 
+        public ParamArray() { }
+        public ParamArray(IParam[] nodes)
+        {
+            Nodes = nodes;
+        }
+
         internal void Read()
         {
             var reader = ParamFile.Reader;

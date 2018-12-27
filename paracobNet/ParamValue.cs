@@ -11,6 +11,11 @@ namespace paracobNET
         {
             TypeKey = type;
         }
+        public ParamValue(ParamType type, object value)
+        {
+            TypeKey = type;
+            Value = value;
+        }
 
         internal void Read()
         {

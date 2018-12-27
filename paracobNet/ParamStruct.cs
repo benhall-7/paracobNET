@@ -12,6 +12,12 @@ namespace paracobNET
         //only used on rebuild
         internal SortedDictionary<Hash40, IParam> SortedNodes { get; set; }
 
+        public ParamStruct() { }
+        public ParamStruct(Dictionary<Hash40, IParam> nodes)
+        {
+            Nodes = nodes;
+        }
+
         internal void Read()
         {
             var reader = ParamFile.Reader;

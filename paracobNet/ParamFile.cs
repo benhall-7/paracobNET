@@ -64,6 +64,10 @@ namespace paracobNET
                 StructOffsets = null;
             }
         }
+        public ParamFile(ParamStruct root)
+        {
+            Root = root;
+        }
 
         public void Save(string filepath)
         {

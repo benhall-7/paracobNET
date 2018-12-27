@@ -11,8 +11,9 @@ namespace ParamXML
     {
         static string HelpText = 
             "ParamXML: Convert Ultimate param (.prc) files to XML format or (TODO) back.\n" +
-            "required: [input]\n" +
+            "required: [input] ; -d / -a (disassemble/assemble)\n" +
             "optional: -h ; -help ; -o [output] ; -l [label file]";
+        static BuildMode mode = BuildMode.Invalid;
         static ParamFile file;
         static XmlDocument xml;
         static Dictionary<uint, string> labels = new Dictionary<uint, string>();
@@ -30,6 +31,12 @@ namespace ParamXML
                 {
                     switch (args[i])
                     {
+                        case "-d":
+                            mode = BuildMode.Disassemble;
+                            break;
+                        case "-a":
+                            mode = BuildMode.Assemble;
+                            break;
                         case "-h":
                         case "-help":
                             Console.WriteLine(HelpText);
@@ -46,24 +53,40 @@ namespace ParamXML
                             break;
                     }
                 }
-                if (input == null)
+                if (input == null || mode == BuildMode.Invalid)
                 {
                     if (!helpPrinted)
                         Console.WriteLine(HelpText);
                     return;
                 }
-                if (output == null)
-                    output = Path.GetFileNameWithoutExtension(input) + ".xml";
-                Console.WriteLine("Initializing...");
-                stopwatch.Start();
-                file = new ParamFile(input);
-                Console.WriteLine("Converting...");
-                xml = new XmlDocument();
-                xml.AppendChild(xml.CreateXmlDeclaration("1.0", "UTF-8", null));
-                xml.AppendChild(ParamStruct2Node(file.Root));
-                xml.Save(output);
-                stopwatch.Stop();
-                Console.WriteLine("Finished in {0} seconds", stopwatch.Elapsed.TotalSeconds);
+                if (mode == BuildMode.Disassemble)
+                {
+                    if (output == null)
+                        output = Path.GetFileNameWithoutExtension(input) + ".xml";
+                    Console.WriteLine("Initializing...");
+                    stopwatch.Start();
+                    file = new ParamFile(input);
+                    Console.WriteLine("Converting...");
+                    xml = new XmlDocument();
+                    xml.AppendChild(xml.CreateXmlDeclaration("1.0", "UTF-8", null));
+                    xml.AppendChild(ParamStruct2Node(file.Root));
+                    xml.Save(output);
+                    stopwatch.Stop();
+                    Console.WriteLine("Finished in {0} seconds", stopwatch.Elapsed.TotalSeconds);
+                }
+                else
+                {
+                    if (output == null)
+                        output = Path.GetFileNameWithoutExtension(input) + ".prc";
+                    Console.WriteLine("Initializing...");
+                    stopwatch.Start();
+                    //stuff
+                    xml = new XmlDocument();
+                    xml.Load(input);
+                    file = new ParamFile(Node2ParamStruct(xml.DocumentElement));
+                    stopwatch.Stop();
+                    Console.WriteLine("Finished in {0} seconds", stopwatch.Elapsed.TotalSeconds);
+                }
             }
             catch (Exception e)
             {
@@ -127,6 +150,18 @@ namespace ParamXML
             XmlText text = xml.CreateTextNode(value.ToString(labels));
             xmlNode.AppendChild(text);
             return xmlNode;
+        }
+
+        static ParamStruct Node2ParamStruct(XmlNode node)
+        {
+
+        }
+
+        enum BuildMode
+        {
+            Disassemble,
+            Assemble,
+            Invalid
         }
     }
 }
