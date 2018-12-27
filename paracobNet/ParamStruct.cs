@@ -46,37 +46,7 @@ namespace paracobNET
                 Nodes.Add(hash, param);
             }
         }
-        internal void Write()
-        {
-            var paramWriter = ParamFile.WriterParam;
-            var refWriter = ParamFile.WriterRef;
-            uint[] offsets = new uint[Nodes.Count];
-            long paramStartPos = paramWriter.BaseStream.Position - 1;
-            long refStartPos = refWriter.BaseStream.Position;
-
-            paramWriter.Write(Nodes.Count);
-            paramWriter.Write((uint)refWriter.BaseStream.Position);
-
-            List<Hash40> sortedHashes = Nodes.Keys.ToList();
-            sortedHashes.Sort();
-
-            //allocate space for the entire node's contents first
-            //so we can generate offsets when each one is assembled
-            //THIS LEAVES NO ROOM FOR STRINGS
-            refWriter.BaseStream.Seek(Nodes.Count * 8, SeekOrigin.Current);
-            for (int i = 0; i < Nodes.Count; i++)
-            {
-                offsets[i] = (uint)(paramWriter.BaseStream.Position - paramStartPos);
-                Util.WriteParam(Nodes[sortedHashes[i]]);
-            }
-            refWriter.BaseStream.Seek(refStartPos, SeekOrigin.Begin);
-            for (int i = 0; i < Nodes.Count; i++)
-            {
-                refWriter.Write(ParamFile.AsmHashTable.IndexOf(sortedHashes[i]));
-                refWriter.Write(offsets[i]);
-            }
-        }
-        public void SetupRefTable()
+        internal void SetupRefTable()
         {
             SortedNodes = new SortedDictionary<Hash40, IParam>(Nodes);
             RefTableEntry entry = new RefTableEntry(this);
@@ -94,6 +64,25 @@ namespace paracobNET
 
             foreach (var node in SortedNodes)
                 Util.ParseParamForRefTables(node.Value, entry);
+        }
+        internal void Write()
+        {
+            var paramWriter = ParamFile.WriterParam;
+            paramWriter.Write(Nodes.Count);
+            paramWriter.Write(ParamFile.RefEntries[(int)ID].offset);
+
+            foreach (var node in SortedNodes)
+            {
+                if (node.Value.TypeKey == ParamType.@string)
+                {
+                    var entry = ParamFile.RefEntries[(int)ID];
+                    paramWriter.Write(entry.stringOffsetPairs[(string)(node.Value as ParamValue).Value] + entry.offset);
+                }
+                else
+                    Util.WriteParam(node.Value);
+            }
+
+            SortedNodes = null;
         }
     }
 }

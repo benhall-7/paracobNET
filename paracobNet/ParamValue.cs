@@ -81,10 +81,6 @@ namespace paracobNET
                 case ParamType.hash40:
                     writer.Write(ParamFile.AsmHashTable.IndexOf((Hash40)Value));
                     break;
-                case ParamType.@string:
-                    writer.Write((uint)ParamFile.WriterRef.BaseStream.Position);
-                    Util.WriteString((string)Value);
-                    break;
             }
         }
 

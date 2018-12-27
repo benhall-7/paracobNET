@@ -85,13 +85,6 @@ namespace paracobNET
                 ParamFile.AsmHashTable.Add(hash);
             }
         }
-        public static void WriteString(string word)
-        {
-            var writer = ParamFile.WriterRef;
-            for (int i = 0; i < word.Length; i++)
-                writer.Write((byte)word[i]);
-            writer.Write((byte)0);
-        }
         public static void ParseParamForRefTables(IParam param, RefTableEntry entry)
         {
             switch (param.TypeKey)
@@ -108,13 +101,24 @@ namespace paracobNET
                     break;
             }
         }
-        //public static uint GetRefSize()
-        //{
-        //    uint local = 0;
-        //    foreach (var entry in ParamFile.RefEntries)
-        //        local += entry.localStringOffset;//after all strings are written, this equals size
-        //    return local;
-        //}
+        public static void WriteRefTables()
+        {
+            var writer = ParamFile.WriterRef;
+            foreach (var entry in ParamFile.RefEntries)
+            {
+                foreach (var pair in entry.hashOffsetPairs)
+                {
+                    writer.Write(pair.Key);
+                    writer.Write(pair.Value);
+                }
+                foreach (var pair in entry.stringOffsetPairs)
+                {
+                    for (int i = 0; i < pair.Key.Length; i++)
+                        writer.Write((byte)pair.Key[i]);
+                    writer.Write((byte)0);
+                }
+            }
+        }
         public static uint GetParamSize(IParam param)
         {
             switch (param.TypeKey)

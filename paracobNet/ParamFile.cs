@@ -28,6 +28,7 @@ namespace paracobNET
         static internal List<Hash40> AsmHashTable { get; set; }//list of hashes appended to
         static internal BinaryWriter WriterHash { get; set; }//hash table stream
         static internal List<RefTableEntry> RefEntries { get; set; }//reference entry classes
+        static internal uint RefSize { get; set; }
         static internal BinaryWriter WriterRef { get; set; }//reference table stream
         static internal BinaryWriter WriterParam { get; set; }//param stream
         #endregion
@@ -81,9 +82,16 @@ namespace paracobNET
                     Util.WriteHash(new Hash40(0));
                     Util.IterateHashes(Root);
                     Root.SetupRefTable();
+                    RefSize = 0;
+                    foreach (var entry in RefEntries)
+                    {
+                        entry.offset = RefSize;
+                        RefSize += entry.localStringOffset;
+                    }
+                    Util.WriteRefTables();
                     Util.WriteParam(Root);
                     WriterHeader.Write((uint)WriterHash.BaseStream.Length);
-                    WriterHeader.Write((uint)WriterRef.BaseStream.Length);
+                    WriterHeader.Write(RefSize);
 
                     WriterHeader.BaseStream.Position = 0;
                     WriterHash.BaseStream.Position = 0;
