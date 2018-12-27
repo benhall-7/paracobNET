@@ -9,6 +9,8 @@ namespace paracobNET
         public ParamType TypeKey { get; } = ParamType.@struct;
         public uint ID { get; set; }
         public Dictionary<Hash40, IParam> Nodes { get; set; }
+        //only used on rebuild
+        internal SortedDictionary<Hash40, IParam> SortedNodes { get; set; }
 
         internal void Read()
         {
@@ -28,14 +30,20 @@ namespace paracobNET
             reader.BaseStream.Seek(StructRefOffset + ParamFile.RefStart, SeekOrigin.Begin);
             Dictionary<uint, uint> pairs = new Dictionary<uint, uint>();
             for (int i = 0; i < size; i++)
-                pairs.Add(reader.ReadUInt32(), reader.ReadUInt32());
+            {
+                uint hashIndex = reader.ReadUInt32();
+                uint paramOffset = reader.ReadUInt32();
+                pairs.Add(hashIndex, paramOffset);
+            }
             var hashIndeces = pairs.Keys.ToList();
             hashIndeces.Sort();
             for (int i = 0; i < size; i++)
             {
                 var key = hashIndeces[i];
                 reader.BaseStream.Seek(startPos + pairs[key], SeekOrigin.Begin);
-                Nodes.Add(ParamFile.DisasmHashTable[key], Util.ReadParam());
+                Hash40 hash = ParamFile.DisasmHashTable[key];
+                IParam param = Util.ReadParam();
+                Nodes.Add(hash, param);
             }
         }
         internal void Write()
@@ -67,6 +75,25 @@ namespace paracobNET
                 refWriter.Write(ParamFile.AsmHashTable.IndexOf(sortedHashes[i]));
                 refWriter.Write(offsets[i]);
             }
+        }
+        public void SetupRefTable()
+        {
+            SortedNodes = new SortedDictionary<Hash40, IParam>(Nodes);
+            RefTableEntry entry = new RefTableEntry(this);
+            int refIndex = ParamFile.RefEntries.IndexOf(entry);
+            if (refIndex < 0)
+            {
+                ID = (uint)ParamFile.RefEntries.Count;
+                ParamFile.RefEntries.Add(entry);
+            }
+            else
+            {
+                ID = (uint)refIndex;
+            }
+            entry = ParamFile.RefEntries[(int)ID];
+
+            foreach (var node in SortedNodes)
+                Util.ParseParamForRefTables(node.Value, entry);
         }
     }
 }

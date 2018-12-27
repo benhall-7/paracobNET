@@ -7,7 +7,7 @@ namespace paracobNET
 {
     internal class RefTableEntry : IEquatable<RefTableEntry>
     {
-        public uint offset { get; set; }
+        public uint offset { get; set; }//gets calculated after all the structs are parsed
         public Dictionary<uint, uint> hashOffsetPairs { get; set; }
         public Dictionary<string, uint> stringOffsetPairs { get; set; }
         public uint localStringOffset { get; set; }
@@ -20,7 +20,7 @@ namespace paracobNET
             stringOffsetPairs = new Dictionary<string, uint>();
             localParamOffset = 9;//typekey + count + offset
             localStringOffset = (uint)paramStruct.Nodes.Count * 8;
-            foreach (var param in paramStruct.Nodes)
+            foreach (var param in paramStruct.SortedNodes)
             {
                 hashOffsetPairs.Add((uint)ParamFile.AsmHashTable.IndexOf(param.Key), localParamOffset);
                 localParamOffset += Util.GetParamSize(param.Value);

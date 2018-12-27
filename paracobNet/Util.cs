@@ -92,48 +92,29 @@ namespace paracobNET
                 writer.Write((byte)word[i]);
             writer.Write((byte)0);
         }
-        public static void SetupRefTables(ParamStruct paramStruct)
-        {
-            RefTableEntry entry = new RefTableEntry(paramStruct);
-            int refIndex = ParamFile.RefEntries.IndexOf(entry);
-            if (refIndex < 0)
-            {
-                paramStruct.ID = (uint)ParamFile.RefEntries.Count;
-                ParamFile.RefEntries.Add(entry);
-            }
-            else
-            {
-                paramStruct.ID = (uint)refIndex;
-            }
-            entry = ParamFile.RefEntries[(int)paramStruct.ID];
-
-            foreach (var node in paramStruct.Nodes)
-            {
-                if (node.Value.TypeKey == ParamType.@string)
-                    entry.AppendString((string)(node.Value as ParamValue).Value);
-                ParseParamForRefTables(node.Value);
-            }
-        }
-        public static void ParseParamForRefTables(IParam param)
+        public static void ParseParamForRefTables(IParam param, RefTableEntry entry)
         {
             switch (param.TypeKey)
             {
+                case ParamType.@string:
+                    entry.AppendString((string)(param as ParamValue).Value);
+                    break;
                 case ParamType.array:
                     foreach (var node in (param as ParamArray).Nodes)
-                        ParseParamForRefTables(node);
+                        ParseParamForRefTables(node, entry);
                     break;
                 case ParamType.@struct:
-                    SetupRefTables(param as ParamStruct);
+                    (param as ParamStruct).SetupRefTable();
                     break;
             }
         }
-        public static uint GetRefSize()
-        {
-            uint local = 0;
-            foreach (var entry in ParamFile.RefEntries)
-                local += entry.localStringOffset;//after all strings are written, this equals size
-            return local;
-        }
+        //public static uint GetRefSize()
+        //{
+        //    uint local = 0;
+        //    foreach (var entry in ParamFile.RefEntries)
+        //        local += entry.localStringOffset;//after all strings are written, this equals size
+        //    return local;
+        //}
         public static uint GetParamSize(IParam param)
         {
             switch (param.TypeKey)
