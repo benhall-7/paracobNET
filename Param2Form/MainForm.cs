@@ -45,27 +45,29 @@ namespace Param2Form
             param_TreeView.Nodes[0].Expand();
         }
 
-        private TreeNode Param2TreeNode(IParam param)
+        private ParamTreeNode Param2TreeNode(IParam param)
         {
-            TreeNode node = new TreeNode(param.TypeKey.ToString());
+            ParamTreeNode node = new ParamTreeNode(param, param.TypeKey.ToString());
             switch (param.TypeKey)
             {
                 case ParamType.array:
                     {
-                        ParamArray paramArray = (ParamArray)param;
-                        foreach (var sub_node in paramArray.Nodes)
-                            node.Nodes.Add(Param2TreeNode(sub_node));
+                        foreach (var child in (param as ParamArray).Nodes)
+                            node.Nodes.Add(Param2TreeNode(child));
                         break;
                     }
                 case ParamType.@struct:
                     {
-                        ParamStruct paramStruct = (ParamStruct)param;
-                        foreach (var sub_node in paramStruct.Nodes)
-                            node.Nodes.Add(Param2TreeNode(sub_node.Value));
+                        foreach (var child in (param as ParamStruct).Nodes)
+                        {
+                            ParamTreeNode childPTN = Param2TreeNode(child.Value);
+                            childPTN.ContainsHash = true;
+                            childPTN.Hash = child.Key;
+                            node.Nodes.Add(childPTN);
+                        }
                         break;
                     }
             }
-            node.Tag = param;
             return node;
         }
 
@@ -107,24 +109,24 @@ namespace Param2Form
 
         private void param_TreeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            IParam param = (IParam)e.Node.Tag;
+            ParamTreeNode node = e.Node as ParamTreeNode;
+            IParam param = node.Param;
             switch (param.TypeKey)
             {
                 case ParamType.@struct:
                     {
                         paramTbl.Clear();
-                        var structure = (ParamStruct)param;
-                        foreach (var node in structure.Nodes)
+                        foreach (var child in (param as ParamStruct).Nodes)
                         {
                             DataRow row = paramTbl.NewRow();
-                            row["Hash"] = node.Key.ToString(labels);
-                            row["Type"] = node.Value.TypeKey.ToString();
-                            if (node.Value is ParamValue)
-                                row["Value"] = (node.Value as ParamValue).ToString(labels);
-                            else if (node.Value is ParamArray)
-                                row["Value"] = (node.Value as ParamArray).Nodes.Length;
+                            row["Hash"] = child.Key.ToString(labels);
+                            row["Type"] = child.Value.TypeKey.ToString();
+                            if (child.Value is ParamValue)
+                                row["Value"] = (child.Value as ParamValue).ToString(labels);
+                            else if (child.Value is ParamArray)
+                                row["Value"] = (child.Value as ParamArray).Nodes.Length;
                             else
-                                row["Value"] = (node.Value as ParamStruct).Nodes.Count;
+                                row["Value"] = (child.Value as ParamStruct).Nodes.Count;
                             paramTbl.Rows.Add(row);
                         }
                         break;
@@ -133,15 +135,10 @@ namespace Param2Form
                     {
                         paramTbl.Clear();
                         DataRow row = paramTbl.NewRow();
-                        if (e.Node.Parent != null && e.Node.Parent.Tag is ParamStruct)
-                        {
-                            //var paramNode = (e.Node.Parent.Tag as ParamStruct).Nodes[e.Node.Index];
-                            //row["Hash"] = paramNode.HashEntry.ToString(labels);
-                        }
+                        if (node.ContainsHash)
+                            row["Hash"] = node.Hash.ToString(labels);
                         else
-                        {
                             row["Hash"] = "NA";
-                        }
                         row["Type"] = param.TypeKey.ToString();
                         if (param is ParamValue)
                             row["Value"] = (param as ParamValue).ToString(labels);
