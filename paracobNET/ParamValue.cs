@@ -84,7 +84,7 @@ namespace paracobNET
                     writer.Write((float)Value);
                     break;
                 case ParamType.hash40:
-                    writer.Write(ParamFile.AsmHashTable.IndexOf((Hash40)Value));
+                    writer.Write(ParamFile.AsmHashTable.IndexOf((ulong)Value));
                     break;
             }
         }
@@ -92,7 +92,7 @@ namespace paracobNET
         public string ToString(Dictionary<ulong, string> labels)
         {
             if (TypeKey == ParamType.hash40)
-                return ((Hash40)Value).ToString(labels);
+                return Hash40Operator.FormatToString((ulong)Value, labels);
             return Value.ToString();
         }
     }

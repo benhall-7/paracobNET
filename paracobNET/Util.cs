@@ -5,7 +5,7 @@ namespace paracobNET
 {
     static class Util
     {
-        public static IParam ReadParam()
+        internal static IParam ReadParam()
         {
             var reader = ParamFile.Reader;
             byte key = reader.ReadByte();
@@ -30,7 +30,7 @@ namespace paracobNET
             }
             return param;
         }
-        public static string ReadStringAsync(BinaryReader reader, uint position)
+        internal static string ReadStringAsync(BinaryReader reader, uint position)
         {
             long returnTo = reader.BaseStream.Position;
             reader.BaseStream.Seek(position, SeekOrigin.Begin);
@@ -40,7 +40,7 @@ namespace paracobNET
             reader.BaseStream.Seek(returnTo, SeekOrigin.Begin);
             return s;
         }
-        public static void IterateHashes(IParam param)
+        internal static void IterateHashes(IParam param)
         {
             switch (param.TypeKey)
             {
@@ -56,11 +56,11 @@ namespace paracobNET
                         IterateHashes(item);
                     break;
                 case ParamType.hash40:
-                    WriteHash((Hash40)(param as ParamValue).Value);
+                    WriteHash((ulong)(param as ParamValue).Value);
                     break;
             }
         }
-        public static void WriteParam(IParam param)
+        internal static void WriteParam(IParam param)
         {
             var writer = ParamFile.WriterParam;
             writer.Write((byte)param.TypeKey);
@@ -77,15 +77,15 @@ namespace paracobNET
                     break;
             }
         }
-        public static void WriteHash(Hash40 hash)
+        internal static void WriteHash(ulong hash)
         {
             if (!ParamFile.AsmHashTable.Contains(hash))
             {
-                ParamFile.WriterHash.Write(hash.Value);
+                ParamFile.WriterHash.Write(hash);
                 ParamFile.AsmHashTable.Add(hash);
             }
         }
-        public static void ParseParamForRefTables(IParam param, RefTableEntry entry)
+        internal static void ParseParamForRefTables(IParam param, RefTableEntry entry)
         {
             switch (param.TypeKey)
             {
@@ -101,7 +101,7 @@ namespace paracobNET
                     break;
             }
         }
-        public static void WriteRefTables()
+        internal static void WriteRefTables()
         {
             var writer = ParamFile.WriterRef;
             foreach (var entry in ParamFile.RefEntries)
@@ -119,7 +119,7 @@ namespace paracobNET
                 }
             }
         }
-        public static uint GetParamSize(IParam param)
+        internal static uint GetParamSize(IParam param)
         {
             switch (param.TypeKey)
             {
@@ -154,7 +154,7 @@ namespace paracobNET
                     }
             }
         }
-        public static uint CRC32(string word)
+        internal static uint CRC32(string word)
         {
             uint hash = 0xffffffff;
             for (int i = 0; i < word.Length; i++)

@@ -21,7 +21,7 @@ namespace paracobNET
             Nodes = new IParam[reader.ReadUInt32()];
             uint[] offsets = new uint[Nodes.Length];
 
-            //TODO: recognize a Type and make sure all elements are the same type
+            //all elements should be the same type but it's not enforced
 
             for (int i = 0; i < offsets.Length; i++)
                 offsets[i] = reader.ReadUInt32();

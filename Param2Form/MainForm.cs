@@ -119,7 +119,7 @@ namespace Param2Form
                         foreach (var child in (param as ParamStruct).Nodes)
                         {
                             DataRow row = paramTbl.NewRow();
-                            row["Hash"] = child.Key.ToString(labels);
+                            row["Hash"] = Hash40Operator.FormatToString(child.Key, labels);
                             row["Type"] = child.Value.TypeKey.ToString();
                             if (child.Value is ParamValue)
                                 row["Value"] = (child.Value as ParamValue).ToString(labels);
@@ -136,7 +136,7 @@ namespace Param2Form
                         paramTbl.Clear();
                         DataRow row = paramTbl.NewRow();
                         if (node.ContainsHash)
-                            row["Hash"] = node.Hash.ToString(labels);
+                            row["Hash"] = Hash40Operator.FormatToString(node.Hash, labels);
                         else
                             row["Hash"] = "NA";
                         row["Type"] = param.TypeKey.ToString();

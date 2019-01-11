@@ -131,7 +131,7 @@ namespace ParamXML
             {
                 XmlNode childNode = Param2Node(node.Value);
                 XmlAttribute attr = xml.CreateAttribute("hash");
-                attr.Value = node.Key.ToString(hashToStringLabels);
+                attr.Value = Hash40Operator.FormatToString(node.Key, hashToStringLabels);
                 childNode.Attributes.Append(attr);
                 xmlNode.AppendChild(childNode);
             }
@@ -181,9 +181,9 @@ namespace ParamXML
 
         static ParamStruct Node2ParamStruct(XmlNode node)
         {
-            Dictionary<Hash40, IParam> childParams = new Dictionary<Hash40, IParam>();
+            Hash40Dictionary<IParam> childParams = new Hash40Dictionary<IParam>();
             foreach (XmlNode child in node.ChildNodes)
-                childParams.Add(new Hash40(child.Attributes["hash"].Value, stringToHashLabels), Node2Param(child));
+                childParams.Add(Hash40Operator.LabelToHash40(child.Attributes["hash"].Value, stringToHashLabels), Node2Param(child));
             return new ParamStruct(childParams);
         }
 
@@ -225,7 +225,7 @@ namespace ParamXML
                     value = float.Parse(node.InnerText);
                     break;
                 case ParamType.hash40:
-                    value = new Hash40(node.InnerText, stringToHashLabels);
+                    value = Hash40Operator.LabelToHash40(node.InnerText, stringToHashLabels);
                     break;
                 case ParamType.@string:
                     value = node.InnerText;

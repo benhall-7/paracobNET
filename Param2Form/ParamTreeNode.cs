@@ -10,12 +10,12 @@ namespace Param2Form
     {
         public IParam Param { get; set; }
         public bool ContainsHash { get; set; }
-        public Hash40 Hash { get; set; }
+        public ulong Hash { get; set; }
 
         public ParamTreeNode(IParam param, string text) : base(text)
         {
             ContainsHash = false;
-            Hash = new Hash40(0);
+            Hash = 0;
             Param = param;
         }
     }

@@ -9,7 +9,7 @@ namespace ParamCLI
     class Program
     {
         const string HelpText =
-            "Param Line Interface: Edit param files on the command line\n" +
+            "ParamCLI: Edit param files on the command line\n" +
             "required: [input file]\n" +
             "optional: -h ; -help ; -o [output] ; -l [label file]";
         const string GlobalCommands =
@@ -29,6 +29,7 @@ namespace ParamCLI
         static void Main(string[] args)
         {
             stopwatch = new Stopwatch();
+            labels = new Dictionary<ulong, string>();
             bool helpPrinted = false;
             try
             {
@@ -159,7 +160,7 @@ namespace ParamCLI
             {
                 case "-pt":
                     foreach (var member in thisParam.Nodes)
-                        Console.WriteLine(">" + member.Key.ToString(labels) + ": " + paramInfo(member.Value));
+                        Console.WriteLine("   >" + Hash40Operator.FormatToString(member.Key, labels) + ": " + ParamInfo(member.Value));
                     break;
                 case "-f":
                     try
@@ -169,7 +170,7 @@ namespace ParamCLI
                             value = ulong.Parse(args[1].Substring(2), NumberStyles.HexNumber);
                         else
                             value = ulong.Parse(args[1]);
-                        stack.Push(thisParam.Nodes[new Hash40(value)]);
+                        stack.Push(thisParam.Nodes[value]);
                     }
                     catch (Exception e)
                     {
@@ -192,7 +193,7 @@ namespace ParamCLI
 
         }
 
-        static string paramInfo(IParam param)
+        static string ParamInfo(IParam param)
         {
             string type = "(" + param.TypeKey.ToString() + ")";
             switch (param.TypeKey)

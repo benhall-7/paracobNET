@@ -8,12 +8,12 @@ namespace paracobNET
     {
         public ParamType TypeKey { get; } = ParamType.@struct;
         public uint ID { get; set; }
-        public Dictionary<Hash40, IParam> Nodes { get; set; }
+        public Hash40Dictionary<IParam> Nodes { get; set; }
         //only used on rebuild
-        internal SortedDictionary<Hash40, IParam> SortedNodes { get; set; }
+        internal SortedDictionary<ulong, IParam> SortedNodes { get; set; }
 
         public ParamStruct() { }
-        public ParamStruct(Dictionary<Hash40, IParam> nodes)
+        public ParamStruct(Hash40Dictionary<IParam> nodes)
         {
             Nodes = nodes;
         }
@@ -23,7 +23,7 @@ namespace paracobNET
             var reader = ParamFile.Reader;
             uint startPos = (uint)reader.BaseStream.Position - 1;
             uint size = reader.ReadUInt32();
-            Nodes = new Dictionary<Hash40, IParam>();
+            Nodes = new Hash40Dictionary<IParam>();
 
             uint StructRefOffset = reader.ReadUInt32();
             if (ParamFile.StructOffsets.Contains(StructRefOffset))
@@ -47,14 +47,14 @@ namespace paracobNET
             {
                 var key = hashIndeces[i];
                 reader.BaseStream.Seek(startPos + pairs[key], SeekOrigin.Begin);
-                Hash40 hash = ParamFile.DisasmHashTable[key];
+                ulong hash = ParamFile.DisasmHashTable[key];
                 IParam param = Util.ReadParam();
                 Nodes.Add(hash, param);
             }
         }
         internal void SetupRefTable()
         {
-            SortedNodes = new SortedDictionary<Hash40, IParam>(Nodes);
+            SortedNodes = new SortedDictionary<ulong, IParam>(Nodes);
             RefTableEntry entry = new RefTableEntry(this);
             int refIndex = ParamFile.RefEntries.IndexOf(entry);
             if (refIndex < 0)
