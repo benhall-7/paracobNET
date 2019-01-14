@@ -19,7 +19,13 @@ namespace paracobNET
                         labels.Add(ulong.Parse(splits[0].Substring(2), NumberStyles.HexNumber), splits[1]);
                     else throw new InvalidDataException();
                 }
-                catch { Console.WriteLine($"Parse error in {filepath}, \"{line}\""); }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Parse error in {filepath}, \"{line}\"");
+#if DEBUG
+                    Console.WriteLine(e.Message);
+#endif
+                }
             }
             return labels;
         }
@@ -36,7 +42,13 @@ namespace paracobNET
                         labels.Add(splits[1], ulong.Parse(splits[0].Substring(2), NumberStyles.HexNumber));
                     else throw new InvalidDataException();
                 }
-                catch { Console.WriteLine($"Parse error in {filepath}, \"{line}\""); }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Parse error in {filepath}, \"{line}\"");
+#if DEBUG
+                    Console.WriteLine(e.Message);
+#endif
+                }
             }
             return labels;
         }

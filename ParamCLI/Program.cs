@@ -14,8 +14,8 @@ namespace ParamCLI
             "optional: -h ; -help ; -o [output] ; -l [label file]";
         const string GlobalCommands =
             "global commands (case sensitive):\n" +
-            "  -h (help) ; -q (quit) ; -s (save) ; -ow (overwrite save)\n" +
-            "  -b (go backward in tree)";
+            "  -h (help) ; -q (quit) ; -s (save) ; -so (save overwrite)\n" +
+            "  -b (go backward in tree) ; -pp (print path)";
 
         static ParamFile paramFile { get; set; }
         static string paramInput { get; set; }
@@ -99,7 +99,7 @@ namespace ParamCLI
                             case "-q":
                                 if (edited)
                                 {
-                                    Console.WriteLine("The file has unsaved changes. Are you sure you want to quit? (n = no, any other = yes)");
+                                    Console.WriteLine("The file has unsaved changes. Do you want to quit? (n = no, any other = yes)");
                                     if (Console.ReadKey().KeyChar == 'n')
                                         break;
                                 }
@@ -117,7 +117,7 @@ namespace ParamCLI
                                 stopwatch.Stop();
                                 Console.WriteLine("File saved in {0} seconds", stopwatch.Elapsed.TotalSeconds);
                                 break;
-                            case "-ow":
+                            case "-so":
                                 stopwatch.Start();
                                 paramFile.Save(paramInput);
                                 stopwatch.Stop();
@@ -126,6 +126,18 @@ namespace ParamCLI
                             case "-b":
                                 if (stack.Count > 1)
                                     stack.Pop();
+                                break;
+                            case "-pp":
+                                {
+                                    IParam[] path = stack.ToArray();
+                                    for (int j = 0; j < path.Length; j++)
+                                    {
+                                        string space = "";
+                                        for (int spaceCount = 0; spaceCount < j; spaceCount++)
+                                            space += " ";
+                                        Console.WriteLine(space + ">" + ParamInfo(path[j]));
+                                    }
+                                }
                                 break;
                             default:
                                 EvalCurrentParam(args);
@@ -142,25 +154,25 @@ namespace ParamCLI
             switch (current.TypeKey)
             {
                 case ParamType.@struct:
-                    EvalStruct(args);
+                    EvalCommandForStruct(args);
                     break;
                 case ParamType.array:
-                    EvalArray(args);
+                    EvalCommandForArray(args);
                     break;
                 default:
-                    EvalValue(args);
+                    EvalCommandForValue(args);
                     break;
             }
         }
 
-        static void EvalStruct(string[] args)
+        static void EvalCommandForStruct(string[] args)
         {
             ParamStruct thisParam = stack.Peek() as ParamStruct;
             switch (args[0])
             {
-                case "-pt":
+                case "-pc":
                     foreach (var member in thisParam.Nodes)
-                        Console.WriteLine("   >" + Hash40Operator.FormatToString(member.Key, labels) + ": " + ParamInfo(member.Value));
+                        Console.WriteLine(" >" + Hash40Operator.FormatToString(member.Key, labels) + ": " + ParamInfo(member.Value));
                     break;
                 case "-f":
                     try
@@ -169,7 +181,7 @@ namespace ParamCLI
                         if (args[1].StartsWith("0x"))
                             value = ulong.Parse(args[1].Substring(2), NumberStyles.HexNumber);
                         else
-                            value = ulong.Parse(args[1]);
+                            value = Hash40Operator.StringToHash40(args[1]);
                         stack.Push(thisParam.Nodes[value]);
                     }
                     catch (Exception e)
@@ -183,12 +195,31 @@ namespace ParamCLI
             }
         }
 
-        static void EvalArray(string[] args)
+        static void EvalCommandForArray(string[] args)
         {
-
+            ParamArray paramArray = stack.Peek() as ParamArray;
+            switch (args[0])
+            {
+                case "-cc":
+                    Console.WriteLine(paramArray.Nodes.Length);
+                    break;
+                case "-f":
+                    try
+                    {
+                        stack.Push(paramArray.Nodes[int.Parse(args[1])]);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                    break;
+                default:
+                    Console.WriteLine("unknown command {0}", args[0]);
+                    break;
+            }
         }
 
-        static void EvalValue(string[] args)
+        static void EvalCommandForValue(string[] args)
         {
 
         }
