@@ -92,7 +92,7 @@ namespace paracobNET
         public string ToString(Dictionary<ulong, string> labels)
         {
             if (TypeKey == ParamType.hash40)
-                return Hash40Operator.FormatToString((ulong)Value, labels);
+                return Hash40Util.FormatToString((ulong)Value, labels);
             return Value.ToString();
         }
     }

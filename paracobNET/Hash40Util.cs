@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Globalization;
 
 namespace paracobNET
 {
-    public static class Hash40Operator
+    public static class Hash40Util
     {
         public static uint GetCRC32(ulong hash40)
         {
@@ -30,7 +31,8 @@ namespace paracobNET
         }
         public static ulong LabelToHash40(string hash40, Dictionary<string, ulong> labels)
         {
-            if (hash40.StartsWith("0x") && ulong.TryParse(hash40.Substring(2), out ulong val))
+            if (hash40.StartsWith("0x") &&
+                ulong.TryParse(hash40.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out ulong val))
                 return val;
             if (labels.ContainsKey(hash40))
                 return labels[hash40];

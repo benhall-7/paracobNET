@@ -8,13 +8,13 @@ namespace paracobNET
     {
         public bool ContainsKey(string keyName)
         {
-            return ContainsKey(Hash40Operator.StringToHash40(keyName));
+            return ContainsKey(Hash40Util.StringToHash40(keyName));
         }
 
         public T this[string keyName]
         {
-            get { return this[Hash40Operator.StringToHash40(keyName)]; }
-            set { this[Hash40Operator.StringToHash40(keyName)] = value; }
+            get { return this[Hash40Util.StringToHash40(keyName)]; }
+            set { this[Hash40Util.StringToHash40(keyName)] = value; }
         }
     }
 }

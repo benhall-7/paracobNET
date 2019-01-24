@@ -172,7 +172,7 @@ namespace ParamCLI
             {
                 case "-pc":
                     foreach (var member in thisParam.Nodes)
-                        Console.WriteLine(" >" + Hash40Operator.FormatToString(member.Key, labels) + ": " + ParamInfo(member.Value));
+                        Console.WriteLine(" >" + Hash40Util.FormatToString(member.Key, labels) + ": " + ParamInfo(member.Value));
                     break;
                 case "-f":
                     try
@@ -181,7 +181,7 @@ namespace ParamCLI
                         if (args[1].StartsWith("0x"))
                             value = ulong.Parse(args[1].Substring(2), NumberStyles.HexNumber);
                         else
-                            value = Hash40Operator.StringToHash40(args[1]);
+                            value = Hash40Util.StringToHash40(args[1]);
                         stack.Push(thisParam.Nodes[value]);
                     }
                     catch (Exception e)
