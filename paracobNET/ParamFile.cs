@@ -21,9 +21,8 @@ namespace paracobNET
         #endregion
 
         #region global_asm
-        //once each is finished being written, append each to the stream and write to file
+        //once each is finished being written, append each together and write to file
         static internal FileStream FileStream { get; set; }
-
         static internal BinaryWriter WriterHeader { get; set; }//header stream
         static internal List<ulong> AsmHashTable { get; set; }//list of hashes appended to
         static internal BinaryWriter WriterHash { get; set; }//hash table stream
@@ -33,15 +32,22 @@ namespace paracobNET
         static internal BinaryWriter WriterParam { get; set; }//param stream
         #endregion
 
-        public ParamFile(string filepath)
+        public ParamFile(string filepath, bool ignoreHeader = false)
         {
             try
             {
                 using (Reader = new BinaryReader(File.OpenRead(filepath)))
                 {
-                    for (int i = 0; i < magic.Length; i++)
-                        if (Reader.ReadByte() != (byte)magic[i])
-                            throw new InvalidDataException("File contains an invalid header");
+                    if (ignoreHeader)
+                    {
+                        Reader.BaseStream.Position = 8;
+                    }
+                    else
+                    {
+                        for (int i = 0; i < magic.Length; i++)
+                            if (Reader.ReadByte() != (byte)magic[i])
+                                throw new InvalidDataException("File contains an invalid header");
+                    }
                     HashTableSize = Reader.ReadUInt32();
                     RefTableSize = Reader.ReadUInt32();
                     DisasmHashTable = new ulong[HashTableSize / 8];
