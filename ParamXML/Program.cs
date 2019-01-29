@@ -67,7 +67,7 @@ namespace ParamXML
                 }
                 if (mode == BuildMode.Disassemble)
                 {
-                    if (output == null)
+                    if (string.IsNullOrEmpty(output))
                         output = Path.GetFileNameWithoutExtension(input) + ".xml";
                     hashToStringLabels = new Dictionary<ulong, string>();
                     if (!string.IsNullOrEmpty(labelName))
@@ -86,7 +86,7 @@ namespace ParamXML
                 }
                 else
                 {
-                    if (output == null)
+                    if (string.IsNullOrEmpty(output))
                         output = Path.GetFileNameWithoutExtension(input) + ".prc";
                     stringToHashLabels = new Dictionary<string, ulong>();
                     if (!string.IsNullOrEmpty(labelName))
@@ -106,9 +106,10 @@ namespace ParamXML
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
-                if (!helpPrinted)
-                    Console.WriteLine(HelpText);
+                if (e.InnerException == null)
+                    Console.WriteLine(e.StackTrace);
+                else
+                    Console.WriteLine(e.InnerException.StackTrace);
             }
         }
 
@@ -169,17 +170,32 @@ namespace ParamXML
 
         static IParam Node2Param(XmlNode node)
         {
-            if (!Enum.IsDefined(typeof(ParamType), node.Name))
-                throw new FormatException(node.Name + " is not a valid param type");
-            ParamType type = (ParamType)Enum.Parse(typeof(ParamType), node.Name);
-            switch (type)
+            try
             {
-                case ParamType.@struct:
-                    return Node2ParamStruct(node);
-                case ParamType.array:
-                    return Node2ParamArray(node);
-                default:
-                    return Node2ParamValue(node, type);
+                if (!Enum.IsDefined(typeof(ParamType), node.Name))
+                    throw new FormatException($"\"{node.Name}\" is not a valid param type");
+                ParamType type = (ParamType)Enum.Parse(typeof(ParamType), node.Name);
+                switch (type)
+                {
+                    case ParamType.@struct:
+                        return Node2ParamStruct(node);
+                    case ParamType.array:
+                        return Node2ParamArray(node);
+                    default:
+                        return Node2ParamValue(node, type);
+                }
+            }
+            catch (Exception e)
+            {
+                //recursively add param node context to exceptions until we exit
+                string trace = "Trace: " + node.Name;
+                foreach (XmlAttribute attr in node.Attributes)
+                    trace += $" ({attr.Name}=\"{attr.Value}\")";
+                string message = trace + Environment.NewLine + e.Message;
+                if (e.InnerException == null)
+                    throw new Exception(message, e);
+                else
+                    throw new Exception(message, e.InnerException);
             }
         }
 
