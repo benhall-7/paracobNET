@@ -2,7 +2,7 @@
 
 Param (.prc) class library for Smash Ultimate, and the central tool for other projects in this repository. Can open, manipulate, save, and create param files. Dependent on .NET Standard 2.0
 
-# paramXML
+# ParamXML
 
 Command line program to convert params to XML format and back. To run requires the .NET Core version 2.1 runtime (https://dotnet.microsoft.com/download/dotnet-core/2.1). To build requires the SDK of the same version.
 
