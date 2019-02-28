@@ -11,16 +11,13 @@ namespace ParamCLI
         const string HelpText =
             "ParamCLI: Edit param files on the command line\n" +
             "required: [input file]\n" +
-            "optional: -h ; -help ; -o [output] ; -l [label file]";
-        const string GlobalCommands =
-            "global commands (case sensitive):\n" +
-            "  -h (help) ; -q (quit) ; -s (save) ; -so (save overwrite)\n" +
-            "  -b (go backward in tree) ; -pp (print path)";
+            "optional: -h / -help ; -o [output] ; -l [label file]";
 
         static ParamFile paramFile { get; set; }
         static string paramInput { get; set; }
         static string paramOutput { get; set; }
-        static Dictionary<ulong, string> labels { get; set; }
+        static Dictionary<ulong, string> hashToString { get; set; }
+        static Dictionary<string, ulong> stringToHash { get; set; }
         static Stopwatch stopwatch { get; set; }
 
         static Stack<IParam> stack { get; set; }
@@ -29,7 +26,7 @@ namespace ParamCLI
         static void Main(string[] args)
         {
             stopwatch = new Stopwatch();
-            labels = new Dictionary<ulong, string>();
+            hashToString = new Dictionary<ulong, string>();
             bool helpPrinted = false;
             try
             {
@@ -46,7 +43,7 @@ namespace ParamCLI
                             paramOutput = args[++i];
                             break;
                         case "-l":
-                            labels = LabelIO.GetHashStringDict(args[++i]);
+                            hashToString = LabelIO.GetHashStringDict(args[++i]);
                             break;
                         default:
                             paramInput = args[i];
@@ -80,7 +77,6 @@ namespace ParamCLI
 
         static void EvalGlobal()
         {
-            Console.WriteLine(GlobalCommands);
             while (true)
             {
                 string[] commands = Console.ReadLine().Split(';');
@@ -93,8 +89,7 @@ namespace ParamCLI
                         switch (args[0])
                         {
                             case "-h":
-                                Console.WriteLine(GlobalCommands);
-                                //local commands
+                                PrintCommands();
                                 break;
                             case "-q":
                                 if (edited)
@@ -140,7 +135,11 @@ namespace ParamCLI
                                 }
                                 break;
                             default:
-                                EvalCurrentParam(args);
+                                if (!EvalCurrentParam(args))
+                                {
+                                    //end execution of command loop if a command failed
+                                    i = commands.Length;
+                                }
                                 break;
                         }
                     }
@@ -148,31 +147,28 @@ namespace ParamCLI
             }
         }
 
-        static void EvalCurrentParam(string[] args)
+        static bool EvalCurrentParam(string[] args)
         {
             IParam current = stack.Peek();
             switch (current.TypeKey)
             {
                 case ParamType.@struct:
-                    EvalCommandForStruct(args);
-                    break;
+                    return EvalCommandForStruct(args);
                 case ParamType.array:
-                    EvalCommandForArray(args);
-                    break;
+                    return EvalCommandForArray(args);
                 default:
-                    EvalCommandForValue(args);
-                    break;
+                    return EvalCommandForValue(args);
             }
         }
 
-        static void EvalCommandForStruct(string[] args)
+        static bool EvalCommandForStruct(string[] args)
         {
-            ParamStruct thisParam = stack.Peek() as ParamStruct;
+            ParamStruct paramStruct = stack.Peek() as ParamStruct;
             switch (args[0])
             {
                 case "-pc":
-                    foreach (var member in thisParam.Nodes)
-                        Console.WriteLine(" >" + Hash40Util.FormatToString(member.Key, labels) + ": " + ParamInfo(member.Value));
+                    foreach (var member in paramStruct.Nodes)
+                        Console.WriteLine($" >{Hash40Util.FormatToString(member.Key, hashToString)}: {ParamInfo(member.Value)}");
                     break;
                 case "-f":
                     try
@@ -182,20 +178,21 @@ namespace ParamCLI
                             value = ulong.Parse(args[1].Substring(2), NumberStyles.HexNumber);
                         else
                             value = Hash40Util.StringToHash40(args[1]);
-                        stack.Push(thisParam.Nodes[value]);
+                        stack.Push(paramStruct.Nodes[value]);
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine(e.Message);
+                        return false;
                     }
                     break;
                 default:
-                    Console.WriteLine("unknown command {0}", args[0]);
-                    break;
+                    return Default(args[0]);
             }
+            return true;
         }
 
-        static void EvalCommandForArray(string[] args)
+        static bool EvalCommandForArray(string[] args)
         {
             ParamArray paramArray = stack.Peek() as ParamArray;
             switch (args[0])
@@ -211,17 +208,82 @@ namespace ParamCLI
                     catch (Exception e)
                     {
                         Console.WriteLine(e.Message);
+                        return false;
                     }
                     break;
                 default:
-                    Console.WriteLine("unknown command {0}", args[0]);
+                    return Default(args[0]);
+            }
+            return true;
+        }
+
+        static bool EvalCommandForValue(string[] args)
+        {
+            ParamValue paramValue = stack.Peek() as ParamValue;
+            switch (args[0])
+            {
+                case "=":
+                    try
+                    {
+                        SetParamValue(paramValue, args[1]);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                        return false;
+                    }
+                    break;
+                default:
+                    return Default(args[0]);
+            }
+            return true;
+        }
+
+        static void SetParamValue(ParamValue param, string str)
+        {
+            object value = param.Value;
+            switch (param.TypeKey)
+            {
+                case ParamType.@bool:
+                    value = bool.Parse(str);
+                    break;
+                case ParamType.@sbyte:
+                    value = sbyte.Parse(str);
+                    break;
+                case ParamType.@byte:
+                    value = byte.Parse(str);
+                    break;
+                case ParamType.@short:
+                    value = short.Parse(str);
+                    break;
+                case ParamType.@ushort:
+                    value = ushort.Parse(str);
+                    break;
+                case ParamType.@int:
+                    value = int.Parse(str);
+                    break;
+                case ParamType.@uint:
+                    value = uint.Parse(str);
+                    break;
+                case ParamType.@float:
+                    value = float.Parse(str);
+                    break;
+                case ParamType.hash40:
+                    value = Hash40Util.LabelToHash40(str, stringToHash);
+                    break;
+                case ParamType.@string:
+                    value = str;
                     break;
             }
         }
 
-        static void EvalCommandForValue(string[] args)
+        /// <summary>
+        /// Default case for evaluated commands. Prints the issue message and returns false
+        /// </summary>
+        static bool Default(string cmd)
         {
-
+            Console.WriteLine($"unknown command {cmd}");
+            return false;
         }
 
         static string ParamInfo(IParam param)
@@ -234,7 +296,32 @@ namespace ParamCLI
                 case ParamType.array:
                     return type + (param as ParamArray).Nodes.Length;
                 default:
-                    return type + (param as ParamValue).ToString(labels);
+                    return type + (param as ParamValue).ToString(hashToString);
+            }
+        }
+
+        static void PrintCommands()
+        {
+            //global commands
+            Console.WriteLine("Global commands:");
+            Console.WriteLine("  -h (help) ; -s (save) ; -so (save overwrite) ; -q (quit)");
+            Console.WriteLine("  -b (go backward in tree) ; -pp (print path)");
+            //local commands
+            IParam local = stack.Peek();
+            switch (local.TypeKey)
+            {
+                case ParamType.@struct:
+                    Console.WriteLine("Local commands (struct):");
+                    Console.WriteLine("  -pc (print children) ; -f (forward) [hash or name]");
+                    break;
+                case ParamType.array:
+                    Console.WriteLine("Local commands (array):");
+                    Console.WriteLine("  -cc (child count) ; -f (forward) [index]");
+                    break;
+                default:
+                    Console.WriteLine("Local commands (value):");
+                    Console.WriteLine("  = [value]");
+                    break;
             }
         }
     }
