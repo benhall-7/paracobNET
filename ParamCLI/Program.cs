@@ -244,38 +244,37 @@ namespace ParamCLI
 
         static void SetParamValue(ParamValue param, string str)
         {
-            object value = param.Value;
             switch (param.TypeKey)
             {
                 case ParamType.@bool:
-                    value = bool.Parse(str);
+                    param.Value = bool.Parse(str);
                     break;
                 case ParamType.@sbyte:
-                    value = sbyte.Parse(str);
+                    param.Value = sbyte.Parse(str);
                     break;
                 case ParamType.@byte:
-                    value = byte.Parse(str);
+                    param.Value = byte.Parse(str);
                     break;
                 case ParamType.@short:
-                    value = short.Parse(str);
+                    param.Value = short.Parse(str);
                     break;
                 case ParamType.@ushort:
-                    value = ushort.Parse(str);
+                    param.Value = ushort.Parse(str);
                     break;
                 case ParamType.@int:
-                    value = int.Parse(str);
+                    param.Value = int.Parse(str);
                     break;
                 case ParamType.@uint:
-                    value = uint.Parse(str);
+                    param.Value = uint.Parse(str);
                     break;
                 case ParamType.@float:
-                    value = float.Parse(str);
+                    param.Value = float.Parse(str);
                     break;
                 case ParamType.hash40:
-                    value = Hash40Util.LabelToHash40(str, stringToHash);
+                    param.Value = Hash40Util.LabelToHash40(str, stringToHash);
                     break;
                 case ParamType.@string:
-                    value = str;
+                    param.Value = str;
                     break;
             }
         }
