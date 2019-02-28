@@ -27,6 +27,7 @@ namespace ParamCLI
         {
             stopwatch = new Stopwatch();
             hashToString = new Dictionary<ulong, string>();
+            stringToHash = new Dictionary<string, ulong>();
             bool helpPrinted = false;
             try
             {
@@ -43,7 +44,9 @@ namespace ParamCLI
                             paramOutput = args[++i];
                             break;
                         case "-l":
-                            hashToString = LabelIO.GetHashStringDict(args[++i]);
+                            string name = args[++i];
+                            hashToString = LabelIO.GetHashStringDict(name);
+                            stringToHash = LabelIO.GetStringHashDict(name);
                             break;
                         default:
                             paramInput = args[i];
@@ -282,7 +285,7 @@ namespace ParamCLI
         /// </summary>
         static bool Default(string cmd)
         {
-            Console.WriteLine($"unknown command {cmd}");
+            Console.WriteLine($"unknown command {cmd}. Try -h to see available commands");
             return false;
         }
 
