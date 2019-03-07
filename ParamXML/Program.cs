@@ -12,7 +12,7 @@ namespace ParamXML
         static string HelpText = 
             "ParamXML: Convert Ultimate param (.prc) files to XML format or back.\n" +
             "required: [input] ; -d / -a (disassemble/assemble)\n" +
-            "optional: -h ; -help ; -o [output] ; -l [label file] ; -i (ignore header)";
+            "optional: -h ; -help ; -o [output] ; -l [label file]";
         static BuildMode mode = BuildMode.Invalid;
         static ParamFile file { get; set; }
         static XmlDocument xml { get; set; }
@@ -25,7 +25,6 @@ namespace ParamXML
         {
             stopwatch = new Stopwatch();
             bool helpPrinted = false;
-            bool ignoreHeader = false;
             string input = null;
             string output = null;
             try
@@ -51,9 +50,6 @@ namespace ParamXML
                         case "-l":
                             labelName = args[++i];
                             break;
-                        case "-i":
-                            ignoreHeader = true;
-                            break;
                         default:
                             input = args[i];
                             break;
@@ -75,7 +71,7 @@ namespace ParamXML
 
                     Console.WriteLine("Initializing...");
                     stopwatch.Start();
-                    file = new ParamFile(input, ignoreHeader);
+                    file = new ParamFile(input);
                     Console.WriteLine("Disassembling...");
                     xml = new XmlDocument();
                     xml.AppendChild(xml.CreateXmlDeclaration("1.0", "UTF-8", null));

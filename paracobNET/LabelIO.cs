@@ -21,7 +21,7 @@ namespace paracobNET
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Parse error in {filepath}, \"{line}\"");
+                    Console.WriteLine($"Parse error in {filepath}: \"{line}\"");
 #if DEBUG
                     Console.WriteLine(e.Message);
 #endif
@@ -44,7 +44,7 @@ namespace paracobNET
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Parse error in {filepath}, \"{line}\"");
+                    Console.WriteLine($"Parse error in {filepath}: \"{line}\"");
 #if DEBUG
                     Console.WriteLine(e.Message);
 #endif

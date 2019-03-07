@@ -32,22 +32,16 @@ namespace paracobNET
         static internal BinaryWriter WriterParam { get; set; }//param stream
         #endregion
 
-        public ParamFile(string filepath, bool ignoreHeader = false)
+        public ParamFile(string filepath)
         {
             try
             {
                 using (Reader = new BinaryReader(File.OpenRead(filepath)))
                 {
-                    if (ignoreHeader)
-                    {
-                        Reader.BaseStream.Position = 8;
-                    }
-                    else
-                    {
-                        for (int i = 0; i < magic.Length; i++)
-                            if (Reader.ReadByte() != (byte)magic[i])
-                                throw new InvalidDataException("File contains an invalid header");
-                    }
+                    for (int i = 0; i < magic.Length; i++)
+                        if (Reader.ReadByte() != (byte)magic[i])
+                            throw new InvalidDataException("File contains an invalid header");
+
                     HashTableSize = Reader.ReadUInt32();
                     RefTableSize = Reader.ReadUInt32();
                     DisasmHashTable = new ulong[HashTableSize / 8];
