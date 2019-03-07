@@ -20,7 +20,7 @@ namespace ParamCLI
         static Dictionary<string, ulong> stringToHash { get; set; }
         static Stopwatch stopwatch { get; set; }
 
-        static Stack<IParam> stack { get; set; }
+        static Stack<ParamBase> stack { get; set; }
         static bool edited { get; set; } = false;
 
         static void Main(string[] args)
@@ -64,7 +64,7 @@ namespace ParamCLI
                 paramFile = new ParamFile(paramInput);
                 stopwatch.Stop();
                 Console.WriteLine("File loaded in {0} seconds", stopwatch.Elapsed.TotalSeconds);
-                stack = new Stack<IParam>();
+                stack = new Stack<ParamBase>();
                 stack.Push(paramFile.Root);
 
                 EvalGlobal();
@@ -91,10 +91,11 @@ namespace ParamCLI
                     {
                         switch (args[0])
                         {
-                            case "-h":
+                            case "h":
+                            case "help":
                                 PrintCommands();
                                 break;
-                            case "-q":
+                            case "q":
                                 if (edited)
                                 {
                                     Console.WriteLine("The file has unsaved changes. Do you want to quit? (n = no, any other = yes)");
@@ -102,7 +103,7 @@ namespace ParamCLI
                                         break;
                                 }
                                 return;
-                            case "-s":
+                            case "s":
                                 if (args.Length > 1)
                                     paramOutput = args[1];
                                 while (string.IsNullOrEmpty(paramOutput))
@@ -115,19 +116,19 @@ namespace ParamCLI
                                 stopwatch.Stop();
                                 Console.WriteLine("File saved in {0} seconds", stopwatch.Elapsed.TotalSeconds);
                                 break;
-                            case "-so":
+                            case "so":
                                 stopwatch.Start();
                                 paramFile.Save(paramInput);
                                 stopwatch.Stop();
                                 Console.WriteLine("File saved in {0} seconds", stopwatch.Elapsed.TotalSeconds);
                                 break;
-                            case "-b":
+                            case "b":
                                 if (stack.Count > 1)
                                     stack.Pop();
                                 break;
-                            case "-pp":
+                            case "pp":
                                 {
-                                    IParam[] path = stack.ToArray();
+                                    ParamBase[] path = stack.ToArray();
                                     for (int j = 0; j < path.Length; j++)
                                     {
                                         string space = "";
@@ -152,7 +153,7 @@ namespace ParamCLI
 
         static bool EvalCurrentParam(string[] args)
         {
-            IParam current = stack.Peek();
+            ParamBase current = stack.Peek();
             switch (current.TypeKey)
             {
                 case ParamType.@struct:
@@ -169,11 +170,11 @@ namespace ParamCLI
             ParamStruct paramStruct = stack.Peek() as ParamStruct;
             switch (args[0])
             {
-                case "-pc":
+                case "pc":
                     foreach (var member in paramStruct.Nodes)
                         Console.WriteLine($" >{Hash40Util.FormatToString(member.Key, hashToString)}: {ParamInfo(member.Value)}");
                     break;
-                case "-f":
+                case "f":
                     try
                     {
                         ulong value;
@@ -200,10 +201,10 @@ namespace ParamCLI
             ParamArray paramArray = stack.Peek() as ParamArray;
             switch (args[0])
             {
-                case "-cc":
+                case "cc":
                     Console.WriteLine(paramArray.Nodes.Length);
                     break;
-                case "-f":
+                case "f":
                     try
                     {
                         stack.Push(paramArray.Nodes[int.Parse(args[1])]);
@@ -284,11 +285,11 @@ namespace ParamCLI
         /// </summary>
         static bool Default(string cmd)
         {
-            Console.WriteLine($"unknown command {cmd}. Try -h to see available commands");
+            Console.WriteLine($"unknown command {cmd}. Try \'h\' to see available commands");
             return false;
         }
 
-        static string ParamInfo(IParam param)
+        static string ParamInfo(ParamBase param)
         {
             string type = "(" + param.TypeKey.ToString() + ")";
             switch (param.TypeKey)
@@ -306,19 +307,19 @@ namespace ParamCLI
         {
             //global commands
             Console.WriteLine("Global commands:");
-            Console.WriteLine("  -h (help) ; -s (save) ; -so (save overwrite) ; -q (quit)");
-            Console.WriteLine("  -b (go backward in tree) ; -pp (print path)");
+            Console.WriteLine("  h (help) ; s (save) ; so (save overwrite) ; q (quit)");
+            Console.WriteLine("  b (go backward in tree) ; pp (print path)");
             //local commands
-            IParam local = stack.Peek();
+            ParamBase local = stack.Peek();
             switch (local.TypeKey)
             {
                 case ParamType.@struct:
                     Console.WriteLine("Local commands (struct):");
-                    Console.WriteLine("  -pc (print children) ; -f (forward) [hash or name]");
+                    Console.WriteLine("  pc (print children) ; f (forward) [hash or name]");
                     break;
                 case ParamType.array:
                     Console.WriteLine("Local commands (array):");
-                    Console.WriteLine("  -cc (child count) ; -f (forward) [index]");
+                    Console.WriteLine("  cc (child count) ; f (forward) [index]");
                     break;
                 default:
                     Console.WriteLine("Local commands (value):");

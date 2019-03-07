@@ -58,7 +58,7 @@ namespace paracobNET
                     if ((ParamType)Reader.ReadByte() == ParamType.@struct)
                     {
                         Root = new ParamStruct();
-                        Root.Read();
+                        Root.Read(Reader);
                     }
                     else
                         throw new InvalidDataException("File does not have a root");
@@ -99,7 +99,7 @@ namespace paracobNET
                         RefSize += entry.localStringOffset;
                     }
                     Util.WriteRefTables();
-                    Util.WriteParam(Root);
+                    Util.WriteParam(Root, WriterParam);
                     WriterHeader.Write((uint)WriterHash.BaseStream.Length);
                     WriterHeader.Write(RefSize);
 

@@ -5,29 +5,26 @@ namespace paracobNET
 {
     static class Util
     {
-        internal static IParam ReadParam()
+        internal static ParamBase ReadParam(BinaryReader reader)
         {
-            var reader = ParamFile.Reader;
             byte key = reader.ReadByte();
             if (!Enum.IsDefined(typeof(ParamType), key))
                 throw new NotImplementedException($"Unimplemented param type '{key}' at {reader.BaseStream.Position - 1}");
             ParamType type = (ParamType)key;
-            IParam param;
+            ParamBase param;
             switch (type)
             {
                 case ParamType.@struct:
                     param = new ParamStruct();
-                    (param as ParamStruct).Read();
                     break;
                 case ParamType.array:
                     param = new ParamArray();
-                    (param as ParamArray).Read();
                     break;
                 default:
                     param = new ParamValue(type);
-                    (param as ParamValue).Read();
                     break;
             }
+            param.Read(reader);
             return param;
         }
         internal static string ReadStringAsync(BinaryReader reader, uint position)
@@ -40,7 +37,7 @@ namespace paracobNET
             reader.BaseStream.Seek(returnTo, SeekOrigin.Begin);
             return s;
         }
-        internal static void IterateHashes(IParam param)
+        internal static void IterateHashes(ParamBase param)
         {
             switch (param.TypeKey)
             {
@@ -60,22 +57,10 @@ namespace paracobNET
                     break;
             }
         }
-        internal static void WriteParam(IParam param)
+        internal static void WriteParam(ParamBase param, BinaryWriter writer)
         {
-            var writer = ParamFile.WriterParam;
             writer.Write((byte)param.TypeKey);
-            switch (param.TypeKey)
-            {
-                case ParamType.@struct:
-                    (param as ParamStruct).Write();
-                    break;
-                case ParamType.array:
-                    (param as ParamArray).Write();
-                    break;
-                default:
-                    (param as ParamValue).Write();
-                    break;
-            }
+            param.Write(writer);
         }
         internal static void WriteHash(ulong hash)
         {
@@ -85,7 +70,7 @@ namespace paracobNET
                 ParamFile.AsmHashTable.Add(hash);
             }
         }
-        internal static void ParseParamForRefTables(IParam param, RefTableEntry entry)
+        internal static void ParseParamForRefTables(ParamBase param, RefTableEntry entry)
         {
             switch (param.TypeKey)
             {
@@ -119,7 +104,7 @@ namespace paracobNET
                 }
             }
         }
-        internal static uint GetParamSize(IParam param)
+        internal static uint GetParamSize(ParamBase param)
         {
             switch (param.TypeKey)
             {

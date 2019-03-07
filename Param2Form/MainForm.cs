@@ -45,7 +45,7 @@ namespace Param2Form
             param_TreeView.Nodes[0].Expand();
         }
 
-        private ParamTreeNode Param2TreeNode(IParam param)
+        private ParamTreeNode Param2TreeNode(ParamBase param)
         {
             ParamTreeNode node = new ParamTreeNode(param, param.TypeKey.ToString());
             switch (param.TypeKey)
@@ -110,7 +110,7 @@ namespace Param2Form
         private void param_TreeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
             ParamTreeNode node = e.Node as ParamTreeNode;
-            IParam param = node.Param;
+            ParamBase param = node.Param;
             switch (param.TypeKey)
             {
                 case ParamType.@struct:

@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 
 namespace paracobNET
 {
-    public class ParamValue : IParam
+    public class ParamValue : ParamBase
     {
-        public ParamType TypeKey { get; set; }
+        public override ParamType TypeKey { get; }
         public object Value { get; set; }
 
         public ParamValue(ParamType type)
@@ -17,9 +18,8 @@ namespace paracobNET
             Value = value;
         }
 
-        internal void Read()
+        internal override void Read(BinaryReader reader)
         {
-            var reader = ParamFile.Reader;
             switch (TypeKey)
             {
                 case ParamType.@bool:
@@ -54,9 +54,8 @@ namespace paracobNET
                     break;
             }
         }
-        internal void Write()
+        internal override void Write(BinaryWriter writer)
         {
-            var writer = ParamFile.WriterParam;
             switch (TypeKey)
             {
                 case ParamType.@bool:
