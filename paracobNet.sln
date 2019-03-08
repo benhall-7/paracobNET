@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Param2Form", "Param2Form\Pa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ParamXML", "ParamXML\ParamXML.csproj", "{99322FDF-DE9E-48A0-B968-790109DBE439}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParamCLI", "ParamCLI\ParamCLI.csproj", "{C2AD8FC1-CAC8-445E-BD26-CDA7424619A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ParamCLI", "ParamCLI\ParamCLI.csproj", "{C2AD8FC1-CAC8-445E-BD26-CDA7424619A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

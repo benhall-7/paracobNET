@@ -67,7 +67,7 @@ namespace ParamCLI
                 stack = new Stack<ParamBase>();
                 stack.Push(paramFile.Root);
 
-                EvalGlobal();
+                EvalUserInput();
             }
             catch (Exception e)
             {
@@ -78,80 +78,84 @@ namespace ParamCLI
             }
         }
 
-        static void EvalGlobal()
+        static void EvalUserInput()
         {
             while (true)
             {
                 string[] commands = Console.ReadLine().Split(';');
-                for (int i = 0; i < commands.Length; i++)
-                {
-                    stopwatch.Reset();
-                    string[] args = commands[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                    if (args.Length > 0)
-                    {
-                        switch (args[0])
-                        {
-                            case "h":
-                            case "help":
-                                PrintCommands();
-                                break;
-                            case "q":
-                                if (edited)
-                                {
-                                    Console.WriteLine("The file has unsaved changes. Do you want to quit? (n = no, any other = yes)");
-                                    if (Console.ReadKey().KeyChar == 'n')
-                                        break;
-                                }
-                                return;
-                            case "s":
-                                if (args.Length > 1)
-                                    paramOutput = args[1];
-                                while (string.IsNullOrEmpty(paramOutput))
-                                {
-                                    Console.WriteLine("Set the desired filename:");
-                                    paramOutput = Console.ReadLine();
-                                }
-                                stopwatch.Start();
-                                paramFile.Save(paramOutput);
-                                stopwatch.Stop();
-                                Console.WriteLine("File saved in {0} seconds", stopwatch.Elapsed.TotalSeconds);
-                                break;
-                            case "so":
-                                stopwatch.Start();
-                                paramFile.Save(paramInput);
-                                stopwatch.Stop();
-                                Console.WriteLine("File saved in {0} seconds", stopwatch.Elapsed.TotalSeconds);
-                                break;
-                            case "b":
-                                if (stack.Count > 1)
-                                    stack.Pop();
-                                break;
-                            case "pp":
-                                {
-                                    ParamBase[] path = stack.ToArray();
-                                    for (int j = 0; j < path.Length; j++)
-                                    {
-                                        string space = "";
-                                        for (int spaceCount = 0; spaceCount < j; spaceCount++)
-                                            space += " ";
-                                        Console.WriteLine(space + ">" + ParamInfo(path[j]));
-                                    }
-                                }
-                                break;
-                            default:
-                                if (!EvalCurrentParam(args))
-                                {
-                                    //end execution of command loop if a command failed
-                                    i = commands.Length;
-                                }
-                                break;
-                        }
-                    }
-                }
+                if (EvalGlobal(commands) == EvalResult.Quit)
+                    return;
             }
         }
 
-        static bool EvalCurrentParam(string[] args)
+        static EvalResult EvalGlobal(string[] commands)
+        {
+            for (int i = 0; i < commands.Length; i++)
+            {
+                stopwatch.Reset();
+                string[] args = commands[i].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (args.Length > 0)
+                {
+                    switch (args[0])
+                    {
+                        case "h":
+                        case "help":
+                            PrintCommands();
+                            break;
+                        case "q":
+                            if (edited)
+                            {
+                                Console.WriteLine("The file has unsaved changes. Do you want to quit? (n = no, any other = yes)");
+                                if (Console.ReadKey().KeyChar == 'n')
+                                    break;
+                            }
+                            return EvalResult.Quit;
+                        case "s":
+                            if (args.Length > 1)
+                                paramOutput = args[1];
+                            while (string.IsNullOrEmpty(paramOutput))
+                            {
+                                Console.WriteLine("Set the desired filename:");
+                                paramOutput = Console.ReadLine();
+                            }
+                            stopwatch.Start();
+                            paramFile.Save(paramOutput);
+                            stopwatch.Stop();
+                            Console.WriteLine("File saved in {0} seconds", stopwatch.Elapsed.TotalSeconds);
+                            break;
+                        case "so":
+                            stopwatch.Start();
+                            paramFile.Save(paramInput);
+                            stopwatch.Stop();
+                            Console.WriteLine("File saved in {0} seconds", stopwatch.Elapsed.TotalSeconds);
+                            break;
+                        case "b":
+                            if (stack.Count > 1)
+                                stack.Pop();
+                            break;
+                        case "pp":
+                            {
+                                ParamBase[] path = stack.ToArray();
+                                for (int j = 0; j < path.Length; j++)
+                                {
+                                    string space = "";
+                                    for (int spaceCount = 0; spaceCount < j; spaceCount++)
+                                        space += " ";
+                                    Console.WriteLine(space + ">" + ParamInfo(path[j]));
+                                }
+                            }
+                            break;
+                        default:
+                            if (EvalCurrentParam(args) == EvalResult.Fail)
+                                return EvalResult.Fail;
+                            break;
+                    }
+                }
+            }
+            return EvalResult.Normal;
+        }
+
+        static EvalResult EvalCurrentParam(string[] args)
         {
             ParamBase current = stack.Peek();
             switch (current.TypeKey)
@@ -165,7 +169,7 @@ namespace ParamCLI
             }
         }
 
-        static bool EvalCommandForStruct(string[] args)
+        static EvalResult EvalCommandForStruct(string[] args)
         {
             ParamStruct paramStruct = stack.Peek() as ParamStruct;
             switch (args[0])
@@ -187,16 +191,16 @@ namespace ParamCLI
                     catch (Exception e)
                     {
                         Console.WriteLine(e.Message);
-                        return false;
+                        return EvalResult.Quit;
                     }
                     break;
                 default:
                     return Default(args[0]);
             }
-            return true;
+            return EvalResult.Normal;
         }
 
-        static bool EvalCommandForArray(string[] args)
+        static EvalResult EvalCommandForArray(string[] args)
         {
             ParamArray paramArray = stack.Peek() as ParamArray;
             switch (args[0])
@@ -212,16 +216,22 @@ namespace ParamCLI
                     catch (Exception e)
                     {
                         Console.WriteLine(e.Message);
-                        return false;
+                        return EvalResult.Fail;
+                    }
+                    break;
+                case "iter":
+                    foreach (ParamBase param in paramArray.Nodes)
+                    {
+
                     }
                     break;
                 default:
                     return Default(args[0]);
             }
-            return true;
+            return EvalResult.Normal;
         }
 
-        static bool EvalCommandForValue(string[] args)
+        static EvalResult EvalCommandForValue(string[] args)
         {
             ParamValue paramValue = stack.Peek() as ParamValue;
             switch (args[0])
@@ -234,13 +244,13 @@ namespace ParamCLI
                     catch (Exception e)
                     {
                         Console.WriteLine(e.Message);
-                        return false;
+                        return EvalResult.Fail;
                     }
                     break;
                 default:
                     return Default(args[0]);
             }
-            return true;
+            return EvalResult.Normal;
         }
 
         static void SetParamValue(ParamValue param, string str)
@@ -281,12 +291,12 @@ namespace ParamCLI
         }
 
         /// <summary>
-        /// Default case for evaluated commands. Prints the issue message and returns false
+        /// Default case for evaluated commands. Prints the issue message and returns a failed result
         /// </summary>
-        static bool Default(string cmd)
+        static EvalResult Default(string cmd)
         {
             Console.WriteLine($"unknown command {cmd}. Try \'h\' to see available commands");
-            return false;
+            return EvalResult.Fail;
         }
 
         static string ParamInfo(ParamBase param)
@@ -326,6 +336,13 @@ namespace ParamCLI
                     Console.WriteLine("  = [value]");
                     break;
             }
+        }
+
+        enum EvalResult
+        {
+            Normal,
+            Quit,
+            Fail
         }
     }
 }
