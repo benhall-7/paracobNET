@@ -25,17 +25,18 @@ namespace paracobNET
         }
         public static string FormatToString(ulong hash40, Dictionary<ulong, string> labels)
         {
-            if (labels.ContainsKey(hash40))
-                return labels[hash40];
+            if (labels.TryGetValue(hash40, out string val))
+                return val;
             else return FormatToString(hash40);
         }
         public static ulong LabelToHash40(string hash40, Dictionary<string, ulong> labels)
         {
+            ulong val;
             if (hash40.StartsWith("0x") &&
-                ulong.TryParse(hash40.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out ulong val))
+                ulong.TryParse(hash40.Substring(2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out val))
                 return val;
-            if (labels.ContainsKey(hash40))
-                return labels[hash40];
+            if (labels.TryGetValue(hash40, out val))
+                return val;
             throw new Exception("The string " + hash40 + " does not represent a hexadecimal value and no matching label was found");
         }
     }

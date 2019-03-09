@@ -1,0 +1,19 @@
+﻿<Window x:Class="prcEditor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:prcEditor"
+        mc:Ignorable="d"
+        Title="Editor" Height="400" Width="600">
+    <DockPanel LastChildFill="True">
+        <ToolBarTray DockPanel.Dock="Top" Background="White">
+            <ToolBar>
+                <Button x:Name="OpenFileButton" Content="Open" Click="OpenFileButton_Click"/>
+                <Button x:Name="SaveFileButton" Content="Save"/>
+            </ToolBar>
+        </ToolBarTray>
+        <TreeView x:Name="Param_TreeView" DockPanel.Dock="Left" MinWidth="200"/>
+        <TextBox TextWrapping="Wrap" Text="Temp" />
+    </DockPanel>
+</Window>
