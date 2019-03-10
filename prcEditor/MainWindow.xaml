@@ -6,7 +6,21 @@
         xmlns:local="clr-namespace:prcEditor"
         mc:Ignorable="d"
         Title="Editor" Height="400" Width="600">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Margin" Value="2,2"/>
+            <Setter Property="Padding" Value="8,2"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+    </Window.Resources>
     <Grid x:Name="MainGrid">
+        <Grid.Background>
+            <LinearGradientBrush EndPoint="0,0.5" MappingMode="RelativeToBoundingBox" StartPoint="1,0.5">
+                <GradientStop Color="White"/>
+                <GradientStop Color="LightGray" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -16,24 +30,21 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <ToolBar Grid.Row="0" Grid.ColumnSpan="3">
-            <ToolBar.Background>
-                <LinearGradientBrush EndPoint="0,0.5" MappingMode="RelativeToBoundingBox" StartPoint="1,0.5">
-                    <GradientStop Color="White"/>
-                    <GradientStop Color="LightGray" Offset="1"/>
-                </LinearGradientBrush>
-            </ToolBar.Background>
+        <StackPanel Grid.Row="0" Grid.ColumnSpan="3"
+                 Orientation="Horizontal">
             <Button x:Name="OpenFileButton" Content="Open" Click="OpenFileButton_Click"/>
             <Button x:Name="SaveFileButton" Content="Save"/>
-        </ToolBar>
+        </StackPanel>
         <TreeView Grid.Row="1" Grid.Column="0" x:Name="ParamTV"/>
         <GridSplitter Grid.Row="1" Grid.Column="1"
                       HorizontalAlignment="Right"
                       VerticalAlignment="Stretch"
                       Width="5"
                       ResizeBehavior="PreviousAndNext"
-                      Background="LightGray"/>
-        <Grid Grid.Row="1" Grid.Column="2" x:Name="DataGrid">
+                      Background="Transparent"/>
+        <Grid Grid.Row="1" Grid.Column="2"
+              x:Name="DataGrid"
+              Background="White">
 
         </Grid>
     </Grid>
