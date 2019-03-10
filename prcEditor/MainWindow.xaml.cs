@@ -50,9 +50,9 @@ namespace prcEditor
 
         private void SetupTreeView()
         {
-            Param_TreeView.Items.Clear();
+            ParamTV.Items.Clear();
             ParamTreeItem root = new ParamTreeItem(PFile.Root, null);
-            Param_TreeView.Items.Add(root);
+            ParamTV.Items.Add(root);
             root.IsExpanded = true;
         }
 
