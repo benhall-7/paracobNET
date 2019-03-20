@@ -2,22 +2,22 @@
 
 namespace paracobNET
 {
-    public class ParamArray : ParamBase
+    public class ParamArray : IParam
     {
-        public override ParamType TypeKey { get; } = ParamType.array;
+        public ParamType TypeKey { get; } = ParamType.array;
         
-        public ParamBase[] Nodes { get; private set; }
+        public IParam[] Nodes { get; private set; }
 
         public ParamArray() { }
-        public ParamArray(ParamBase[] nodes)
+        public ParamArray(IParam[] nodes)
         {
             Nodes = nodes;
         }
 
-        internal override void Read(BinaryReader reader)
+        internal void Read(BinaryReader reader)
         {
             uint startPos = (uint)reader.BaseStream.Position - 1;
-            Nodes = new ParamBase[reader.ReadUInt32()];
+            Nodes = new IParam[reader.ReadUInt32()];
             uint[] offsets = new uint[Nodes.Length];
 
             //all elements should be the same type but it's not enforced
@@ -30,7 +30,7 @@ namespace paracobNET
                 Nodes[i] = Util.ReadParam(reader);
             }
         }
-        internal override void Write(BinaryWriter writer)
+        internal void Write(BinaryWriter writer, RefTableEntry parent)
         {
             uint startPos = (uint)writer.BaseStream.Position - 1;
             writer.Write(Nodes.Length);
@@ -42,7 +42,7 @@ namespace paracobNET
             {
                 var node = Nodes[i];
                 offsets[i] = (uint)(writer.BaseStream.Position - startPos);
-                Util.WriteParam(node, writer);
+                Util.WriteParam(node, writer, parent);
             }
             long endPos = writer.BaseStream.Position;
             writer.BaseStream.Seek(ptrStartPos, SeekOrigin.Begin);

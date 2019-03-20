@@ -10,7 +10,7 @@ namespace prcEditor
 {
     class ParamTreeItem : TreeViewItem
     {
-        public ParamBase Param { get; set; }
+        public IParam Param { get; set; }
         public new ParamTreeItem Parent { get; set; }
 
         private string _ParentAccessor;
@@ -25,7 +25,7 @@ namespace prcEditor
             }
         }
 
-        public ParamTreeItem(ParamBase param, ParamTreeItem parent)
+        public ParamTreeItem(IParam param, ParamTreeItem parent)
         {
             Param = param;
             Parent = parent;

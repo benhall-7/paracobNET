@@ -109,7 +109,7 @@ namespace ParamXML
             }
         }
 
-        static XmlNode Param2Node(ParamBase param)
+        static XmlNode Param2Node(IParam param)
         {
             switch (param.TypeKey)
             {
@@ -164,7 +164,7 @@ namespace ParamXML
             return xmlNode;
         }
 
-        static ParamBase Node2Param(XmlNode node)
+        static IParam Node2Param(XmlNode node)
         {
             try
             {
@@ -197,7 +197,7 @@ namespace ParamXML
 
         static ParamStruct Node2ParamStruct(XmlNode node)
         {
-            Hash40Dictionary<ParamBase> childParams = new Hash40Dictionary<ParamBase>();
+            Hash40Dictionary<IParam> childParams = new Hash40Dictionary<IParam>();
             foreach (XmlNode child in node.ChildNodes)
                 childParams.Add(Hash40Util.LabelToHash40(child.Attributes["hash"].Value, stringToHashLabels), Node2Param(child));
             return new ParamStruct(childParams);
@@ -205,7 +205,7 @@ namespace ParamXML
 
         static ParamArray Node2ParamArray(XmlNode node)
         {
-            ParamBase[] children = new ParamBase[node.ChildNodes.Count];
+            IParam[] children = new IParam[node.ChildNodes.Count];
             for (int i = 0; i < children.Length; i++)
                 children[i] = Node2Param(node.ChildNodes[i]);
             return new ParamArray(children);

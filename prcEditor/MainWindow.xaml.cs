@@ -25,6 +25,8 @@ namespace prcEditor
     {
         ParamFile PFile { get; set; }
 
+        IParam CopiedParam { get; set; }
+
         static bool LabelsLoaded { get; set; }
         public static Dictionary<ulong, string> HashToStringLabels { get; set; }
         public static Dictionary<string, ulong> StringToHashLabels { get; set; }
@@ -56,6 +58,27 @@ namespace prcEditor
             root.IsExpanded = true;
         }
 
+        private void SetupDataGrid(ParamTreeItem ptItem)
+        {
+            /*
+            Layout summary
+            --------------
+            Ex: select struct
+
+            Row 0: "self" data
+                contains: name/hash or index of self (based on param parent), followed by value if they are a ParamValue
+            Row 1: "child" data. Only used on structs and arrays
+                contains: name/hash or index of child, followed by value if they are a ParamValue
+            
+            that's it? Can I do anything else on structs/arrays? Should names/indexes be editable?
+             */
+            IParam param = ptItem.Param;
+            if (param is ParamStruct paramStruct)
+            {
+                ParamData.ItemsSource = paramStruct.Nodes.Values;
+            }
+        }
+
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
@@ -66,6 +89,35 @@ namespace prcEditor
             {
                 PFile = new ParamFile(ofd.FileName);
                 SetupTreeView();
+            }
+        }
+
+        private void ParamTV_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (!(e.OriginalSource is ParamTreeItem ptItem))
+                return;
+            
+            if (e.KeyboardDevice.IsKeyDown(Key.LeftCtrl) ||
+                e.KeyboardDevice.IsKeyDown(Key.RightCtrl))
+            {
+                switch (e.Key)
+                {
+                    //TODO: ctrl+c and ctrl+v
+                    case Key.C:
+                        //CopiedParam = pItem.Param;
+                        break;
+                    case Key.V:
+                        break;
+                }
+            }
+            else
+            {
+                switch (e.Key)
+                {
+                    case Key.Enter:
+                        SetupDataGrid(ptItem);
+                        break;
+                }
             }
         }
     }

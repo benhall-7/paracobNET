@@ -20,7 +20,7 @@ namespace ParamCLI
         static Dictionary<string, ulong> stringToHash { get; set; }
         static Stopwatch stopwatch { get; set; }
 
-        static Stack<ParamBase> stack { get; set; }
+        static Stack<IParam> stack { get; set; }
         static bool edited { get; set; } = false;
 
         static void Main(string[] args)
@@ -64,7 +64,7 @@ namespace ParamCLI
                 paramFile = new ParamFile(paramInput);
                 stopwatch.Stop();
                 Console.WriteLine("File loaded in {0} seconds", stopwatch.Elapsed.TotalSeconds);
-                stack = new Stack<ParamBase>();
+                stack = new Stack<IParam>();
                 stack.Push(paramFile.Root);
 
                 EvalUserInput();
@@ -135,7 +135,7 @@ namespace ParamCLI
                             break;
                         case "pp":
                             {
-                                ParamBase[] path = stack.ToArray();
+                                IParam[] path = stack.ToArray();
                                 for (int j = 0; j < path.Length; j++)
                                 {
                                     string space = "";
@@ -157,7 +157,7 @@ namespace ParamCLI
 
         static EvalResult EvalCurrentParam(string[] args)
         {
-            ParamBase current = stack.Peek();
+            IParam current = stack.Peek();
             switch (current.TypeKey)
             {
                 case ParamType.@struct:
@@ -220,7 +220,7 @@ namespace ParamCLI
                     }
                     break;
                 case "iter":
-                    foreach (ParamBase param in paramArray.Nodes)
+                    foreach (IParam param in paramArray.Nodes)
                     {
 
                     }
@@ -299,7 +299,7 @@ namespace ParamCLI
             return EvalResult.Fail;
         }
 
-        static string ParamInfo(ParamBase param)
+        static string ParamInfo(IParam param)
         {
             string type = "(" + param.TypeKey.ToString() + ")";
             switch (param.TypeKey)
@@ -320,7 +320,7 @@ namespace ParamCLI
             Console.WriteLine("  h (help) ; s (save) ; so (save overwrite) ; q (quit)");
             Console.WriteLine("  b (go backward in tree) ; pp (print path)");
             //local commands
-            ParamBase local = stack.Peek();
+            IParam local = stack.Peek();
             switch (local.TypeKey)
             {
                 case ParamType.@struct:

@@ -6,39 +6,28 @@ namespace paracobNET
 {
     internal class RefTableEntry : IEquatable<RefTableEntry>
     {
-        public uint offset { get; set; }//gets calculated after all the structs are parsed
-        public Dictionary<uint, uint> hashOffsetPairs { get; set; }
-        public Dictionary<string, uint> stringOffsetPairs { get; set; }
-        public uint localStringOffset { get; set; }
+        public int RefTableOffset { get; set; }
+        public ParamStruct CorrespondingStruct { get; set; }
+        public Dictionary<int, int> HashOffsets { get; set; }
+        public Dictionary<string, int> StringOffsets { get; set; }
 
-        private uint localParamOffset { get; set; }
-
-        public RefTableEntry(ParamStruct paramStruct)
+        public RefTableEntry(ParamStruct correspondingStruct)
         {
-            hashOffsetPairs = new Dictionary<uint, uint>();
-            stringOffsetPairs = new Dictionary<string, uint>();
-            localParamOffset = 9;//typekey + count + offset
-            localStringOffset = (uint)paramStruct.Nodes.Count * 8;
-            foreach (var param in paramStruct.SortedNodes)
-            {
-                hashOffsetPairs.Add((uint)ParamFile.AsmHashTable.IndexOf(param.Key), localParamOffset);
-                localParamOffset += Util.GetParamSize(param.Value);
-            }
+            CorrespondingStruct = correspondingStruct;
+            HashOffsets = new Dictionary<int, int>();
+            StringOffsets = new Dictionary<string, int>();
         }
 
         public void AppendString(string word)
         {
-            if (!stringOffsetPairs.ContainsKey(word))
-            {
-                stringOffsetPairs.Add(word, localStringOffset);
-                localStringOffset += (uint)word.Length + 1;
-            }
+            if (!StringOffsets.ContainsKey(word))
+                StringOffsets.Add(word, 0);
         }
 
         public bool Equals(RefTableEntry other)
         {
             //thanks to Nick Jones: https://stackoverflow.com/a/3804852
-            if (hashOffsetPairs.Count == other.hashOffsetPairs.Count && !hashOffsetPairs.Except(other.hashOffsetPairs).Any())
+            if (HashOffsets.Count == other.HashOffsets.Count && !HashOffsets.Except(other.HashOffsets).Any())
                 return true;
             return false;
         }

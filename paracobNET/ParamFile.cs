@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace paracobNET
@@ -21,15 +22,15 @@ namespace paracobNET
         #endregion
 
         #region global_asm
-        //once each is finished being written, append each together and write to file
         static internal FileStream FileStream { get; set; }
         static internal BinaryWriter WriterHeader { get; set; }//header stream
         static internal List<ulong> AsmHashTable { get; set; }//list of hashes appended to
         static internal BinaryWriter WriterHash { get; set; }//hash table stream
         static internal List<RefTableEntry> RefEntries { get; set; }//reference entry classes
-        static internal uint RefSize { get; set; }
         static internal BinaryWriter WriterRef { get; set; }//reference table stream
         static internal BinaryWriter WriterParam { get; set; }//param stream
+        static internal List<Tuple<int, ParamStruct>> UnresolvedStructs { get; set; }
+        static internal List<Tuple<int, ParamStruct, string>> UnresolvedStrings { get; set; }
         #endregion
 
         public ParamFile(string filepath)
@@ -75,6 +76,9 @@ namespace paracobNET
             {
                 AsmHashTable = new List<ulong>();
                 RefEntries = new List<RefTableEntry>();
+                UnresolvedStructs = new List<Tuple<int, ParamStruct>>();
+                UnresolvedStrings = new List<Tuple<int, ParamStruct, string>>();
+
                 using (FileStream = File.Create(filepath))
                 using (WriterHeader = new BinaryWriter(new MemoryStream()))
                 using (WriterHash = new BinaryWriter(new MemoryStream()))
@@ -85,27 +89,22 @@ namespace paracobNET
                         WriterHeader.Write((byte)magic[i]);
                     Util.WriteHash(0);
                     Util.IterateHashes(Root);
-                    Root.SetupRefTable();
-                    RefSize = 0;
-                    foreach (var entry in RefEntries)
-                    {
-                        entry.offset = RefSize;
-                        RefSize += entry.localStringOffset;
-                    }
+
+                    Util.WriteParam(Root, WriterParam, null);
+
+                    Util.MergeRefTables();
                     Util.WriteRefTables();
-                    Util.WriteParam(Root, WriterParam);
+
+                    Util.ResolveStructStringRefs();
+
                     WriterHeader.Write((uint)WriterHash.BaseStream.Length);
-                    WriterHeader.Write(RefSize);
+                    WriterHeader.Write((uint)WriterRef.BaseStream.Length);
 
-                    WriterHeader.BaseStream.Position = 0;
-                    WriterHash.BaseStream.Position = 0;
-                    WriterRef.BaseStream.Position = 0;
-                    WriterParam.BaseStream.Position = 0;
-
-                    WriterHeader.BaseStream.CopyTo(FileStream);
-                    WriterHash.BaseStream.CopyTo(FileStream);
-                    WriterRef.BaseStream.CopyTo(FileStream);
-                    WriterParam.BaseStream.CopyTo(FileStream);
+                    foreach (var writer in new BinaryWriter[] { WriterHeader, WriterHash, WriterRef, WriterParam })
+                    {
+                        writer.BaseStream.Position = 0;
+                        writer.BaseStream.CopyTo(FileStream);
+                    }
                 }
             }
             finally

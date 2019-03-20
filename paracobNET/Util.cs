@@ -1,30 +1,33 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 
 namespace paracobNET
 {
     static class Util
     {
-        internal static ParamBase ReadParam(BinaryReader reader)
+        internal static IParam ReadParam(BinaryReader reader)
         {
             byte key = reader.ReadByte();
             if (!Enum.IsDefined(typeof(ParamType), key))
                 throw new NotImplementedException($"Unimplemented param type '{key}' at {reader.BaseStream.Position - 1}");
             ParamType type = (ParamType)key;
-            ParamBase param;
+            IParam param;
             switch (type)
             {
                 case ParamType.@struct:
                     param = new ParamStruct();
+                    (param as ParamStruct).Read(reader);
                     break;
                 case ParamType.array:
                     param = new ParamArray();
+                    (param as ParamArray).Read(reader);
                     break;
                 default:
                     param = new ParamValue(type);
+                    (param as ParamValue).Read(reader);
                     break;
             }
-            param.Read(reader);
             return param;
         }
         internal static string ReadStringAsync(BinaryReader reader, uint position)
@@ -37,7 +40,7 @@ namespace paracobNET
             reader.BaseStream.Seek(returnTo, SeekOrigin.Begin);
             return s;
         }
-        internal static void IterateHashes(ParamBase param)
+        internal static void IterateHashes(IParam param)
         {
             switch (param.TypeKey)
             {
@@ -57,10 +60,21 @@ namespace paracobNET
                     break;
             }
         }
-        internal static void WriteParam(ParamBase param, BinaryWriter writer)
+        internal static void WriteParam(IParam param, BinaryWriter writer, RefTableEntry parent)
         {
             writer.Write((byte)param.TypeKey);
-            param.Write(writer);
+            switch (param.TypeKey)
+            {
+                case ParamType.@struct:
+                    (param as ParamStruct).Write(writer);
+                    break;
+                case ParamType.array:
+                    (param as ParamArray).Write(writer, parent);
+                    break;
+                default:
+                    (param as ParamValue).Write(writer, parent);
+                    break;
+            }
         }
         internal static void WriteHash(ulong hash)
         {
@@ -70,73 +84,67 @@ namespace paracobNET
                 ParamFile.AsmHashTable.Add(hash);
             }
         }
-        internal static void ParseParamForRefTables(ParamBase param, RefTableEntry entry)
+        internal static void MergeRefTables()
         {
-            switch (param.TypeKey)
+            var entries = ParamFile.RefEntries;
+            int index = 0;
+            while (index < entries.Count)
             {
-                case ParamType.@string:
-                    entry.AppendString((string)(param as ParamValue).Value);
-                    break;
-                case ParamType.array:
-                    foreach (var node in (param as ParamArray).Nodes)
-                        ParseParamForRefTables(node, entry);
-                    break;
-                case ParamType.@struct:
-                    (param as ParamStruct).SetupRefTable();
-                    break;
+                //RefTableEntry implements IEquatable. We check if there's aleady an entry
+                //prior in the list with the same HashOffset dictionary, if there is we merge
+                int firstOccur = entries.IndexOf(entries[index]);
+                if (firstOccur < index)
+                {
+                    var first = entries[firstOccur];
+                    var current = entries[index];
+                    //take the strings from the second and merge them into the first
+                    foreach (var pair in current.StringOffsets)
+                        first.AppendString(pair.Key);
+                    //change the corresponding struct reference
+                    current.CorrespondingStruct.RefEntry = first;
+                    //remove the duplicate from the list
+                    entries.RemoveAt(index);
+                    current = null;
+                }
+                else
+                    index++;
             }
         }
+        /// <summary>
+        /// Writes the list of RefTableEntries into the WriterRef stream and records offsets needed to resolve strings and structs
+        /// </summary>
         internal static void WriteRefTables()
         {
             var writer = ParamFile.WriterRef;
             foreach (var entry in ParamFile.RefEntries)
             {
-                foreach (var pair in entry.hashOffsetPairs)
+                entry.RefTableOffset = (int)writer.BaseStream.Position;
+                foreach (var pair in entry.HashOffsets)
                 {
                     writer.Write(pair.Key);
                     writer.Write(pair.Value);
                 }
-                foreach (var pair in entry.stringOffsetPairs)
+                foreach (var word in entry.StringOffsets.Keys.ToList())
                 {
-                    for (int i = 0; i < pair.Key.Length; i++)
-                        writer.Write((byte)pair.Key[i]);
+                    entry.StringOffsets[word] = (int)writer.BaseStream.Position;
+                    for (int c = 0; c < word.Length; c++)
+                        writer.Write((byte)word[c]);
                     writer.Write((byte)0);
                 }
             }
         }
-        internal static uint GetParamSize(ParamBase param)
+        internal static void ResolveStructStringRefs()
         {
-            switch (param.TypeKey)
+            var writer = ParamFile.WriterParam;
+            foreach (var tup in ParamFile.UnresolvedStructs)
             {
-                case ParamType.@bool:
-                case ParamType.@sbyte:
-                case ParamType.@byte:
-                    return 2;
-                case ParamType.@short:
-                case ParamType.@ushort:
-                    return 3;
-                case ParamType.@int:
-                case ParamType.@uint:
-                case ParamType.@float:
-                case ParamType.hash40:
-                case ParamType.@string:
-                    return 5;
-                case ParamType.array:
-                    {
-                        ParamArray array = param as ParamArray;
-                        uint local = 5 + (uint)array.Nodes.Length * 4;
-                        foreach (var node in array.Nodes)
-                            local += GetParamSize(node);
-                        return local;
-                    }
-                default:
-                    {
-                        ParamStruct str = param as ParamStruct;
-                        uint local = 9;
-                        foreach (var pair in str.Nodes)
-                            local += GetParamSize(pair.Value);
-                        return local;
-                    }
+                writer.BaseStream.Position = tup.Item1;
+                writer.Write(tup.Item2.RefEntry.RefTableOffset);
+            }
+            foreach (var tup in ParamFile.UnresolvedStrings)
+            {
+                writer.BaseStream.Position = tup.Item1;
+                writer.Write(tup.Item2.RefEntry.StringOffsets[tup.Item3]);
             }
         }
         internal static uint CRC32(string word)

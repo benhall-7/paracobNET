@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace paracobNET
 {
-    public class ParamValue : ParamBase
+    public class ParamValue : IParam
     {
-        public override ParamType TypeKey { get; }
+        public ParamType TypeKey { get; set; }
         public object Value { get; set; }
 
         public ParamValue(ParamType type)
@@ -18,7 +19,7 @@ namespace paracobNET
             Value = value;
         }
 
-        internal override void Read(BinaryReader reader)
+        internal void Read(BinaryReader reader)
         {
             switch (TypeKey)
             {
@@ -54,7 +55,7 @@ namespace paracobNET
                     break;
             }
         }
-        internal override void Write(BinaryWriter writer)
+        internal void Write(BinaryWriter writer, RefTableEntry parent)
         {
             switch (TypeKey)
             {
@@ -84,6 +85,15 @@ namespace paracobNET
                     break;
                 case ParamType.hash40:
                     writer.Write(ParamFile.AsmHashTable.IndexOf((ulong)Value));
+                    break;
+                case ParamType.@string:
+                    ParamFile.UnresolvedStrings.Add(new Tuple<int, ParamStruct, string>(
+                        (int)writer.BaseStream.Position,
+                        parent.CorrespondingStruct,
+                        (string)Value));
+
+                    parent.AppendString((string)Value);
+                    writer.Write((int)0);
                     break;
             }
         }

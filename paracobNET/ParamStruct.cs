@@ -1,35 +1,37 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 namespace paracobNET
 {
-    public class ParamStruct : ParamBase
+    public class ParamStruct : IParam
     {
-        public override ParamType TypeKey { get; } = ParamType.@struct;
-        public uint ID { get; set; }
-        public Hash40Dictionary<ParamBase> Nodes { get; set; }
+        public ParamType TypeKey { get; } = ParamType.@struct;
+        public int ID { get; set; }
+        public Hash40Dictionary<IParam> Nodes { get; set; }
+
         //only used on rebuild
-        internal SortedDictionary<ulong, ParamBase> SortedNodes { get; set; }
+        internal RefTableEntry RefEntry { get; set; }
 
         public ParamStruct() { }
-        public ParamStruct(Hash40Dictionary<ParamBase> nodes)
+        public ParamStruct(Hash40Dictionary<IParam> nodes)
         {
             Nodes = nodes;
         }
 
-        internal override void Read(BinaryReader reader)
+        internal void Read(BinaryReader reader)
         {
             uint startPos = (uint)reader.BaseStream.Position - 1;
             uint size = reader.ReadUInt32();
-            Nodes = new Hash40Dictionary<ParamBase>();
+            Nodes = new Hash40Dictionary<IParam>();
 
             uint StructRefOffset = reader.ReadUInt32();
             if (ParamFile.StructOffsets.Contains(StructRefOffset))
-                ID = (uint)ParamFile.StructOffsets.IndexOf(StructRefOffset);
+                ID = ParamFile.StructOffsets.IndexOf(StructRefOffset);
             else
             {
-                ID = (uint)ParamFile.StructOffsets.Count;
+                ID = ParamFile.StructOffsets.Count;
                 ParamFile.StructOffsets.Add(StructRefOffset);
             }
             reader.BaseStream.Seek(StructRefOffset + ParamFile.RefStart, SeekOrigin.Begin);
@@ -47,47 +49,29 @@ namespace paracobNET
                 var key = hashIndeces[i];
                 reader.BaseStream.Seek(startPos + pairs[key], SeekOrigin.Begin);
                 ulong hash = ParamFile.DisasmHashTable[key];
-                ParamBase param = Util.ReadParam(reader);
+                IParam param = Util.ReadParam(reader);
                 Nodes.Add(hash, param);
             }
         }
-        internal override void Write(BinaryWriter writer)
+        internal void Write(BinaryWriter writer)
         {
+            RefEntry = new RefTableEntry(this);
+            ParamFile.RefEntries.Add(RefEntry);//reserve a space in the file's RefEntries so they stay in order
+
+            var start = writer.BaseStream.Position - 1;
             writer.Write(Nodes.Count);
-            writer.Write(ParamFile.RefEntries[(int)ID].offset);
 
-            foreach (var node in SortedNodes)
-            {
-                if (node.Value.TypeKey == ParamType.@string)
-                {
-                    var entry = ParamFile.RefEntries[(int)ID];
-                    writer.Write((byte)ParamType.@string);
-                    writer.Write(entry.stringOffsetPairs[(string)(node.Value as ParamValue).Value] + entry.offset);
-                }
-                else
-                    Util.WriteParam(node.Value, writer);
-            }
+            ParamFile.UnresolvedStructs.Add(new Tuple<int, ParamStruct>((int)writer.BaseStream.Position, this));
+            writer.Write((int)0);
 
-            SortedNodes = null;
-        }
-        internal void SetupRefTable()
-        {
-            SortedNodes = new SortedDictionary<ulong, ParamBase>(Nodes);
-            RefTableEntry entry = new RefTableEntry(this);
-            int refIndex = ParamFile.RefEntries.IndexOf(entry);
-            if (refIndex < 0)
+            foreach (var node in Nodes.OrderBy(x => x.Key))
             {
-                ID = (uint)ParamFile.RefEntries.Count;
-                ParamFile.RefEntries.Add(entry);
-            }
-            else
-            {
-                ID = (uint)refIndex;
-            }
-            entry = ParamFile.RefEntries[(int)ID];
+                int hashIndex = ParamFile.AsmHashTable.IndexOf(node.Key);
+                int relOffset = (int)(writer.BaseStream.Position - start);
+                RefEntry.HashOffsets.Add(hashIndex, relOffset);
 
-            foreach (var node in SortedNodes)
-                Util.ParseParamForRefTables(node.Value, entry);
+                Util.WriteParam(node.Value, writer, RefEntry);
+            }
         }
     }
 }
