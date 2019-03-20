@@ -32,8 +32,12 @@
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Row="0" Grid.ColumnSpan="3"
                  Orientation="Horizontal">
-            <Button x:Name="OpenFileButton" Content="Open" Click="OpenFileButton_Click"/>
-            <Button x:Name="SaveFileButton" Content="Save"/>
+            <Button x:Name="OpenFileButton"
+                    Content="Open"
+                    Click="OpenFileButton_Click"/>
+            <Button x:Name="SaveFileButton"
+                    Content="Save"
+                    Click="SaveFileButton_Click"/>
         </StackPanel>
         <TreeView Grid.Row="1" Grid.Column="0"
                   x:Name="ParamTV" BorderThickness="0"
@@ -44,17 +48,13 @@
                       Width="5"
                       ResizeBehavior="PreviousAndNext"
                       Background="Transparent"/>
-        <StackPanel Grid.Row="1" Grid.Column="2"
-                    Background="White"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch">
-            <DataGrid x:Name="ParamData"
-                      BorderThickness="0"
-                      Background="Transparent"
-                      AlternatingRowBackground="LightBlue"
-                      HorizontalAlignment="Left"
-                      CanUserSortColumns="False">
-            </DataGrid>
-        </StackPanel>
+        <DataGrid x:Name="ParamData"
+                  Grid.Row="1" Grid.Column="2"
+                  BorderThickness="0"
+                  Background="White"
+                  AlternatingRowBackground="LightBlue"
+                  CanUserSortColumns="False"
+                  ColumnWidth="*">
+        </DataGrid>
     </Grid>
 </Window>

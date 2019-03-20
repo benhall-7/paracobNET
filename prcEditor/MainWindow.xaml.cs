@@ -63,30 +63,49 @@ namespace prcEditor
             IParam param = ptItem.Param;
             if (param is ParamStruct paramStruct)
             {
-                var Entries = new List<ParamStructEntry>();
+                var entries = new List<ParamStructEntry>();
                 foreach (var node in paramStruct.Nodes)
                 {
                     if (node.Value is ParamValue pValue)
-                        Entries.Add(new ParamStructEntry(node.Key, pValue));
+                        entries.Add(new ParamStructEntry(node.Key, pValue));
                 }
-                ParamData.ItemsSource = Entries;
+                ParamData.ItemsSource = entries;
             }
-            else if (param is ParamArray)
+            else if (param is ParamArray paramArray)
             {
-
+                var entries = new List<ParamArrayEntry>();
+                for (int i = 0; i < paramArray.Nodes.Length; i++)
+                {
+                    var node = paramArray.Nodes[i];
+                    if (node is ParamValue pValue)
+                        entries.Add(new ParamArrayEntry(i, pValue));
+                }
+                ParamData.ItemsSource = entries;
             }
         }
 
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "param files|*.prc;*.stdat;*.stprm";
+            ofd.Filter = "Param files|*.prc;*.stdat;*.stprm|All files|*.*";
 
             bool? result = ofd.ShowDialog();
             if (result == true)
             {
                 PFile = new ParamFile(ofd.FileName);
                 SetupTreeView();
+            }
+        }
+
+        private void SaveFileButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "Param files|*.prc;*.stdat;*.stprm|All files|*.*";
+
+            bool? result = sfd.ShowDialog();
+            if (result == true)
+            {
+                PFile.Save(sfd.FileName);
             }
         }
 

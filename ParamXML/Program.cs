@@ -76,7 +76,9 @@ namespace ParamXML
                     xml = new XmlDocument();
                     xml.AppendChild(xml.CreateXmlDeclaration("1.0", "UTF-8", null));
                     xml.AppendChild(ParamStruct2Node(file.Root));
-                    xml.Save(output);
+                    XmlWriterSettings settings = new XmlWriterSettings() { Indent = true };
+                    XmlWriter writer = XmlWriter.Create(output, settings);
+                    xml.Save(writer);
                     stopwatch.Stop();
                     Console.WriteLine("Finished in {0} seconds", stopwatch.Elapsed.TotalSeconds);
                 }

@@ -1,22 +1,20 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 using paracobNET;
 
 namespace prcEditor
 {
-    public class ParamStructEntry
+    public class ParamArrayEntry
     {
-        private ulong Hash { get; set; }
-        private ParamValue Param { get; set; }
+        private int Index;
+        private ParamValue Param;
 
-        public string Key
+        public int Key
         {
-            get { return Hash40Util.FormatToString(Hash, MainWindow.HashToStringLabels); }
+            get { return Index; }
         }
         public ParamType Type
         {
@@ -28,9 +26,9 @@ namespace prcEditor
             set { Param.SetValue(value, MainWindow.StringToHashLabels); }
         }
 
-        public ParamStructEntry(ulong key, ParamValue param)
+        public ParamArrayEntry(int key, ParamValue param)
         {
-            Hash = key;
+            Index = key;
             Param = param;
         }
     }
