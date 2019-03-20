@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:prcEditor"
         mc:Ignorable="d"
-        Title="Editor" Height="500" Width="800">
+        Title="Editor" Height="500" Width="600">
     <Window.Resources>
         <Style TargetType="Button">
             <Setter Property="Margin" Value="2,2"/>

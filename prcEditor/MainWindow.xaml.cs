@@ -94,6 +94,7 @@ namespace prcEditor
             {
                 PFile = new ParamFile(ofd.FileName);
                 SetupTreeView();
+                ParamData.ItemsSource = null;
             }
         }
 
@@ -113,28 +114,18 @@ namespace prcEditor
         {
             if (!(e.OriginalSource is ParamTreeItem ptItem))
                 return;
-            
-            if (e.KeyboardDevice.IsKeyDown(Key.LeftCtrl) ||
-                e.KeyboardDevice.IsKeyDown(Key.RightCtrl))
+
+            switch (e.Key)
             {
-                switch (e.Key)
-                {
-                    //TODO: ctrl+c and ctrl+v
-                    case Key.C:
-                        //CopiedParam = pItem.Param;
-                        break;
-                    case Key.V:
-                        break;
-                }
-            }
-            else
-            {
-                switch (e.Key)
-                {
-                    case Key.Enter:
-                        SetupDataGrid(ptItem);
-                        break;
-                }
+                case Key.Enter:
+                    SetupDataGrid(ptItem);
+                    break;
+                case Key.C:
+                    //copies param into new entry
+                    break;
+                case Key.Delete:
+                    //deletes the param
+                    break;
             }
         }
 
