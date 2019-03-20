@@ -213,43 +213,9 @@ namespace ParamXML
 
         static ParamValue Node2ParamValue(XmlNode node, ParamType type)
         {
-            object value;
-            switch (type)
-            {
-                case ParamType.@bool:
-                    value = bool.Parse(node.InnerText);
-                    break;
-                case ParamType.@sbyte:
-                    value = sbyte.Parse(node.InnerText);
-                    break;
-                case ParamType.@byte:
-                    value = byte.Parse(node.InnerText);
-                    break;
-                case ParamType.@short:
-                    value = short.Parse(node.InnerText);
-                    break;
-                case ParamType.@ushort:
-                    value = ushort.Parse(node.InnerText);
-                    break;
-                case ParamType.@int:
-                    value = int.Parse(node.InnerText);
-                    break;
-                case ParamType.@uint:
-                    value = uint.Parse(node.InnerText);
-                    break;
-                case ParamType.@float:
-                    value = float.Parse(node.InnerText);
-                    break;
-                case ParamType.hash40:
-                    value = Hash40Util.LabelToHash40(node.InnerText, stringToHashLabels);
-                    break;
-                case ParamType.@string:
-                    value = node.InnerText;
-                    break;
-                default:
-                    throw new Exception("This exception isn't designed to be possible");
-            }
-            return new ParamValue(type, value);
+            ParamValue param = new ParamValue(type);
+            param.SetValue(node.InnerText, stringToHashLabels);
+            return param;
         }
 
         enum BuildMode

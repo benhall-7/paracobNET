@@ -1,38 +1,37 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using paracobNET;
 
 namespace prcEditor
 {
-    public class ParamStructData
-    {
-        private ParamStruct UnderlyingStruct { get; set; }
-
-        public ParamStructData(ParamStruct param)
-        {
-            foreach (var node in param.Nodes)
-            {
-
-            }
-        }
-    }
-
     public class ParamStructEntry
     {
         private ulong Key { get; set; }
-        private IParam Param { get; set; }
+        private ParamValue Param { get; set; }
+
         public string Hash
         {
             get { return Hash40Util.FormatToString(Key, MainWindow.HashToStringLabels); }
-            set { Key = Hash40Util.LabelToHash40(value, MainWindow.StringToHashLabels); }
         }
         public ParamType Type
         {
             get { return Param.TypeKey; }
-            //set { Param.TypeKey = value; }
+        }
+        public string Value
+        {
+            get { return Param.ToString(MainWindow.HashToStringLabels); }
+            set { Param.SetValue(value, MainWindow.StringToHashLabels); }
+        }
+
+        public ParamStructEntry(ulong key, ParamValue param)
+        {
+            Key = key;
+            Param = param;
         }
     }
 }

@@ -65,7 +65,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ParamArrayData.cs" />
-    <Compile Include="ParamStructData.cs" />
+    <Compile Include="ParamStructEntry.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

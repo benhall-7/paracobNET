@@ -60,22 +60,20 @@ namespace prcEditor
 
         private void SetupDataGrid(ParamTreeItem ptItem)
         {
-            /*
-            Layout summary
-            --------------
-            Ex: select struct
-
-            Row 0: "self" data
-                contains: name/hash or index of self (based on param parent), followed by value if they are a ParamValue
-            Row 1: "child" data. Only used on structs and arrays
-                contains: name/hash or index of child, followed by value if they are a ParamValue
-            
-            that's it? Can I do anything else on structs/arrays? Should names/indexes be editable?
-             */
             IParam param = ptItem.Param;
             if (param is ParamStruct paramStruct)
             {
-                ParamData.ItemsSource = paramStruct.Nodes.Values;
+                var Entries = new List<ParamStructEntry>();
+                foreach (var node in paramStruct.Nodes)
+                {
+                    if (node.Value is ParamValue pValue)
+                        Entries.Add(new ParamStructEntry(node.Key, pValue));
+                }
+                ParamData.ItemsSource = Entries;
+            }
+            else if (param is ParamArray)
+            {
+
             }
         }
 

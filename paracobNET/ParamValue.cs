@@ -104,5 +104,42 @@ namespace paracobNET
                 return Hash40Util.FormatToString((ulong)Value, labels);
             return Value.ToString();
         }
+
+        public void SetValue(string value, Dictionary<string, ulong> labels)
+        {
+            switch (TypeKey)
+            {
+                case ParamType.@bool:
+                    Value = bool.Parse(value);
+                    break;
+                case ParamType.@sbyte:
+                    Value = sbyte.Parse(value);
+                    break;
+                case ParamType.@byte:
+                    Value = byte.Parse(value);
+                    break;
+                case ParamType.@short:
+                    Value = short.Parse(value);
+                    break;
+                case ParamType.@ushort:
+                    Value = ushort.Parse(value);
+                    break;
+                case ParamType.@int:
+                    Value = int.Parse(value);
+                    break;
+                case ParamType.@uint:
+                    Value = uint.Parse(value);
+                    break;
+                case ParamType.@float:
+                    Value = float.Parse(value);
+                    break;
+                case ParamType.hash40:
+                    Value = Hash40Util.LabelToHash40(value, labels);
+                    break;
+                case ParamType.@string:
+                    Value = value;
+                    break;
+            }
+        }
     }
 }

@@ -44,13 +44,17 @@
                       Width="5"
                       ResizeBehavior="PreviousAndNext"
                       Background="Transparent"/>
-        <DataGrid Grid.Row="1" Grid.Column="2"
-              x:Name="ParamData"
-              Background="White"
-              BorderThickness="0">
-            <DataGrid.Columns>
-                
-            </DataGrid.Columns>
-        </DataGrid>
+        <StackPanel Grid.Row="1" Grid.Column="2"
+                    Background="White"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch">
+            <DataGrid x:Name="ParamData"
+                      BorderThickness="0"
+                      Background="Transparent"
+                      AlternatingRowBackground="LightBlue"
+                      HorizontalAlignment="Left"
+                      CanUserSortColumns="False">
+            </DataGrid>
+        </StackPanel>
     </Grid>
 </Window>
