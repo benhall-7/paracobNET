@@ -111,7 +111,7 @@ namespace paracobNET
             }
         }
         /// <summary>
-        /// Writes the list of RefTableEntries into the WriterRef stream and records offsets needed to resolve strings and structs
+        /// Writes the list of RefTableEntries into the WriterRef stream and records offsets needed to resolve strings and structs later
         /// </summary>
         internal static void WriteRefTables()
         {

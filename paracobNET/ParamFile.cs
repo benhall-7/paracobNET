@@ -111,6 +111,8 @@ namespace paracobNET
             {
                 AsmHashTable = null;
                 RefEntries = null;
+                UnresolvedStructs = null;
+                UnresolvedStrings = null;
             }
         }
     }
