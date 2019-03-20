@@ -14,6 +14,12 @@ Use `-h` or `-help` to see the help text, containing the required/optional args.
 
 Example: `dotnet ParamXML.dll -d fighter_param.prc -l ParamLabels.csv`
 
-# Param2Form / ParamCLI
+# prcEditor
 
-These projects are in progress. If you would like to build them on your own, Param2Form requires .NET Framework 4.6.1 and ParamCLI requires .NET Core 2.1.
+WPF Graphical User Interface for editing param files using a TreeView -> DataGrid format. To build requires .NET Framework 4.6.1. To run, just select the .exe (Windows only).
+
+To load labels, place the label file in the same directory as the application. To open a selected struct or array, press the "Enter" key. Note, the DataGrid is populated only with value type params, meaning it does not show embedded arrays or structs. This are still visible on the TreeView
+
+# ParamCLI
+
+This projects is in progress. If you would like to build it on your own, ParamCLI requires .NET Core 2.1.
