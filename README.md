@@ -16,10 +16,10 @@ Example: `dotnet ParamXML.dll -d fighter_param.prc -l ParamLabels.csv`
 
 # prcEditor
 
-WPF Graphical User Interface for editing param files using a TreeView -> DataGrid format. To build requires .NET Framework 4.6.1. To run, just select the .exe (Windows only).
+WPF Graphical User Interface for editing param files using a TreeView -> DataGrid format (Windows only). To build requires .NET Framework 4.6.1
 
-To load labels, place the label file in the same directory as the application. To open a selected struct or array, press the "Enter" key while the TreeView item is selected. Note, the DataGrid is populated only with "value-type" params, meaning it does not show embedded arrays or structs. This are still visible on the TreeView
+To load labels, place the label file in the same directory as the application. To open a selected struct or array, press the "Enter" key while the TreeView item is selected. Note, the DataGrid is populated only with "value-type" params, meaning it does not show embedded arrays or structs. These are still visible in the TreeView sub-nodes
 
-# ParamCLI
+## ParamCLI
 
 This projects is in progress. If you would like to build it on your own, it requires .NET Core 2.1.
