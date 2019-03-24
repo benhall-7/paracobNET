@@ -1,31 +1,37 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using paracobNET;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Microsoft.Win32;
-using paracobNET;
 
 namespace prcEditor
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         ParamFile PFile { get; set; }
 
         IParam CopiedParam { get; set; }
+
+        private string status;
+        public string Status
+        {
+            get { return status; }
+            set
+            {
+                status = value;
+                RaisePropertyChanged(nameof(Status));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         static bool LabelsLoaded { get; set; }
         public static Dictionary<ulong, string> HashToStringLabels { get; set; }
@@ -41,13 +47,21 @@ namespace prcEditor
         public MainWindow()
         {
             InitializeComponent();
+            
+            StatusTB.DataContext = this;
+        }
 
-            string autoLoadName = "ParamLabels.csv";
-            if (!LabelsLoaded && File.Exists(autoLoadName))
-            {
-                HashToStringLabels = LabelIO.GetHashStringDict(autoLoadName);
-                StringToHashLabels = LabelIO.GetStringHashDict(autoLoadName);
-            }
+        public async void ExecuteStatus(Action statusFunc, string message)
+        {
+            Status = message;
+            await Task.Factory.StartNew(statusFunc);
+            Status = "Idle";
+        }
+
+        private void RaisePropertyChanged(string propName)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(propName));
         }
 
         private void SetupTreeView()
@@ -84,6 +98,8 @@ namespace prcEditor
             }
         }
 
+        #region EVENT_HANDLERS
+
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
@@ -92,9 +108,11 @@ namespace prcEditor
             bool? result = ofd.ShowDialog();
             if (result == true)
             {
+                ParamData.ItemsSource = null;
+                //ExecuteStatus(() => { PFile = new ParamFile(ofd.FileName); }, "Loading param file...");
+                //ExecuteStatus(() => { }, "Setting up treeview...");
                 PFile = new ParamFile(ofd.FileName);
                 SetupTreeView();
-                ParamData.ItemsSource = null;
             }
         }
 
@@ -106,7 +124,7 @@ namespace prcEditor
             bool? result = sfd.ShowDialog();
             if (result == true)
             {
-                PFile.Save(sfd.FileName);
+                ExecuteStatus(() => { PFile.Save(sfd.FileName); }, "Saving param file...");
             }
         }
 
@@ -124,7 +142,22 @@ namespace prcEditor
                     //copies param into new entry
                     break;
                 case Key.Delete:
-                    //deletes the param
+                    if (ptItem.Parent == null)
+                        return;
+                    IParam parentParam = ptItem.Parent.Param;
+                    if (parentParam is ParamStruct parentStruct)
+                    {
+                        ulong key = Hash40Util.LabelToHash40(ptItem.ParentAccessor, StringToHashLabels);
+                        parentStruct.Nodes.Remove(key);
+                    }
+                    else
+                    {
+                        ParamList parentList = parentParam as ParamList;
+                        parentList.Nodes.RemoveAt(int.Parse(ptItem.ParentAccessor));
+                    }
+                    ptItem.Parent.Items.Remove(ptItem);
+                    ptItem.Param = null;
+                    ptItem = null;
                     break;
             }
         }
@@ -136,5 +169,21 @@ namespace prcEditor
             DataGridColumn column = ((DataGrid)sender).Columns[i - 1];
             column.Width = new DataGridLength(1, DataGridLengthUnitType.Star);
         }
+
+        private void Window_ContentRendered(object sender, EventArgs e)
+        {
+            string autoLoadName = "ParamLabels.csv";
+            if (!LabelsLoaded && File.Exists(autoLoadName))
+            {
+                Action action = () =>
+                {
+                    HashToStringLabels = LabelIO.GetHashStringDict(autoLoadName);
+                    StringToHashLabels = LabelIO.GetStringHashDict(autoLoadName);
+                };
+                ExecuteStatus(action, "Loading label dictionaries...");
+            }
+        }
+
+        #endregion
     }
 }

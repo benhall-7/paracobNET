@@ -48,10 +48,7 @@ namespace prcEditor
                     foreach (var childParam in (param as ParamStruct).Nodes)
                     {
                         var childNode = new ParamTreeItem(childParam.Value, this);
-                        if (MainWindow.HashToStringLabels.TryGetValue(childParam.Key, out string label))
-                            childNode.ParentAccessor = label;
-                        else
-                            childNode.ParentAccessor = "0x" + childParam.Key.ToString("x10");
+                        childNode.ParentAccessor = Hash40Util.FormatToString(childParam.Key, MainWindow.HashToStringLabels);
                         Items.Add(childNode);
                     }
                     break;
