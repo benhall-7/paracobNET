@@ -54,5 +54,14 @@ namespace paracobNET
                 writer.Write(offset);
             writer.BaseStream.Seek(endPos, SeekOrigin.Begin);
         }
+
+        public IParam Clone()
+        {
+            ParamList clone = new ParamList();
+            clone.Nodes = new List<IParam>(Nodes.Count);
+            foreach (var node in Nodes)
+                clone.Nodes.Add(node.Clone());
+            return clone;
+        }
     }
 }

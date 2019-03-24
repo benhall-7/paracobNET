@@ -23,8 +23,8 @@ namespace paracobNET
         internal void Read(BinaryReader reader)
         {
             uint startPos = (uint)reader.BaseStream.Position - 1;
-            uint size = reader.ReadUInt32();
-            Nodes = new Hash40Dictionary<IParam>();
+            int size = reader.ReadInt32();
+            Nodes = new Hash40Dictionary<IParam>(size);
 
             uint StructRefOffset = reader.ReadUInt32();
             if (ParamFile.StructOffsets.Contains(StructRefOffset))
@@ -72,6 +72,15 @@ namespace paracobNET
 
                 Util.WriteParam(node.Value, writer, RefEntry);
             }
+        }
+
+        public IParam Clone()
+        {
+            ParamStruct clone = new ParamStruct();
+            clone.Nodes = new Hash40Dictionary<IParam>(Nodes.Count);
+            foreach (var node in Nodes)
+                clone.Nodes.Add(node.Key, node.Value.Clone());
+            return clone;
         }
     }
 }

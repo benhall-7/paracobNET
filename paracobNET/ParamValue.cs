@@ -141,5 +141,10 @@ namespace paracobNET
                     break;
             }
         }
+
+        public IParam Clone()
+        {
+            return new ParamValue(TypeKey, Value);
+        }
     }
 }
