@@ -19,9 +19,9 @@ namespace paracobNET
                     param = new ParamStruct();
                     (param as ParamStruct).Read(reader);
                     break;
-                case ParamType.array:
-                    param = new ParamArray();
-                    (param as ParamArray).Read(reader);
+                case ParamType.list:
+                    param = new ParamList();
+                    (param as ParamList).Read(reader);
                     break;
                 default:
                     param = new ParamValue(type);
@@ -51,8 +51,8 @@ namespace paracobNET
                         IterateHashes(item.Value);
                     }
                     break;
-                case ParamType.array:
-                    foreach (var item in (param as ParamArray).Nodes)
+                case ParamType.list:
+                    foreach (var item in (param as ParamList).Nodes)
                         IterateHashes(item);
                     break;
                 case ParamType.hash40:
@@ -68,8 +68,8 @@ namespace paracobNET
                 case ParamType.@struct:
                     (param as ParamStruct).Write(writer);
                     break;
-                case ParamType.array:
-                    (param as ParamArray).Write(writer, parent);
+                case ParamType.list:
+                    (param as ParamList).Write(writer, parent);
                     break;
                 default:
                     (param as ParamValue).Write(writer, parent);

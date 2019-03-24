@@ -1,15 +1,16 @@
 ﻿using System.IO;
+using System.Collections.Generic;
 
 namespace paracobNET
 {
-    public class ParamArray : IParam
+    public class ParamList : IParam
     {
-        public ParamType TypeKey { get; } = ParamType.array;
+        public ParamType TypeKey { get; } = ParamType.list;
         
-        public IParam[] Nodes { get; private set; }
+        public List<IParam> Nodes { get; private set; }
 
-        public ParamArray() { }
-        public ParamArray(IParam[] nodes)
+        public ParamList() { }
+        public ParamList(List<IParam> nodes)
         {
             Nodes = nodes;
         }
@@ -17,28 +18,31 @@ namespace paracobNET
         internal void Read(BinaryReader reader)
         {
             uint startPos = (uint)reader.BaseStream.Position - 1;
-            Nodes = new IParam[reader.ReadUInt32()];
-            uint[] offsets = new uint[Nodes.Length];
+            int count = reader.ReadInt32();
+            Nodes = new List<IParam>(count);
+            uint[] offsets = new uint[count];
 
             //all elements should be the same type but it's not enforced
 
             for (int i = 0; i < offsets.Length; i++)
                 offsets[i] = reader.ReadUInt32();
-            for (int i = 0; i < Nodes.Length; i++)
+            for (int i = 0; i < count; i++)
             {
                 reader.BaseStream.Seek(startPos + offsets[i], SeekOrigin.Begin);
-                Nodes[i] = Util.ReadParam(reader);
+                Nodes.Add(Util.ReadParam(reader));
             }
         }
         internal void Write(BinaryWriter writer, RefTableEntry parent)
         {
             uint startPos = (uint)writer.BaseStream.Position - 1;
-            writer.Write(Nodes.Length);
 
-            uint[] offsets = new uint[Nodes.Length];
+            int count = Nodes.Count;
+            writer.Write(count);
+
+            uint[] offsets = new uint[Nodes.Count];
             long ptrStartPos = writer.BaseStream.Position;
-            writer.BaseStream.Seek(4 * Nodes.Length, SeekOrigin.Current);
-            for (int i = 0; i < Nodes.Length; i++)
+            writer.BaseStream.Seek(4 * count, SeekOrigin.Current);
+            for (int i = 0; i < count; i++)
             {
                 var node = Nodes[i];
                 offsets[i] = (uint)(writer.BaseStream.Position - startPos);

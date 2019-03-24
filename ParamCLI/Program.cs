@@ -162,7 +162,7 @@ namespace ParamCLI
             {
                 case ParamType.@struct:
                     return EvalCommandForStruct(args);
-                case ParamType.array:
+                case ParamType.list:
                     return EvalCommandForArray(args);
                 default:
                     return EvalCommandForValue(args);
@@ -202,11 +202,11 @@ namespace ParamCLI
 
         static EvalResult EvalCommandForArray(string[] args)
         {
-            ParamArray paramArray = stack.Peek() as ParamArray;
+            ParamList paramArray = stack.Peek() as ParamList;
             switch (args[0])
             {
                 case "cc":
-                    Console.WriteLine(paramArray.Nodes.Length);
+                    Console.WriteLine(paramArray.Nodes.Count);
                     break;
                 case "f":
                     try
@@ -306,8 +306,8 @@ namespace ParamCLI
             {
                 case ParamType.@struct:
                     return type + (param as ParamStruct).Nodes.Count;
-                case ParamType.array:
-                    return type + (param as ParamArray).Nodes.Length;
+                case ParamType.list:
+                    return type + (param as ParamList).Nodes.Count;
                 default:
                     return type + (param as ParamValue).ToString(hashToString);
             }
@@ -327,7 +327,7 @@ namespace ParamCLI
                     Console.WriteLine("Local commands (struct):");
                     Console.WriteLine("  pc (print children) ; f (forward) [hash or name]");
                     break;
-                case ParamType.array:
+                case ParamType.list:
                     Console.WriteLine("Local commands (array):");
                     Console.WriteLine("  cc (child count) ; f (forward) [index]");
                     break;

@@ -12,7 +12,7 @@
         @float,
         hash40,
         @string,
-        array,
+        list,
         @struct
     }
 }

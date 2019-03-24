@@ -71,10 +71,10 @@ namespace prcEditor
                 }
                 ParamData.ItemsSource = entries;
             }
-            else if (param is ParamArray paramArray)
+            else if (param is ParamList paramArray)
             {
                 var entries = new List<ParamArrayEntry>();
-                for (int i = 0; i < paramArray.Nodes.Length; i++)
+                for (int i = 0; i < paramArray.Nodes.Count; i++)
                 {
                     var node = paramArray.Nodes[i];
                     if (node is ParamValue pValue)

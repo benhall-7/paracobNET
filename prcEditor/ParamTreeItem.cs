@@ -32,11 +32,11 @@ namespace prcEditor
 
             switch (param.TypeKey)
             {
-                case ParamType.array:
+                case ParamType.list:
                     {
-                        var nodes = (param as ParamArray).Nodes;
-                        string format = $"d{(nodes.Length - 1).ToString().Length}";
-                        for (int i = 0; i < nodes.Length; i++)
+                        var nodes = (param as ParamList).Nodes;
+                        string format = $"d{(nodes.Count - 1).ToString().Length}";
+                        for (int i = 0; i < nodes.Count; i++)
                         {
                             var child = new ParamTreeItem(nodes[i], this);
                             child.ParentAccessor = i.ToString(format);

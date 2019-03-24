@@ -117,8 +117,8 @@ namespace ParamXML
             {
                 case ParamType.@struct:
                     return ParamStruct2Node(param as ParamStruct);
-                case ParamType.array:
-                    return ParamArray2Node(param as ParamArray);
+                case ParamType.list:
+                    return ParamArray2Node(param as ParamList);
                 default:
                     return ParamValue2Node(param as ParamValue);
             }
@@ -141,13 +141,13 @@ namespace ParamXML
             return xmlNode;
         }
 
-        static XmlNode ParamArray2Node(ParamArray array)
+        static XmlNode ParamArray2Node(ParamList array)
         {
-            XmlNode xmlNode = xml.CreateElement(ParamType.array.ToString());
+            XmlNode xmlNode = xml.CreateElement(ParamType.list.ToString());
             XmlAttribute mainAttr = xml.CreateAttribute("size");
-            mainAttr.Value = array.Nodes.Length.ToString();
+            mainAttr.Value = array.Nodes.Count.ToString();
             xmlNode.Attributes.Append(mainAttr);
-            for (int i = 0; i < array.Nodes.Length; i++)
+            for (int i = 0; i < array.Nodes.Count; i++)
             {
                 XmlNode childNode = Param2Node(array.Nodes[i]);
                 XmlAttribute attr = xml.CreateAttribute("index");
@@ -177,7 +177,7 @@ namespace ParamXML
                 {
                     case ParamType.@struct:
                         return Node2ParamStruct(node);
-                    case ParamType.array:
+                    case ParamType.list:
                         return Node2ParamArray(node);
                     default:
                         return Node2ParamValue(node, type);
@@ -205,12 +205,13 @@ namespace ParamXML
             return new ParamStruct(childParams);
         }
 
-        static ParamArray Node2ParamArray(XmlNode node)
+        static ParamList Node2ParamArray(XmlNode node)
         {
-            IParam[] children = new IParam[node.ChildNodes.Count];
-            for (int i = 0; i < children.Length; i++)
-                children[i] = Node2Param(node.ChildNodes[i]);
-            return new ParamArray(children);
+            int count = node.ChildNodes.Count;
+            List<IParam> children = new List<IParam>(count);
+            for (int i = 0; i < count; i++)
+                children.Add(Node2Param(node.ChildNodes[i]));
+            return new ParamList(children);
         }
 
         static ParamValue Node2ParamValue(XmlNode node, ParamType type)
