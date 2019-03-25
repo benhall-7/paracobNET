@@ -21,8 +21,9 @@ namespace prcEditor
         ParamFile PFile { get; set; }
         ParamTreeItem PTreeRoot { get; set; }
         
+        Thread WorkerThread { get; set; }
         Queue<EnqueuableStatus> WorkerQueue { get; set; } 
-        public readonly object WorkerThreadLock = new object();
+        readonly object WorkerThreadLock = new object();
 
         IParam CopiedParam { get; set; }
 
@@ -59,9 +60,9 @@ namespace prcEditor
             StatusTB.DataContext = this;
         }
 
-        private void ExecuteWorkerQueue()
+        private void StartWorkerThread()
         {
-            Thread thread = new Thread(() =>
+            WorkerThread = new Thread(() =>
             {
                 EnqueuableStatus status;
                 while (WorkerQueue.Count > 0)
@@ -74,9 +75,9 @@ namespace prcEditor
 
                 StatusMessage = "Idle";
             });
-            thread.IsBackground = true;
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
+            WorkerThread.IsBackground = true;
+            WorkerThread.SetApartmentState(ApartmentState.STA);
+            WorkerThread.Start();
         }
 
         private void RaisePropertyChanged(string propName)
@@ -123,7 +124,7 @@ namespace prcEditor
                     HashToStringLabels = LabelIO.GetHashStringDict(autoLoadName);
                     StringToHashLabels = LabelIO.GetStringHashDict(autoLoadName);
                 }, "Loading label dictionaries"));
-                ExecuteWorkerQueue();
+                StartWorkerThread();
             }
         }
 
@@ -137,8 +138,10 @@ namespace prcEditor
             {
                 ParamData.ItemsSource = null;
                 ParamTV.Items.Clear();
-                OpenFileButton.IsEnabled = false;
-                SaveFileButton.IsEnabled = false;
+                
+                //USE A BINDING FOR THESE INSTEAD
+                //OpenFileButton.IsEnabled = false;
+                //SaveFileButton.IsEnabled = false;
 
                 WorkerQueue.Enqueue(new EnqueuableStatus(() =>
                 {
@@ -148,12 +151,11 @@ namespace prcEditor
                 {
                     PTreeRoot = new ParamTreeItem(PFile.Root, null);
                     PTreeRoot.IsExpanded = true;
-                    Application.Current.Dispatcher.Invoke(() => ParamTV.Items.Add(PTreeRoot));
                 }, "Setting up treeview"));
-                ExecuteWorkerQueue();
+                StartWorkerThread();
 
-                OpenFileButton.IsEnabled = true;
-                SaveFileButton.IsEnabled = true;
+                //OpenFileButton.IsEnabled = true;
+                //SaveFileButton.IsEnabled = true;
             }
         }
 
@@ -169,7 +171,7 @@ namespace prcEditor
                 {
                     PFile.Save(sfd.FileName);
                 }, "Saving param file"));
-                ExecuteWorkerQueue();
+                StartWorkerThread();
             }
         }
 
