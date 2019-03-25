@@ -7,7 +7,7 @@ using paracobNET;
 
 namespace prcEditor
 {
-    public class ParamArrayEntry
+    public class ParamListEntry
     {
         private int Index;
         private ParamValue Param;
@@ -26,7 +26,7 @@ namespace prcEditor
             set { Param.SetValue(value, MainWindow.StringToHashLabels); }
         }
 
-        public ParamArrayEntry(int key, ParamValue param)
+        public ParamListEntry(int key, ParamValue param)
         {
             Index = key;
             Param = param;

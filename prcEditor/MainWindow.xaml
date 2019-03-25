@@ -62,7 +62,7 @@
         </DataGrid>
         <StatusBar Grid.Row="2" Grid.ColumnSpan="3"
                    Background="Transparent">
-            <TextBlock x:Name="StatusTB" Text="{Binding Path=Status}"/>
+            <TextBlock x:Name="StatusTB" Text="{Binding Path=StatusMessage}"/>
         </StatusBar>
     </Grid>
 </Window>

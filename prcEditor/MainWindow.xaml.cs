@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,18 +20,21 @@ namespace prcEditor
     {
         ParamFile PFile { get; set; }
         ParamTreeItem PTreeRoot { get; set; }
+        
+        Queue<EnqueuableStatus> WorkerQueue { get; set; } 
+        public readonly object WorkerThreadLock = new object();
 
         IParam CopiedParam { get; set; }
 
         //Thanks to Greg Sansom: https://stackoverflow.com/a/5507826
-        private string status;
-        public string Status
+        private string statusMessage = "Idle";
+        public string StatusMessage
         {
-            get { return status; }
+            get { return statusMessage; }
             set
             {
-                status = value;
-                RaisePropertyChanged(nameof(Status));
+                statusMessage = value;
+                RaisePropertyChanged(nameof(StatusMessage));
             }
         }
 
@@ -50,15 +54,29 @@ namespace prcEditor
         public MainWindow()
         {
             InitializeComponent();
-            
+
+            WorkerQueue = new Queue<EnqueuableStatus>();
             StatusTB.DataContext = this;
         }
 
-        public async Task ExecuteStatus(Action statusFunc, string message)
+        private void ExecuteWorkerQueue()
         {
-            Status = message;
-            await Task.Factory.StartNew(statusFunc);
-            Status = "Idle";
+            Thread thread = new Thread(() =>
+            {
+                EnqueuableStatus status;
+                while (WorkerQueue.Count > 0)
+                {
+                    status = WorkerQueue.Dequeue();
+
+                    StatusMessage = status.Message;
+                    status.Action.Invoke();
+                }
+
+                StatusMessage = "Idle";
+            });
+            thread.IsBackground = true;
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
         }
 
         private void RaisePropertyChanged(string propName)
@@ -80,14 +98,14 @@ namespace prcEditor
                 }
                 ParamData.ItemsSource = entries;
             }
-            else if (param is ParamList paramArray)
+            else if (param is ParamList paramList)
             {
-                var entries = new List<ParamArrayEntry>();
-                for (int i = 0; i < paramArray.Nodes.Count; i++)
+                var entries = new List<ParamListEntry>();
+                for (int i = 0; i < paramList.Nodes.Count; i++)
                 {
-                    var node = paramArray.Nodes[i];
+                    var node = paramList.Nodes[i];
                     if (node is ParamValue pValue)
-                        entries.Add(new ParamArrayEntry(i, pValue));
+                        entries.Add(new ParamListEntry(i, pValue));
                 }
                 ParamData.ItemsSource = entries;
             }
@@ -95,21 +113,21 @@ namespace prcEditor
 
         #region EVENT_HANDLERS
 
-        private async void Window_ContentRendered(object sender, EventArgs e)
+        private void Window_ContentRendered(object sender, EventArgs e)
         {
             string autoLoadName = "ParamLabels.csv";
             if (!LabelsLoaded && File.Exists(autoLoadName))
             {
-                Action action = () =>
+                WorkerQueue.Enqueue(new EnqueuableStatus(() =>
                 {
                     HashToStringLabels = LabelIO.GetHashStringDict(autoLoadName);
                     StringToHashLabels = LabelIO.GetStringHashDict(autoLoadName);
-                };
-                await ExecuteStatus(action, "Loading label dictionaries");
+                }, "Loading label dictionaries"));
+                ExecuteWorkerQueue();
             }
         }
 
-        private async void OpenFileButton_Click(object sender, RoutedEventArgs e)
+        private void OpenFileButton_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = "Param files|*.prc;*.stdat;*.stprm|All files|*.*";
@@ -119,16 +137,27 @@ namespace prcEditor
             {
                 ParamData.ItemsSource = null;
                 ParamTV.Items.Clear();
+                OpenFileButton.IsEnabled = false;
+                SaveFileButton.IsEnabled = false;
 
-                await ExecuteStatus(() => { PFile = new ParamFile(ofd.FileName); }, "Loading param file");
-                //await ExecuteStatus(() => { PTreeRoot = new ParamTreeItem(PFile.Root, null); }, "Setting up treeview");
-                PTreeRoot = new ParamTreeItem(PFile.Root, null);
-                ParamTV.Items.Add(PTreeRoot);
-                PTreeRoot.IsExpanded = true;
+                WorkerQueue.Enqueue(new EnqueuableStatus(() =>
+                {
+                    PFile = new ParamFile(ofd.FileName);
+                }, "Loading param file"));
+                WorkerQueue.Enqueue(new EnqueuableStatus(() =>
+                {
+                    PTreeRoot = new ParamTreeItem(PFile.Root, null);
+                    PTreeRoot.IsExpanded = true;
+                    Application.Current.Dispatcher.Invoke(() => ParamTV.Items.Add(PTreeRoot));
+                }, "Setting up treeview"));
+                ExecuteWorkerQueue();
+
+                OpenFileButton.IsEnabled = true;
+                SaveFileButton.IsEnabled = true;
             }
         }
 
-        private async void SaveFileButton_Click(object sender, RoutedEventArgs e)
+        private void SaveFileButton_Click(object sender, RoutedEventArgs e)
         {
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.Filter = "Param files|*.prc;*.stdat;*.stprm|All files|*.*";
@@ -136,7 +165,11 @@ namespace prcEditor
             bool? result = sfd.ShowDialog();
             if (result == true)
             {
-                await ExecuteStatus(() => { PFile.Save(sfd.FileName); }, "Saving param file");
+                WorkerQueue.Enqueue(new EnqueuableStatus(() =>
+                {
+                    PFile.Save(sfd.FileName);
+                }, "Saving param file"));
+                ExecuteWorkerQueue();
             }
         }
 
