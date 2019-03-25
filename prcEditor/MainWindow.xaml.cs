@@ -3,6 +3,7 @@ using paracobNET;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,9 +18,11 @@ namespace prcEditor
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         ParamFile PFile { get; set; }
+        ParamTreeItem PTreeRoot { get; set; }
 
         IParam CopiedParam { get; set; }
 
+        //Thanks to Greg Sansom: https://stackoverflow.com/a/5507826
         private string status;
         public string Status
         {
@@ -51,7 +54,7 @@ namespace prcEditor
             StatusTB.DataContext = this;
         }
 
-        public async void ExecuteStatus(Action statusFunc, string message)
+        public async Task ExecuteStatus(Action statusFunc, string message)
         {
             Status = message;
             await Task.Factory.StartNew(statusFunc);
@@ -62,14 +65,6 @@ namespace prcEditor
         {
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(propName));
-        }
-
-        private void SetupTreeView()
-        {
-            ParamTV.Items.Clear();
-            ParamTreeItem root = new ParamTreeItem(PFile.Root, null);
-            ParamTV.Items.Add(root);
-            root.IsExpanded = true;
         }
 
         private void SetupDataGrid(ParamTreeItem ptItem)
@@ -100,7 +95,21 @@ namespace prcEditor
 
         #region EVENT_HANDLERS
 
-        private void OpenFileButton_Click(object sender, RoutedEventArgs e)
+        private async void Window_ContentRendered(object sender, EventArgs e)
+        {
+            string autoLoadName = "ParamLabels.csv";
+            if (!LabelsLoaded && File.Exists(autoLoadName))
+            {
+                Action action = () =>
+                {
+                    HashToStringLabels = LabelIO.GetHashStringDict(autoLoadName);
+                    StringToHashLabels = LabelIO.GetStringHashDict(autoLoadName);
+                };
+                await ExecuteStatus(action, "Loading label dictionaries");
+            }
+        }
+
+        private async void OpenFileButton_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = "Param files|*.prc;*.stdat;*.stprm|All files|*.*";
@@ -109,14 +118,17 @@ namespace prcEditor
             if (result == true)
             {
                 ParamData.ItemsSource = null;
-                //ExecuteStatus(() => { PFile = new ParamFile(ofd.FileName); }, "Loading param file...");
-                //ExecuteStatus(() => { }, "Setting up treeview...");
-                PFile = new ParamFile(ofd.FileName);
-                SetupTreeView();
+                ParamTV.Items.Clear();
+
+                await ExecuteStatus(() => { PFile = new ParamFile(ofd.FileName); }, "Loading param file");
+                //await ExecuteStatus(() => { PTreeRoot = new ParamTreeItem(PFile.Root, null); }, "Setting up treeview");
+                PTreeRoot = new ParamTreeItem(PFile.Root, null);
+                ParamTV.Items.Add(PTreeRoot);
+                PTreeRoot.IsExpanded = true;
             }
         }
 
-        private void SaveFileButton_Click(object sender, RoutedEventArgs e)
+        private async void SaveFileButton_Click(object sender, RoutedEventArgs e)
         {
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.Filter = "Param files|*.prc;*.stdat;*.stprm|All files|*.*";
@@ -124,7 +136,7 @@ namespace prcEditor
             bool? result = sfd.ShowDialog();
             if (result == true)
             {
-                ExecuteStatus(() => { PFile.Save(sfd.FileName); }, "Saving param file...");
+                await ExecuteStatus(() => { PFile.Save(sfd.FileName); }, "Saving param file");
             }
         }
 
@@ -168,20 +180,6 @@ namespace prcEditor
             int i = ((DataGrid)sender).Columns.Count;
             DataGridColumn column = ((DataGrid)sender).Columns[i - 1];
             column.Width = new DataGridLength(1, DataGridLengthUnitType.Star);
-        }
-
-        private void Window_ContentRendered(object sender, EventArgs e)
-        {
-            string autoLoadName = "ParamLabels.csv";
-            if (!LabelsLoaded && File.Exists(autoLoadName))
-            {
-                Action action = () =>
-                {
-                    HashToStringLabels = LabelIO.GetHashStringDict(autoLoadName);
-                    StringToHashLabels = LabelIO.GetStringHashDict(autoLoadName);
-                };
-                ExecuteStatus(action, "Loading label dictionaries...");
-            }
         }
 
         #endregion
