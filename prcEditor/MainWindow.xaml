@@ -36,10 +36,12 @@
                  Orientation="Horizontal">
             <Button x:Name="OpenFileButton"
                     Content="Open"
-                    Click="OpenFileButton_Click"/>
+                    Click="OpenFileButton_Click"
+                    IsEnabled="{Binding Path=IsOpenEnabled}"/>
             <Button x:Name="SaveFileButton"
                     Content="Save"
-                    Click="SaveFileButton_Click"/>
+                    Click="SaveFileButton_Click"
+                    IsEnabled="{Binding Path=IsSaveEnabled}"/>
         </StackPanel>
         <TreeView Grid.Row="1" Grid.Column="0"
                   x:Name="ParamTV" BorderThickness="0"
