@@ -201,7 +201,7 @@ namespace ParamXML
         {
             Hash40Dictionary<IParam> childParams = new Hash40Dictionary<IParam>();
             foreach (XmlNode child in node.ChildNodes)
-                childParams.Add(Hash40Util.LabelToHash40(child.Attributes["hash"].Value, stringToHashLabels), Node2Param(child));
+                childParams.Add(child.Attributes["hash"].Value, stringToHashLabels, Node2Param(child));
             return new ParamStruct(childParams);
         }
 

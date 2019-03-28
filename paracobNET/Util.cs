@@ -138,12 +138,12 @@ namespace paracobNET
             var writer = ParamFile.WriterParam;
             foreach (var tup in ParamFile.UnresolvedStructs)
             {
-                writer.BaseStream.Position = tup.Item1;
+                writer.BaseStream.Seek(tup.Item1, SeekOrigin.Begin);
                 writer.Write(tup.Item2.RefEntry.RefTableOffset);
             }
             foreach (var tup in ParamFile.UnresolvedStrings)
             {
-                writer.BaseStream.Position = tup.Item1;
+                writer.BaseStream.Seek(tup.Item1, SeekOrigin.Begin);
                 writer.Write(tup.Item2.RefEntry.StringOffsets[tup.Item3]);
             }
         }
