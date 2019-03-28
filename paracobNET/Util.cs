@@ -86,7 +86,7 @@ namespace paracobNET
         }
         internal static void MergeRefTables()
         {
-            var entries = ParamFile.RefEntries;
+            var entries = ParamFile.DisasmRefEntries;
             int index = 0;
             while (index < entries.Count)
             {
@@ -116,7 +116,7 @@ namespace paracobNET
         internal static void WriteRefTables()
         {
             var writer = ParamFile.WriterRef;
-            foreach (var entry in ParamFile.RefEntries)
+            foreach (var entry in ParamFile.DisasmRefEntries)
             {
                 entry.RefTableOffset = (int)writer.BaseStream.Position;
                 foreach (var pair in entry.HashOffsets)

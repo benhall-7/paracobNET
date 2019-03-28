@@ -127,9 +127,6 @@ namespace ParamXML
         static XmlNode ParamStruct2Node(ParamStruct structure)
         {
             XmlNode xmlNode = xml.CreateElement(ParamType.@struct.ToString());
-            XmlAttribute mainAttr = xml.CreateAttribute("type");
-            mainAttr.Value = structure.ID.ToString();
-            xmlNode.Attributes.Append(mainAttr);
             foreach (var node in structure.Nodes)
             {
                 XmlNode childNode = Param2Node(node.Value);

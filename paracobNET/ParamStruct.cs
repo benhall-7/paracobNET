@@ -8,10 +8,8 @@ namespace paracobNET
     public class ParamStruct : IParam
     {
         public ParamType TypeKey { get; } = ParamType.@struct;
-        public int ID { get; set; }
         public Hash40Dictionary<IParam> Nodes { get; set; }
-
-        //only used on rebuild
+        //this property only used when rebuilding
         internal RefTableEntry RefEntry { get; set; }
 
         public ParamStruct() { }
@@ -24,31 +22,37 @@ namespace paracobNET
         {
             uint startPos = (uint)reader.BaseStream.Position - 1;
             int size = reader.ReadInt32();
+            uint structRefOffset = reader.ReadUInt32();
             Nodes = new Hash40Dictionary<IParam>(size);
 
-            uint StructRefOffset = reader.ReadUInt32();
-            if (ParamFile.StructOffsets.Contains(StructRefOffset))
-                ID = ParamFile.StructOffsets.IndexOf(StructRefOffset);
+            Dictionary<int, int> hashOffsets;
+            if (ParamFile.AsmRefEntries.TryGetValue(structRefOffset, out var refEntry))
+                hashOffsets = refEntry.HashOffsets;
             else
             {
-                ID = ParamFile.StructOffsets.Count;
-                ParamFile.StructOffsets.Add(StructRefOffset);
+                var entry = new RefTableEntry();
+                var hashOffsetTuples = new List<Tuple<int, int>>();
+                reader.BaseStream.Seek(structRefOffset + ParamFile.RefStart, SeekOrigin.Begin);
+                for (int i = 0; i < size; i++)
+                {
+                    int hashIndex = reader.ReadInt32();
+                    int paramOffset = reader.ReadInt32();
+                    hashOffsetTuples.Add(new Tuple<int, int>(hashIndex, paramOffset));
+                    //entry.HashOffsets.Add(hashIndex, paramOffset);
+                }
+                //sort by the hash index, now we do this only once per RefEntry
+                //TODO: maybe I should use a sorted dictionary instead?
+                hashOffsetTuples.Sort((pair1, pair2) => pair1.Item1.CompareTo(pair2.Item1));
+                foreach (var tuple in hashOffsetTuples)
+                    entry.HashOffsets.Add(tuple.Item1, tuple.Item2);
+                ParamFile.AsmRefEntries.Add(structRefOffset, entry);
+                hashOffsets = entry.HashOffsets;
             }
-            reader.BaseStream.Seek(StructRefOffset + ParamFile.RefStart, SeekOrigin.Begin);
-            Dictionary<uint, uint> pairs = new Dictionary<uint, uint>();
-            for (int i = 0; i < size; i++)
+
+            foreach (var pair in hashOffsets)
             {
-                uint hashIndex = reader.ReadUInt32();
-                uint paramOffset = reader.ReadUInt32();
-                pairs.Add(hashIndex, paramOffset);
-            }
-            var hashIndeces = pairs.Keys.ToList();
-            hashIndeces.Sort();
-            for (int i = 0; i < size; i++)
-            {
-                var key = hashIndeces[i];
-                reader.BaseStream.Seek(startPos + pairs[key], SeekOrigin.Begin);
-                ulong hash = ParamFile.DisasmHashTable[key];
+                reader.BaseStream.Seek(startPos + pair.Value, SeekOrigin.Begin);
+                ulong hash = ParamFile.DisasmHashTable[pair.Key];
                 IParam param = Util.ReadParam(reader);
                 Nodes.Add(hash, param);
             }
@@ -56,7 +60,7 @@ namespace paracobNET
         internal void Write(BinaryWriter writer)
         {
             RefEntry = new RefTableEntry(this);
-            ParamFile.RefEntries.Add(RefEntry);//reserve a space in the file's RefEntries so they stay in order
+            ParamFile.DisasmRefEntries.Add(RefEntry);//reserve a space in the file's RefEntries so they stay in order
 
             var start = writer.BaseStream.Position - 1;
             writer.Write(Nodes.Count);
