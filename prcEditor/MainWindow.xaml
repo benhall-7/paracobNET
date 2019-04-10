@@ -47,7 +47,15 @@
                   x:Name="ParamTV" BorderThickness="0"
                   KeyDown="ParamTV_KeyDown"
                   VirtualizingStackPanel.IsVirtualizing="True"
-                  VirtualizingStackPanel.VirtualizationMode="Recycling"/>
+                  VirtualizingStackPanel.VirtualizationMode="Recycling"
+                  ItemsSource="{Binding ParamTreeRootContainer}">
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type local:ParamTreeItem}"
+                                          ItemsSource="{Binding Path=Items}">
+                    <TreeViewItem Header="{Binding Name}"/>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
         <GridSplitter Grid.Row="1" Grid.Column="1"
                       HorizontalAlignment="Right"
                       VerticalAlignment="Stretch"

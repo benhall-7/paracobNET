@@ -19,7 +19,26 @@ namespace prcEditor
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         ParamFile PFile { get; set; }
-        ParamTreeItem PTreeRoot { get; set; }
+
+        private ParamTreeItem paramTI;
+        public ParamTreeItem ParamTI
+        {
+            get { return paramTI; }
+            set
+            {
+                paramTI = value;
+                RaisePropertyChanged(nameof(ParamTreeRootContainer));
+            }
+        }
+        public List<ParamTreeItem> ParamTreeRootContainer
+        {
+            get
+            {
+                if (ParamTI == null)
+                    return new List<ParamTreeItem>();
+                return new List<ParamTreeItem>() { ParamTI };
+            }
+        }
         
         Thread WorkerThread { get; set; }
         Queue<EnqueuableStatus> WorkerQueue { get; set; } 
@@ -83,6 +102,7 @@ namespace prcEditor
             StatusTB.DataContext = this;
             OpenFileButton.DataContext = this;
             SaveFileButton.DataContext = this;
+            ParamTV.DataContext = this;
         }
 
         private void StartWorkerThread()
@@ -163,7 +183,7 @@ namespace prcEditor
             if (result == true)
             {
                 ParamData.ItemsSource = null;
-                ParamTV.Items.Clear();
+                //ParamTV.Items.Clear();
                 
                 IsOpenEnabled = false;
                 IsSaveEnabled = false;
@@ -174,9 +194,7 @@ namespace prcEditor
                 }, "Loading param file"));
                 WorkerQueue.Enqueue(new EnqueuableStatus(() =>
                 {
-                    PTreeRoot = new ParamTreeItem(PFile.Root, null);
-                    //ParamTV.Dispatcher.Invoke(() => ParamTV.Items.Add(PTreeRoot));
-                    PTreeRoot.IsExpanded = true;
+                    ParamTI = new ParamTreeItem(PFile.Root, null, null);
                     IsOpenEnabled = true;
                     IsSaveEnabled = true;
                 }, "Setting up treeview"));
@@ -217,19 +235,19 @@ namespace prcEditor
                     if (ptItem.Parent == null)
                         return;
                     IParam parentParam = ptItem.Parent.Param;
-                    if (parentParam is ParamStruct parentStruct)
-                    {
-                        ulong key = Hash40Util.LabelToHash40(ptItem.ParentAccessor, StringToHashLabels);
-                        parentStruct.Nodes.Remove(key);
-                    }
-                    else
-                    {
-                        ParamList parentList = parentParam as ParamList;
-                        parentList.Nodes.RemoveAt(int.Parse(ptItem.ParentAccessor));
-                    }
-                    ptItem.Parent.Items.Remove(ptItem);
-                    ptItem.Param = null;
-                    ptItem = null;
+                    //if (parentParam is ParamStruct parentStruct)
+                    //{
+                    //    ulong key = (ulong)ptItem.ParentAccessor;
+                    //    parentStruct.Nodes.Remove(key);
+                    //}
+                    //else
+                    //{
+                    //    ParamList parentList = parentParam as ParamList;
+                    //    parentList.Nodes.RemoveAt(int.Parse(ptItem.ParentAccessor));
+                    //}
+                    //ptItem.Parent.Items.Remove(ptItem);
+                    //ptItem.Param = null;
+                    //ptItem = null;
                     break;
             }
         }

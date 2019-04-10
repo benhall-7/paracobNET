@@ -8,53 +8,62 @@ using paracobNET;
 
 namespace prcEditor
 {
-    class ParamTreeItem : TreeViewItem
+    public class ParamTreeItem
     {
         public IParam Param { get; set; }
-        public new ParamTreeItem Parent { get; set; }
+        public ParamTreeItem Parent { get; set; }
+        public object ParentAccessor { get; set; }
+        public List<ParamTreeItem> Items { get; set; }
 
-        private string _ParentAccessor;
-        public string ParentAccessor
+        public string Name
         {
-            get { return _ParentAccessor; }
-            set
+            get
             {
-                _ParentAccessor = value;
-                if (!string.IsNullOrEmpty(value))
-                    Header = Param.TypeKey.ToString() + $" ({value})";
+                string name = Param.TypeKey.ToString();
+
+                if (Parent == null)
+                    return name;
+
+                switch (Parent.Param.TypeKey)
+                {
+                    case ParamType.@struct:
+                        name += " " + Hash40Util.FormatToString((ulong)ParentAccessor, MainWindow.HashToStringLabels);
+                        break;
+                    case ParamType.list:
+                        name += " " + ((int)ParentAccessor).ToString();
+                        break;
+                }
+
+                return name;
             }
         }
 
-        public ParamTreeItem(IParam param, ParamTreeItem parent)
+        public ParamTreeItem(IParam param, ParamTreeItem parent, object parentAccessor)
         {
             Param = param;
             Parent = parent;
+            ParentAccessor = parentAccessor;
 
-            switch (param.TypeKey)
+            switch (Param.TypeKey)
             {
+                case ParamType.@struct:
+                    {
+                        List<ParamTreeItem> Items = new List<ParamTreeItem>();
+                        foreach (var node in (Param as ParamStruct).Nodes)
+                            Items.Add(new ParamTreeItem(node.Value, this, node.Key));
+                        this.Items = Items;
+                        break;
+                    }
                 case ParamType.list:
                     {
-                        var nodes = (param as ParamList).Nodes;
-                        string format = $"d{(nodes.Count - 1).ToString().Length}";
-                        for (int i = 0; i < nodes.Count; i++)
-                        {
-                            var child = new ParamTreeItem(nodes[i], this);
-                            child.ParentAccessor = i.ToString(format);
-                            Items.Add(child);
-                        }
+                        List<ParamTreeItem> Items = new List<ParamTreeItem>();
+                        var list = (Param as ParamList).Nodes;
+                        for (int i = 0; i < list.Count; i++)
+                            Items.Add(new ParamTreeItem(list[i], this, i));
+                        this.Items = Items;
+                        break;
                     }
-                    break;
-                case ParamType.@struct:
-                    foreach (var childParam in (param as ParamStruct).Nodes)
-                    {
-                        var childNode = new ParamTreeItem(childParam.Value, this);
-                        childNode.ParentAccessor = Hash40Util.FormatToString(childParam.Key, MainWindow.HashToStringLabels);
-                        Items.Add(childNode);
-                    }
-                    break;
             }
-
-            Header = Param.TypeKey.ToString();
         }
     }
 }
