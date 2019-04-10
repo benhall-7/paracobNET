@@ -52,7 +52,7 @@
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate DataType="{x:Type local:ParamTreeItem}"
                                           ItemsSource="{Binding Path=Items}">
-                    <TreeViewItem Header="{Binding Name}"/>
+                    <TextBlock Text="{Binding Path=Name}"/>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>

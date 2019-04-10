@@ -27,10 +27,10 @@ namespace prcEditor
                 switch (Parent.Param.TypeKey)
                 {
                     case ParamType.@struct:
-                        name += " " + Hash40Util.FormatToString((ulong)ParentAccessor, MainWindow.HashToStringLabels);
+                        name += $" ({Hash40Util.FormatToString((ulong)ParentAccessor, MainWindow.HashToStringLabels)})";
                         break;
                     case ParamType.list:
-                        name += " " + ((int)ParentAccessor).ToString();
+                        name += $" ({((int)ParentAccessor).ToString()})";
                         break;
                 }
 

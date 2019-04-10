@@ -220,7 +220,7 @@ namespace prcEditor
 
         private void ParamTV_KeyDown(object sender, KeyEventArgs e)
         {
-            if (!(e.OriginalSource is ParamTreeItem ptItem))
+            if (!(e.OriginalSource is TreeViewItem tvi && tvi.Header is ParamTreeItem ptItem))
                 return;
 
             switch (e.Key)
