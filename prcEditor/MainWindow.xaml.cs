@@ -196,13 +196,10 @@ namespace prcEditor
                 WorkerQueue.Enqueue(new EnqueuableStatus(() =>
                 {
                     PFile = new ParamFile(ofd.FileName);
-                }, "Loading param file"));
-                WorkerQueue.Enqueue(new EnqueuableStatus(() =>
-                {
                     ParamTI = new ParamTreeItem(PFile.Root, null, null);
                     IsOpenEnabled = true;
                     IsSaveEnabled = true;
-                }, "Setting up treeview"));
+                }, "Loading param file"));
                 StartWorkerThread();
             }
         }
