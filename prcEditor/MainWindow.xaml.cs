@@ -27,7 +27,7 @@ namespace prcEditor
             set
             {
                 paramTI = value;
-                RaisePropertyChanged(nameof(ParamTreeRootContainer));
+                NotifyPropertyChanged(nameof(ParamTreeRootContainer));
             }
         }
         public List<ParamTreeItem> ParamTreeRootContainer
@@ -54,7 +54,7 @@ namespace prcEditor
             set
             {
                 statusMessage = value;
-                RaisePropertyChanged(nameof(StatusMessage));
+                NotifyPropertyChanged(nameof(StatusMessage));
             }
         }
 
@@ -65,7 +65,7 @@ namespace prcEditor
             set
             {
                 isOpenEnabled = value;
-                RaisePropertyChanged(nameof(IsOpenEnabled));
+                NotifyPropertyChanged(nameof(IsOpenEnabled));
             }
         }
 
@@ -76,7 +76,7 @@ namespace prcEditor
             set
             {
                 isSaveEnabled = value;
-                RaisePropertyChanged(nameof(IsSaveEnabled));
+                NotifyPropertyChanged(nameof(IsSaveEnabled));
             }
         }
 
@@ -126,7 +126,7 @@ namespace prcEditor
             WorkerThread.Start();
         }
 
-        private void RaisePropertyChanged(string propName)
+        private void NotifyPropertyChanged(string propName)
         {
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(propName));
@@ -232,22 +232,7 @@ namespace prcEditor
                     //copies param into new entry
                     break;
                 case Key.Delete:
-                    if (ptItem.Parent == null)
-                        return;
-                    IParam parentParam = ptItem.Parent.Param;
-                    //if (parentParam is ParamStruct parentStruct)
-                    //{
-                    //    ulong key = (ulong)ptItem.ParentAccessor;
-                    //    parentStruct.Nodes.Remove(key);
-                    //}
-                    //else
-                    //{
-                    //    ParamList parentList = parentParam as ParamList;
-                    //    parentList.Nodes.RemoveAt(int.Parse(ptItem.ParentAccessor));
-                    //}
-                    //ptItem.Parent.Items.Remove(ptItem);
-                    //ptItem.Param = null;
-                    //ptItem = null;
+                    ptItem.Remove();
                     break;
             }
         }

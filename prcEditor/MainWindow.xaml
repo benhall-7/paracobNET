@@ -48,7 +48,7 @@
                   KeyDown="ParamTV_KeyDown"
                   VirtualizingStackPanel.IsVirtualizing="True"
                   VirtualizingStackPanel.VirtualizationMode="Recycling"
-                  ItemsSource="{Binding ParamTreeRootContainer}">
+                  ItemsSource="{Binding Path=ParamTreeRootContainer}">
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate DataType="{x:Type local:ParamTreeItem}"
                                           ItemsSource="{Binding Path=Items}">
