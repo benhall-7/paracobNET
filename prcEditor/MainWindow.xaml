@@ -46,6 +46,7 @@
         <TreeView Grid.Row="1" Grid.Column="0"
                   x:Name="ParamTV" BorderThickness="0"
                   KeyDown="ParamTV_KeyDown"
+                  KeyUp="ParamTV_KeyUp"
                   VirtualizingStackPanel.IsVirtualizing="True"
                   VirtualizingStackPanel.VirtualizationMode="Recycling"
                   ItemsSource="{Binding Path=ParamTreeRootContainer}">

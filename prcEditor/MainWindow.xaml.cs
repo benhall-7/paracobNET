@@ -2,6 +2,7 @@
 using paracobNET;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -19,6 +20,20 @@ namespace prcEditor
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         ParamFile PFile { get; set; }
+
+        Thread WorkerThread { get; set; }
+        Queue<EnqueuableStatus> WorkerQueue { get; set; }
+        readonly object WorkerThreadLock = new object();
+
+        IParam CopiedParam { get; set; }
+
+        bool KeyCtrl = false;
+
+        static bool LabelsLoaded { get; set; }
+        public static Dictionary<ulong, string> HashToStringLabels { get; set; }
+        public static Dictionary<string, ulong> StringToHashLabels { get; set; }
+
+        #region BindedProperties
 
         private ParamTreeItem paramTI;
         public ParamTreeItem ParamTI
@@ -39,12 +54,6 @@ namespace prcEditor
                 return new List<ParamTreeItem>() { ParamTI };
             }
         }
-        
-        Thread WorkerThread { get; set; }
-        Queue<EnqueuableStatus> WorkerQueue { get; set; } 
-        readonly object WorkerThreadLock = new object();
-
-        IParam CopiedParam { get; set; }
 
         //Thanks to Greg Sansom: https://stackoverflow.com/a/5507826
         private string statusMessage = "Idle";
@@ -80,11 +89,9 @@ namespace prcEditor
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion
 
-        static bool LabelsLoaded { get; set; }
-        public static Dictionary<ulong, string> HashToStringLabels { get; set; }
-        public static Dictionary<string, ulong> StringToHashLabels { get; set; }
+        public event PropertyChangedEventHandler PropertyChanged;
 
         static MainWindow()
         {
@@ -137,23 +144,25 @@ namespace prcEditor
             IParam param = ptItem.Param;
             if (param is ParamStruct paramStruct)
             {
-                var entries = new List<ParamStructEntry>();
+                var entries = new ObservableCollection<ParamStructEntry>();
                 foreach (var node in paramStruct.Nodes)
                 {
                     if (node.Value is ParamValue pValue)
                         entries.Add(new ParamStructEntry(node.Key, pValue));
                 }
+                ParamData.Tag = ptItem;
                 ParamData.ItemsSource = entries;
             }
             else if (param is ParamList paramList)
             {
-                var entries = new List<ParamListEntry>();
+                var entries = new ObservableCollection<ParamListEntry>();
                 for (int i = 0; i < paramList.Nodes.Count; i++)
                 {
                     var node = paramList.Nodes[i];
                     if (node is ParamValue pValue)
                         entries.Add(new ParamListEntry(i, pValue));
                 }
+                ParamData.Tag = ptItem;
                 ParamData.ItemsSource = entries;
             }
         }
@@ -183,7 +192,6 @@ namespace prcEditor
             if (result == true)
             {
                 ParamData.ItemsSource = null;
-                //ParamTV.Items.Clear();
                 
                 IsOpenEnabled = false;
                 IsSaveEnabled = false;
@@ -220,25 +228,48 @@ namespace prcEditor
 
         private void ParamTV_KeyDown(object sender, KeyEventArgs e)
         {
+            if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
+            {
+                KeyCtrl = true;
+                return;
+            }
+
             if (!(e.OriginalSource is TreeViewItem tvi && tvi.Header is ParamTreeItem ptItem))
                 return;
 
-            switch (e.Key)
+            if (!KeyCtrl)
             {
-                case Key.Enter:
-                    SetupDataGrid(ptItem);
-                    break;
-                case Key.C:
-                    CopiedParam = ptItem.Param.Clone();
-                    break;
-                case Key.V:
-                    if (CopiedParam != null)
-                        ptItem.Add(CopiedParam);
-                    break;
-                case Key.Delete:
-                    ptItem.Remove();
-                    break;
+                switch (e.Key)
+                {
+                    case Key.Enter:
+                        SetupDataGrid(ptItem);
+                        break;
+                    case Key.Delete:
+                        if (ParamData.Tag as ParamTreeItem == ptItem)
+                            ParamData.ItemsSource = null;
+                        ptItem.Remove();
+                        break;
+                }
             }
+            else //commands that require holding ctrl first
+            {
+                switch (e.Key)
+                {
+                    case Key.C:
+                        CopiedParam = ptItem.Param.Clone();
+                        break;
+                    case Key.V:
+                        if (CopiedParam != null)
+                            ptItem.Add(CopiedParam);
+                        break;
+                }
+            }
+        }
+
+        private void ParamTV_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
+                KeyCtrl = false;
         }
 
         private void ParamData_AutoGeneratedColumns(object sender, EventArgs e)
