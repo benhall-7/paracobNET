@@ -229,7 +229,11 @@ namespace prcEditor
                     SetupDataGrid(ptItem);
                     break;
                 case Key.C:
-                    //copies param into new entry
+                    CopiedParam = ptItem.Param.Clone();
+                    break;
+                case Key.V:
+                    if (CopiedParam != null)
+                        ptItem.Add(CopiedParam);
                     break;
                 case Key.Delete:
                     ptItem.Remove();

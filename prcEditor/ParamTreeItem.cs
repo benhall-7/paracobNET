@@ -75,7 +75,23 @@ namespace prcEditor
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(propName));
         }
-
+        /// <summary>
+        /// Adds a new ParamTreeItem to the end of the observable collection of a parent.
+        /// Only supported on list-types.
+        /// </summary>
+        public void Add(IParam child)
+        {
+            if (Param is ParamList list)
+            {
+                list.Nodes.Add(child);
+                var node = new ParamTreeItem(child, this, list.Nodes.Count - 1);
+                Items.Add(node);
+            }
+        }
+        /// <summary>
+        /// Removes a ParamTreeItem from the observable collection of its parent.
+        /// If the item is a member of a list, notifies the children of the list to change their indeces.
+        /// </summary>
         public void Remove()
         {
             if (Parent == null)
@@ -91,12 +107,13 @@ namespace prcEditor
             FixListAccessorOfSiblings();
             Param = null;
         }
+
         public void FixListAccessorOfSiblings()
         {
             if (Parent.Param is ParamList list)
             {
-                int deletedIndex = (int)ParentAccessor;
-                for (int i = deletedIndex; i < Parent.Items.Count; i++)
+                int startIndex = (int)ParentAccessor;
+                for (int i = startIndex; i < Parent.Items.Count; i++)
                 {
                     var item = Parent.Items[i];
                     item.ParentAccessor = i;
