@@ -2,12 +2,9 @@
 using paracobNET;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -144,7 +141,7 @@ namespace prcEditor
             IParam param = ptItem.Param;
             if (param is ParamStruct paramStruct)
             {
-                var entries = new ObservableCollection<ParamStructEntry>();
+                var entries = new List<ParamStructEntry>();
                 foreach (var node in paramStruct.Nodes)
                 {
                     if (node.Value is ParamValue pValue)
@@ -155,7 +152,7 @@ namespace prcEditor
             }
             else if (param is ParamList paramList)
             {
-                var entries = new ObservableCollection<ParamListEntry>();
+                var entries = new List<ParamListEntry>();
                 for (int i = 0; i < paramList.Nodes.Count; i++)
                 {
                     var node = paramList.Nodes[i];
