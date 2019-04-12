@@ -24,9 +24,9 @@ namespace prcEditor
 
         IParam CopiedParam { get; set; }
 
-        bool KeyCtrl = false;
+        private static bool KeyCtrl { get; set; }
 
-        static bool LabelsLoaded { get; set; }
+        private static bool LabelsLoaded { get; set; }
         public static Dictionary<ulong, string> HashToStringLabels { get; set; }
         public static Dictionary<string, ulong> StringToHashLabels { get; set; }
 
@@ -92,6 +92,7 @@ namespace prcEditor
 
         static MainWindow()
         {
+            KeyCtrl = false;
             LabelsLoaded = false;
             HashToStringLabels = new Dictionary<ulong, string>();
             StringToHashLabels = new Dictionary<string, ulong>();

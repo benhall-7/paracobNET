@@ -26,7 +26,7 @@ namespace paracobNET
             Nodes = new Hash40Dictionary<IParam>(size);
 
             Dictionary<int, int> hashOffsets;
-            if (ParamFile.AsmRefEntries.TryGetValue(structRefOffset, out var refEntry))
+            if (ParamFile.DisasmRefEntries.TryGetValue(structRefOffset, out var refEntry))
                 hashOffsets = refEntry.HashOffsets;
             else
             {
@@ -45,7 +45,7 @@ namespace paracobNET
                 hashOffsetTuples.Sort((pair1, pair2) => pair1.Item1.CompareTo(pair2.Item1));
                 foreach (var tuple in hashOffsetTuples)
                     entry.HashOffsets.Add(tuple.Item1, tuple.Item2);
-                ParamFile.AsmRefEntries.Add(structRefOffset, entry);
+                ParamFile.DisasmRefEntries.Add(structRefOffset, entry);
                 hashOffsets = entry.HashOffsets;
             }
 
@@ -60,7 +60,7 @@ namespace paracobNET
         internal void Write(BinaryWriter writer)
         {
             RefEntry = new RefTableEntry(this);
-            ParamFile.DisasmRefEntries.Add(RefEntry);//reserve a space in the file's RefEntries so they stay in order
+            ParamFile.AsmRefEntries.Add(RefEntry);//reserve a space in the file's RefEntries so they stay in order
 
             var start = writer.BaseStream.Position - 1;
             writer.Write(Nodes.Count);

@@ -84,30 +84,33 @@ namespace paracobNET
                 ParamFile.AsmHashTable.Add(hash);
             }
         }
+        internal static void AppendRefTableString(string word)
+        {
+            var entries = ParamFile.AsmRefEntries;
+            if (!entries.Contains(word))
+                entries.Add(word);
+        }
         internal static void MergeRefTables()
         {
-            var entries = ParamFile.DisasmRefEntries;
-            int index = 0;
-            while (index < entries.Count)
+            var entries = ParamFile.AsmRefEntries;
+            
+            for (int current_index = 0; current_index < entries.Count; current_index++)
             {
-                //RefTableEntry implements IEquatable. We check if there's aleady an entry
-                //prior in the list with the same HashOffset dictionary, if there is we merge
-                int firstOccur = entries.IndexOf(entries[index]);
-                if (firstOccur < index)
+                if (!(entries[current_index] is RefTableEntry currentTableEntry))
+                    continue;
+
+                //We check if there's aleady an entry prior in the list with the same HashOffsets
+                //if so, we merge
+                int firstOccur = entries.IndexOf(currentTableEntry);
+                if (firstOccur < current_index)
                 {
-                    var first = entries[firstOccur];
-                    var current = entries[index];
-                    //take the strings from the second and merge them into the first
-                    foreach (var pair in current.StringOffsets)
-                        first.AppendString(pair.Key);
+                    var first = entries[firstOccur] as RefTableEntry;
                     //change the corresponding struct reference
-                    current.CorrespondingStruct.RefEntry = first;
+                    currentTableEntry.CorrespondingStruct.RefEntry = first;
                     //remove the duplicate from the list
-                    entries.RemoveAt(index);
-                    current = null;
+                    entries.RemoveAt(current_index--);
+                    currentTableEntry = null;
                 }
-                else
-                    index++;
             }
         }
         /// <summary>
@@ -116,17 +119,20 @@ namespace paracobNET
         internal static void WriteRefTables()
         {
             var writer = ParamFile.WriterRef;
-            foreach (var entry in ParamFile.DisasmRefEntries)
+            foreach (var entry in ParamFile.AsmRefEntries)
             {
-                entry.RefTableOffset = (int)writer.BaseStream.Position;
-                foreach (var pair in entry.HashOffsets)
+                if (entry is RefTableEntry refEntry)
                 {
-                    writer.Write(pair.Key);
-                    writer.Write(pair.Value);
+                    refEntry.RefTableOffset = (int)writer.BaseStream.Position;
+                    foreach (var pair in refEntry.HashOffsets)
+                    {
+                        writer.Write(pair.Key);
+                        writer.Write(pair.Value);
+                    }
                 }
-                foreach (var word in entry.StringOffsets.Keys.ToList())
+                else if (entry is string word)
                 {
-                    entry.StringOffsets[word] = (int)writer.BaseStream.Position;
+                    ParamFile.RefStringEntries.Add(word, (int)writer.BaseStream.Position);
                     for (int c = 0; c < word.Length; c++)
                         writer.Write((byte)word[c]);
                     writer.Write((byte)0);
@@ -144,7 +150,7 @@ namespace paracobNET
             foreach (var tup in ParamFile.UnresolvedStrings)
             {
                 writer.BaseStream.Seek(tup.Item1, SeekOrigin.Begin);
-                writer.Write(tup.Item2.RefEntry.StringOffsets[tup.Item3]);
+                writer.Write(ParamFile.RefStringEntries[tup.Item2]);
             }
         }
         internal static uint CRC32(string word)

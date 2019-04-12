@@ -87,12 +87,10 @@ namespace paracobNET
                     writer.Write(ParamFile.AsmHashTable.IndexOf((ulong)Value));
                     break;
                 case ParamType.@string:
-                    ParamFile.UnresolvedStrings.Add(new Tuple<int, ParamStruct, string>(
-                        (int)writer.BaseStream.Position,
-                        parent.CorrespondingStruct,
-                        (string)Value));
+                    string word = (string)Value;
+                    ParamFile.UnresolvedStrings.Add(new Tuple<int, string>((int)writer.BaseStream.Position, word));
 
-                    parent.AppendString((string)Value);
+                    Util.AppendRefTableString(word);
                     writer.Write((int)0);
                     break;
             }

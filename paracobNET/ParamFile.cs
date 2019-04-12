@@ -18,7 +18,7 @@ namespace paracobNET
         static internal uint HashStart { get { return 0x10; } }
         static internal uint RefStart { get { return 0x10 + HashTableSize; } }
         static internal uint ParamStart { get { return 0x10 + HashTableSize + RefTableSize; } }
-        static internal Dictionary<uint, RefTableEntry> AsmRefEntries { get; set; }
+        static internal Dictionary<uint, RefTableEntry> DisasmRefEntries { get; set; }
         #endregion
 
         #region global_asm
@@ -26,11 +26,12 @@ namespace paracobNET
         static internal BinaryWriter WriterHeader { get; set; }//header stream
         static internal List<ulong> AsmHashTable { get; set; }//list of hashes appended to
         static internal BinaryWriter WriterHash { get; set; }//hash table stream
-        static internal List<RefTableEntry> DisasmRefEntries { get; set; }//reference entry classes
+        static internal List<object> AsmRefEntries { get; set; }//reference entry classes, and strings
         static internal BinaryWriter WriterRef { get; set; }//reference table stream
         static internal BinaryWriter WriterParam { get; set; }//param stream
         static internal List<Tuple<int, ParamStruct>> UnresolvedStructs { get; set; }
-        static internal List<Tuple<int, ParamStruct, string>> UnresolvedStrings { get; set; }
+        static internal List<Tuple<int, string>> UnresolvedStrings { get; set; }
+        static internal Dictionary<string, int> RefStringEntries { get; set; }
         #endregion
 
         public ParamFile(string filepath)
@@ -48,7 +49,7 @@ namespace paracobNET
                     DisasmHashTable = new ulong[HashTableSize / 8];
                     for (int i = 0; i < DisasmHashTable.Length; i++)
                         DisasmHashTable[i] = Reader.ReadUInt64();
-                    AsmRefEntries = new Dictionary<uint, RefTableEntry>();
+                    DisasmRefEntries = new Dictionary<uint, RefTableEntry>();
                     Reader.BaseStream.Seek(ParamStart, SeekOrigin.Begin);
                     if ((ParamType)Reader.ReadByte() == ParamType.@struct)
                     {
@@ -62,7 +63,7 @@ namespace paracobNET
             finally
             {
                 DisasmHashTable = null;
-                AsmRefEntries = null;
+                DisasmRefEntries = null;
             }
         }
         public ParamFile(ParamStruct root)
@@ -75,9 +76,10 @@ namespace paracobNET
             try
             {
                 AsmHashTable = new List<ulong>();
-                DisasmRefEntries = new List<RefTableEntry>();
+                AsmRefEntries = new List<object>();
                 UnresolvedStructs = new List<Tuple<int, ParamStruct>>();
-                UnresolvedStrings = new List<Tuple<int, ParamStruct, string>>();
+                UnresolvedStrings = new List<Tuple<int, string>>();
+                RefStringEntries = new Dictionary<string, int>();
 
                 using (FileStream = File.Create(filepath))
                 using (WriterHeader = new BinaryWriter(new MemoryStream()))
@@ -110,9 +112,10 @@ namespace paracobNET
             finally
             {
                 AsmHashTable = null;
-                DisasmRefEntries = null;
+                AsmRefEntries = null;
                 UnresolvedStructs = null;
                 UnresolvedStrings = null;
+                RefStringEntries = null;
             }
         }
     }
