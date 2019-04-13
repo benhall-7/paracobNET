@@ -55,7 +55,7 @@ namespace paracobNET
                     break;
             }
         }
-        internal void Write(BinaryWriter writer, RefTableEntry parent)
+        internal void Write(BinaryWriter writer)
         {
             switch (TypeKey)
             {

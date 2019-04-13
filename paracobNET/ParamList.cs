@@ -32,7 +32,7 @@ namespace paracobNET
                 Nodes.Add(Util.ReadParam(reader));
             }
         }
-        internal void Write(BinaryWriter writer, RefTableEntry parent)
+        internal void Write(BinaryWriter writer)
         {
             uint startPos = (uint)writer.BaseStream.Position - 1;
 
@@ -46,7 +46,7 @@ namespace paracobNET
             {
                 var node = Nodes[i];
                 offsets[i] = (uint)(writer.BaseStream.Position - startPos);
-                Util.WriteParam(node, writer, parent);
+                Util.WriteParam(node, writer);
             }
             long endPos = writer.BaseStream.Position;
             writer.BaseStream.Seek(ptrStartPos, SeekOrigin.Begin);

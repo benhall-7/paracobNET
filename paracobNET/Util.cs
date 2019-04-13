@@ -60,7 +60,7 @@ namespace paracobNET
                     break;
             }
         }
-        internal static void WriteParam(IParam param, BinaryWriter writer, RefTableEntry parent)
+        internal static void WriteParam(IParam param, BinaryWriter writer)
         {
             writer.Write((byte)param.TypeKey);
             switch (param.TypeKey)
@@ -69,10 +69,10 @@ namespace paracobNET
                     (param as ParamStruct).Write(writer);
                     break;
                 case ParamType.list:
-                    (param as ParamList).Write(writer, parent);
+                    (param as ParamList).Write(writer);
                     break;
                 default:
-                    (param as ParamValue).Write(writer, parent);
+                    (param as ParamValue).Write(writer);
                     break;
             }
         }
