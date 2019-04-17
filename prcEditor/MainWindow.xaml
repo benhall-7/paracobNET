@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:prcEditor"
         mc:Ignorable="d"
-        Title="prcEditor v1.9" Height="500" Width="600"
+        Title="prcEditor v1.9" Height="600" Width="800"
         ContentRendered="Window_ContentRendered">
     <Window.Resources>
         <Style TargetType="Button">
@@ -28,7 +28,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250" MinWidth="200"/>
+            <ColumnDefinition Width="300" MinWidth="200"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>

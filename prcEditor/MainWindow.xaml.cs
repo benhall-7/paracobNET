@@ -30,7 +30,7 @@ namespace prcEditor
         public static Dictionary<ulong, string> HashToStringLabels { get; set; }
         public static Dictionary<string, ulong> StringToHashLabels { get; set; }
 
-        #region Binded Properties
+        #region PROPERTY_BINDING
 
         private ParamTreeItem paramTI;
         public ParamTreeItem ParamTI
@@ -172,10 +172,13 @@ namespace prcEditor
             string autoLoadName = "ParamLabels.csv";
             if (!LabelsLoaded && File.Exists(autoLoadName))
             {
+                IsOpenEnabled = false;
+
                 WorkerQueue.Enqueue(new EnqueuableStatus(() =>
                 {
                     HashToStringLabels = LabelIO.GetHashStringDict(autoLoadName);
                     StringToHashLabels = LabelIO.GetStringHashDict(autoLoadName);
+                    IsOpenEnabled = true;
                 }, "Loading label dictionaries"));
                 StartWorkerThread();
             }
@@ -213,9 +216,14 @@ namespace prcEditor
             bool? result = sfd.ShowDialog();
             if (result == true)
             {
+                IsOpenEnabled = false;
+                IsSaveEnabled = false;
+
                 WorkerQueue.Enqueue(new EnqueuableStatus(() =>
                 {
                     PFile.Save(sfd.FileName);
+                    IsOpenEnabled = true;
+                    IsSaveEnabled = true;
                 }, "Saving param file"));
                 StartWorkerThread();
             }
