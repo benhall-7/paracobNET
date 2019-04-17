@@ -18,7 +18,7 @@ namespace paracobNET
         static internal uint HashStart { get { return 0x10; } }
         static internal uint RefStart { get { return 0x10 + HashTableSize; } }
         static internal uint ParamStart { get { return 0x10 + HashTableSize + RefTableSize; } }
-        static internal Dictionary<uint, RefTableEntry> DisasmRefEntries { get; set; }
+        static internal Dictionary<uint, SortedDictionary<int, int>> DisasmRefEntries { get; set; }
         #endregion
 
         #region global_asm
@@ -49,7 +49,7 @@ namespace paracobNET
                     DisasmHashTable = new ulong[HashTableSize / 8];
                     for (int i = 0; i < DisasmHashTable.Length; i++)
                         DisasmHashTable[i] = Reader.ReadUInt64();
-                    DisasmRefEntries = new Dictionary<uint, RefTableEntry>();
+                    DisasmRefEntries = new Dictionary<uint, SortedDictionary<int, int>>();
                     Reader.BaseStream.Seek(ParamStart, SeekOrigin.Begin);
                     if ((ParamType)Reader.ReadByte() == ParamType.@struct)
                     {
@@ -92,7 +92,7 @@ namespace paracobNET
                     Util.WriteHash(0);
                     Util.IterateHashes(Root);
 
-                    Util.WriteParam(Root, WriterParam, null);
+                    Util.WriteParam(Root, WriterParam);
 
                     Util.MergeRefTables();
                     Util.WriteRefTables();

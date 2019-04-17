@@ -25,28 +25,20 @@ namespace paracobNET
             uint structRefOffset = reader.ReadUInt32();
             Nodes = new Hash40Dictionary<IParam>(size);
 
-            Dictionary<int, int> hashOffsets;
+            SortedDictionary<int, int> hashOffsets;
             if (ParamFile.DisasmRefEntries.TryGetValue(structRefOffset, out var refEntry))
-                hashOffsets = refEntry.HashOffsets;
+                hashOffsets = refEntry;
             else
             {
-                var entry = new RefTableEntry();
-                var hashOffsetTuples = new List<Tuple<int, int>>();
+                hashOffsets = new SortedDictionary<int, int>();
                 reader.BaseStream.Seek(structRefOffset + ParamFile.RefStart, SeekOrigin.Begin);
                 for (int i = 0; i < size; i++)
                 {
                     int hashIndex = reader.ReadInt32();
                     int paramOffset = reader.ReadInt32();
-                    hashOffsetTuples.Add(new Tuple<int, int>(hashIndex, paramOffset));
-                    //entry.HashOffsets.Add(hashIndex, paramOffset);
+                    hashOffsets.Add(hashIndex, paramOffset);
                 }
-                //sort by the hash index, now we do this only once per RefEntry
-                //TODO: maybe I should use a sorted dictionary instead?
-                hashOffsetTuples.Sort((pair1, pair2) => pair1.Item1.CompareTo(pair2.Item1));
-                foreach (var tuple in hashOffsetTuples)
-                    entry.HashOffsets.Add(tuple.Item1, tuple.Item2);
-                ParamFile.DisasmRefEntries.Add(structRefOffset, entry);
-                hashOffsets = entry.HashOffsets;
+                ParamFile.DisasmRefEntries.Add(structRefOffset, hashOffsets);
             }
 
             foreach (var pair in hashOffsets)
@@ -66,7 +58,7 @@ namespace paracobNET
             writer.Write(Nodes.Count);
 
             ParamFile.UnresolvedStructs.Add(new Tuple<int, ParamStruct>((int)writer.BaseStream.Position, this));
-            writer.Write((int)0);
+            writer.Write(0);
 
             foreach (var node in Nodes.OrderBy(x => x.Key))
             {
@@ -74,7 +66,7 @@ namespace paracobNET
                 int relOffset = (int)(writer.BaseStream.Position - start);
                 RefEntry.HashOffsets.Add(hashIndex, relOffset);
 
-                Util.WriteParam(node.Value, writer, RefEntry);
+                Util.WriteParam(node.Value, writer);
             }
         }
 

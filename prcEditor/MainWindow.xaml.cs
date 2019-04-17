@@ -30,7 +30,7 @@ namespace prcEditor
         public static Dictionary<ulong, string> HashToStringLabels { get; set; }
         public static Dictionary<string, ulong> StringToHashLabels { get; set; }
 
-        #region BindedProperties
+        #region Binded Properties
 
         private ParamTreeItem paramTI;
         public ParamTreeItem ParamTI
@@ -263,7 +263,7 @@ namespace prcEditor
 
         private void ParamTV_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
+            if (e.KeyboardDevice.IsKeyUp(Key.LeftCtrl) && e.KeyboardDevice.IsKeyUp(Key.RightCtrl))
                 KeyCtrl = false;
         }
 
