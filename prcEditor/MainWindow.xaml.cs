@@ -16,7 +16,16 @@ namespace prcEditor
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        ParamFile PFile { get; set; }
+        private ParamFile pFile;
+        ParamFile PFile
+        {
+            get { return pFile; }
+            set
+            {
+                pFile = value;
+                ParamViewModel = value != null ? new VM_ParamStruct(value.Root, null) : null;
+            }
+        }
 
         Thread WorkerThread { get; set; }
         Queue<EnqueuableStatus> WorkerQueue { get; set; }
@@ -32,23 +41,23 @@ namespace prcEditor
 
         #region PROPERTY_BINDING
 
-        private ParamTreeItem paramTI;
-        public ParamTreeItem ParamTI
+        private VM_ParamStruct paramVM;
+        public VM_ParamStruct ParamViewModel
         {
-            get { return paramTI; }
+            get { return paramVM; }
             set
             {
-                paramTI = value;
-                NotifyPropertyChanged(nameof(ParamTreeRootContainer));
+                paramVM = value;
+                NotifyPropertyChanged(nameof(ParamViewModelList));
             }
         }
-        public List<ParamTreeItem> ParamTreeRootContainer
+        public List<VM_ParamStruct> ParamViewModelList
         {
             get
             {
-                if (ParamTI == null)
-                    return new List<ParamTreeItem>();
-                return new List<ParamTreeItem>() { ParamTI };
+                if (ParamViewModel == null)
+                    return new List<VM_ParamStruct>();
+                return new List<VM_ParamStruct>() { ParamViewModel };
             }
         }
 
@@ -107,7 +116,7 @@ namespace prcEditor
             StatusTB.DataContext = this;
             OpenFileButton.DataContext = this;
             SaveFileButton.DataContext = this;
-            ParamTV.DataContext = this;
+            Param_TreeView.DataContext = this;
         }
 
         private void StartWorkerThread()
@@ -133,37 +142,36 @@ namespace prcEditor
 
         private void NotifyPropertyChanged(string propName)
         {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }
 
-        private void SetupDataGrid(ParamTreeItem ptItem)
-        {
-            IParam param = ptItem.Param;
-            if (param is ParamStruct paramStruct)
-            {
-                var entries = new List<ParamStructEntry>();
-                foreach (var node in paramStruct.Nodes)
-                {
-                    if (node.Value is ParamValue pValue)
-                        entries.Add(new ParamStructEntry(node.Key, pValue));
-                }
-                ParamData.Tag = ptItem;
-                ParamData.ItemsSource = entries;
-            }
-            else if (param is ParamList paramList)
-            {
-                var entries = new List<ParamListEntry>();
-                for (int i = 0; i < paramList.Nodes.Count; i++)
-                {
-                    var node = paramList.Nodes[i];
-                    if (node is ParamValue pValue)
-                        entries.Add(new ParamListEntry(i, pValue));
-                }
-                ParamData.Tag = ptItem;
-                ParamData.ItemsSource = entries;
-            }
-        }
+        //private void SetupDataGrid(ParamTreeItem ptItem)
+        //{
+        //    IParam param = ptItem.Param;
+        //    if (param is ParamStruct paramStruct)
+        //    {
+        //        var entries = new List<ParamStructEntry>();
+        //        foreach (var node in paramStruct.Nodes)
+        //        {
+        //            if (node.Value is ParamValue pValue)
+        //                entries.Add(new ParamStructEntry(node.Key, pValue));
+        //        }
+        //        ParamData.Tag = ptItem;
+        //        ParamData.ItemsSource = entries;
+        //    }
+        //    else if (param is ParamList paramList)
+        //    {
+        //        var entries = new List<ParamListEntry>();
+        //        for (int i = 0; i < paramList.Nodes.Count; i++)
+        //        {
+        //            var node = paramList.Nodes[i];
+        //            if (node is ParamValue pValue)
+        //                entries.Add(new ParamListEntry(i, pValue));
+        //        }
+        //        ParamData.Tag = ptItem;
+        //        ParamData.ItemsSource = entries;
+        //    }
+        //}
 
         #region EVENT_HANDLERS
 
@@ -178,6 +186,7 @@ namespace prcEditor
                 {
                     HashToStringLabels = LabelIO.GetHashStringDict(autoLoadName);
                     StringToHashLabels = LabelIO.GetStringHashDict(autoLoadName);
+                    LabelsLoaded = true;
                     IsOpenEnabled = true;
                 }, "Loading label dictionaries"));
                 StartWorkerThread();
@@ -192,7 +201,7 @@ namespace prcEditor
             bool? result = ofd.ShowDialog();
             if (result == true)
             {
-                ParamData.ItemsSource = null;
+                //ParamData.ItemsSource = null;
                 
                 IsOpenEnabled = false;
                 IsSaveEnabled = false;
@@ -200,7 +209,6 @@ namespace prcEditor
                 WorkerQueue.Enqueue(new EnqueuableStatus(() =>
                 {
                     PFile = new ParamFile(ofd.FileName);
-                    ParamTI = new ParamTreeItem(PFile.Root, null, null);
                     IsOpenEnabled = true;
                     IsSaveEnabled = true;
                 }, "Loading param file"));
@@ -229,7 +237,7 @@ namespace prcEditor
             }
         }
 
-        private void ParamTV_KeyDown(object sender, KeyEventArgs e)
+        private void Param_TreeView_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
             {
@@ -237,39 +245,39 @@ namespace prcEditor
                 return;
             }
 
-            if (!(e.OriginalSource is TreeViewItem tvi && tvi.Header is ParamTreeItem ptItem))
-                return;
+            //if (!(e.OriginalSource is TreeViewItem tvi && tvi.Header is ParamTreeItem ptItem))
+            //    return;
 
-            if (!KeyCtrl)
-            {
-                switch (e.Key)
-                {
-                    case Key.Enter:
-                        SetupDataGrid(ptItem);
-                        break;
-                    case Key.Delete:
-                        if (ParamData.Tag as ParamTreeItem == ptItem)
-                            ParamData.ItemsSource = null;
-                        ptItem.Remove();
-                        break;
-                }
-            }
-            else //commands that require holding ctrl first
-            {
-                switch (e.Key)
-                {
-                    case Key.C:
-                        CopiedParam = ptItem.Param.Clone();
-                        break;
-                    case Key.V:
-                        if (CopiedParam != null)
-                            ptItem.Add(CopiedParam);
-                        break;
-                }
-            }
+            //if (!KeyCtrl)
+            //{
+            //    switch (e.Key)
+            //    {
+            //        case Key.Enter:
+            //            SetupDataGrid(ptItem);
+            //            break;
+            //        case Key.Delete:
+            //            if (ParamData.Tag as ParamTreeItem == ptItem)
+            //                ParamData.ItemsSource = null;
+            //            ptItem.Remove();
+            //            break;
+            //    }
+            //}
+            //else //commands that require holding ctrl first
+            //{
+            //    switch (e.Key)
+            //    {
+            //        case Key.C:
+            //            CopiedParam = ptItem.Param.Clone();
+            //            break;
+            //        case Key.V:
+            //            if (CopiedParam != null)
+            //                ptItem.Add(CopiedParam);
+            //            break;
+            //    }
+            //}
         }
 
-        private void ParamTV_KeyUp(object sender, KeyEventArgs e)
+        private void Param_TreeView_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyboardDevice.IsKeyUp(Key.LeftCtrl) && e.KeyboardDevice.IsKeyUp(Key.RightCtrl))
                 KeyCtrl = false;

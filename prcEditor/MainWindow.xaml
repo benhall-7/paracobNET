@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:prcEditor"
         mc:Ignorable="d"
-        Title="prcEditor v1.9" Height="600" Width="800"
+        Title="prcEditor v1.9"
+        Icon="Resources\FoxLogo.ico"
+        Height="600" Width="800"
         ContentRendered="Window_ContentRendered">
     <Window.Resources>
         <Style TargetType="Button">
@@ -17,7 +19,7 @@
     </Window.Resources>
     <Grid x:Name="MainGrid">
         <Grid.Background>
-            <LinearGradientBrush EndPoint="0,0.5" MappingMode="RelativeToBoundingBox" StartPoint="1,0.5">
+            <LinearGradientBrush StartPoint="1,0.5" EndPoint="0,0.5" MappingMode="RelativeToBoundingBox">
                 <GradientStop Color="White"/>
                 <GradientStop Color="LightGray" Offset="1"/>
             </LinearGradientBrush>
@@ -44,18 +46,31 @@
                     IsEnabled="{Binding Path=IsSaveEnabled}"/>
         </StackPanel>
         <TreeView Grid.Row="1" Grid.Column="0"
-                  x:Name="ParamTV" BorderThickness="0"
-                  KeyDown="ParamTV_KeyDown"
-                  KeyUp="ParamTV_KeyUp"
+                  x:Name="Param_TreeView" BorderThickness="0"
+                  KeyDown="Param_TreeView_KeyDown"
+                  KeyUp="Param_TreeView_KeyUp"
                   VirtualizingStackPanel.IsVirtualizing="True"
                   VirtualizingStackPanel.VirtualizationMode="Recycling"
-                  ItemsSource="{Binding Path=ParamTreeRootContainer}">
-            <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type local:ParamTreeItem}"
-                                          ItemsSource="{Binding Path=Items}">
-                    <TextBlock Text="{Binding Path=Name}"/>
+                  ItemsSource="{Binding Path=ParamViewModelList}">
+            <TreeView.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type local:VM_ParamStruct}"
+                                          ItemsSource="{Binding Path=Children}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Resources\struct_bw.png" Margin="0,2,4,2"/>
+                        <TextBlock Text="{Binding Path=Param.TypeKey}"/>
+                    </StackPanel>
                 </HierarchicalDataTemplate>
-            </TreeView.ItemTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type local:VM_ParamList}"
+                                          ItemsSource="{Binding Path=Children}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Resources\list_bw.png" Margin="0,2,4,2"/>
+                        <TextBlock Text="{Binding Path=Param.TypeKey}"/>
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+                <DataTemplate DataType="{x:Type local:VM_ParamValue}">
+                    <TextBlock Text="{Binding Path=Param.TypeKey}"/>
+                </DataTemplate>
+            </TreeView.Resources>
         </TreeView>
         <GridSplitter Grid.Row="1" Grid.Column="1"
                       HorizontalAlignment="Right"
@@ -63,7 +78,7 @@
                       Width="5"
                       ResizeBehavior="PreviousAndNext"
                       Background="Transparent"/>
-        <DataGrid x:Name="ParamData"
+        <DataGrid x:Name="Param_DataGrid"
                   Grid.Row="1" Grid.Column="2"
                   BorderThickness="0"
                   Background="White"
