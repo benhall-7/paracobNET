@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,6 +15,8 @@ namespace prcEditor
     public abstract class VM_Param
     {
         public IParam Param { get; set; }
+        
+        public abstract string Name { get; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -47,13 +48,13 @@ namespace prcEditor
                 switch (node.Value.TypeKey)
                 {
                     case ParamType.@struct:
-                        Children.Add(new VM_StructStruct(node.Value as ParamStruct, this));
+                        Children.Add(new VM_StructStruct(node.Value as ParamStruct, this, node.Key));
                         break;
                     case ParamType.list:
-                        Children.Add(new VM_StructList(node.Value as ParamList, this));
+                        Children.Add(new VM_StructList(node.Value as ParamList, this, node.Key));
                         break;
                     default:
-                        Children.Add(new VM_StructValue(node.Value as ParamValue, this));
+                        Children.Add(new VM_StructValue(node.Value as ParamValue, this, node.Key));
                         break;
                 }
             }
@@ -77,18 +78,19 @@ namespace prcEditor
         {
             Param = param;
             Children = new ObservableCollection<IListChild>();
-            foreach (var node in param.Nodes)
+            for (int i = 0; i < param.Nodes.Count; i++)
             {
+                IParam node = param.Nodes[i];
                 switch (node.TypeKey)
                 {
                     case ParamType.@struct:
-                        Children.Add(new VM_ListStruct(node as ParamStruct, this));
+                        Children.Add(new VM_ListStruct(node as ParamStruct, this, i));
                         break;
                     case ParamType.list:
-                        Children.Add(new VM_ListList(node as ParamList, this));
+                        Children.Add(new VM_ListList(node as ParamList, this, i));
                         break;
                     default:
-                        Children.Add(new VM_ListValue(node as ParamValue, this));
+                        Children.Add(new VM_ListValue(node as ParamValue, this, i));
                         break;
                 }
             }
@@ -113,78 +115,111 @@ namespace prcEditor
     }
 
     /// <summary>
-    /// Represents a generic child of a list
-    /// </summary>
-    public interface IListChild
-    {
-        VM_ParamList Parent { get; set; }
-    }
-
-    /// <summary>
     /// Represents a generic child of a struct
     /// </summary>
     public interface IStructChild
     {
         VM_ParamStruct Parent { get; set; }
+        ulong Hash40 { get; set; }
     }
 
-    public class VM_ListList : VM_ParamList, IListChild
+    /// <summary>
+    /// Represents a generic child of a list
+    /// </summary>
+    public interface IListChild
     {
-        public VM_ParamList Parent { get; set; }
-
-        public VM_ListList(ParamList list, VM_ParamList parent) : base(list)
-        {
-            Parent = parent;
-        }
+        VM_ParamList Parent { get; set; }
+        int Index { get; set; }
     }
 
-    public class VM_ListStruct : VM_ParamStruct, IListChild
+    public class VM_ParamRoot : VM_ParamStruct
     {
-        public VM_ParamList Parent { get; set; }
+        public override string Name => Param.TypeKey.ToString();
 
-        public VM_ListStruct(ParamStruct struc, VM_ParamList parent) : base(struc)
-        {
-            Parent = parent;
-        }
+        public VM_ParamRoot(ParamStruct struc) : base(struc) { }
     }
 
-    public class VM_ListValue : VM_ParamValue, IListChild
+    public class VM_StructStruct : VM_ParamStruct, IStructChild
     {
-        public VM_ParamList Parent { get; set; }
+        public VM_ParamStruct Parent { get; set; }
+        public ulong Hash40 { get; set; }
 
-        public VM_ListValue(ParamValue value, VM_ParamList parent) : base(value)
+        public override string Name => Util.GetStructChildName(Param, Hash40);
+
+        public VM_StructStruct(ParamStruct struc, VM_ParamStruct parent, ulong hash40) : base(struc)
         {
             Parent = parent;
+            Hash40 = hash40;
         }
     }
 
     public class VM_StructList : VM_ParamList, IStructChild
     {
         public VM_ParamStruct Parent { get; set; }
+        public ulong Hash40 { get; set; }
 
-        public VM_StructList(ParamList list, VM_ParamStruct parent) : base(list)
+        public override string Name => Util.GetStructChildName(Param, Hash40);
+
+        public VM_StructList(ParamList list, VM_ParamStruct parent, ulong hash40) : base(list)
         {
             Parent = parent;
-        }
-    }
-
-    public class VM_StructStruct : VM_ParamStruct, IStructChild
-    {
-        public VM_ParamStruct Parent { get; set; }
-
-        public VM_StructStruct(ParamStruct struc, VM_ParamStruct parent) : base(struc)
-        {
-            Parent = parent;
+            Hash40 = hash40;
         }
     }
 
     public class VM_StructValue : VM_ParamValue, IStructChild
     {
         public VM_ParamStruct Parent { get; set; }
+        public ulong Hash40 { get; set; }
 
-        public VM_StructValue(ParamValue value, VM_ParamStruct parent) : base(value)
+        public override string Name => Util.GetStructChildName(Param, Hash40);
+
+        public VM_StructValue(ParamValue value, VM_ParamStruct parent, ulong hash40) : base(value)
         {
             Parent = parent;
+            Hash40 = hash40;
+        }
+    }
+
+    public class VM_ListStruct : VM_ParamStruct, IListChild
+    {
+        public VM_ParamList Parent { get; set; }
+        public int Index { get; set; }
+
+        public override string Name => Util.GetListChildName(Param, Index);
+
+        public VM_ListStruct(ParamStruct struc, VM_ParamList parent, int index) : base(struc)
+        {
+            Parent = parent;
+            Index = index;
+        }
+    }
+
+    public class VM_ListList : VM_ParamList, IListChild
+    {
+        public VM_ParamList Parent { get; set; }
+        public int Index { get; set; }
+
+        public override string Name => Util.GetListChildName(Param, Index);
+
+        public VM_ListList(ParamList list, VM_ParamList parent, int index) : base(list)
+        {
+            Parent = parent;
+            Index = index;
+        }
+    }
+
+    public class VM_ListValue : VM_ParamValue, IListChild
+    {
+        public VM_ParamList Parent { get; set; }
+        public int Index { get; set; }
+
+        public override string Name => Util.GetListChildName(Param, Index);
+
+        public VM_ListValue(ParamValue value, VM_ParamList parent, int index) : base(value)
+        {
+            Parent = parent;
+            Index = index;
         }
     }
 }
