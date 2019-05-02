@@ -146,7 +146,6 @@ namespace prcEditor
                 if (_hash40 == value)
                     return;
                 Util.ChangeStructChildHash40(this, ref _hash40, value);
-                NotifyPropertyChanged(nameof(Hash40));
                 NotifyPropertyChanged(nameof(Name));
             }
         }
@@ -172,7 +171,6 @@ namespace prcEditor
                 if (_hash40 == value)
                     return;
                 Util.ChangeStructChildHash40(this, ref _hash40, value);
-                NotifyPropertyChanged(nameof(Hash40));
                 NotifyPropertyChanged(nameof(Name));
             }
         }
@@ -198,7 +196,6 @@ namespace prcEditor
                 if (_hash40 == value)
                     return;
                 Util.ChangeStructChildHash40(this, ref _hash40, value);
-                NotifyPropertyChanged(nameof(Hash40));
                 NotifyPropertyChanged(nameof(Name));
             }
         }
