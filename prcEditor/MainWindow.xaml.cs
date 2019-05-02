@@ -251,33 +251,36 @@ namespace prcEditor
             //if (!(e.OriginalSource is TreeViewItem tvi && tvi.Header is ParamTreeItem ptItem))
             //    return;
 
-            //if (!KeyCtrl)
-            //{
-            //    switch (e.Key)
-            //    {
-            //        case Key.Enter:
-            //            SetupDataGrid(ptItem);
-            //            break;
-            //        case Key.Delete:
-            //            if (ParamData.Tag as ParamTreeItem == ptItem)
-            //                ParamData.ItemsSource = null;
-            //            ptItem.Remove();
-            //            break;
-            //    }
-            //}
-            //else //commands that require holding ctrl first
-            //{
-            //    switch (e.Key)
-            //    {
-            //        case Key.C:
-            //            CopiedParam = ptItem.Param.Clone();
-            //            break;
-            //        case Key.V:
-            //            if (CopiedParam != null)
-            //                ptItem.Add(CopiedParam);
-            //            break;
-            //    }
-            //}
+            if (!KeyCtrl)
+            {
+                switch (e.Key)
+                {
+                    case Key.Enter:
+                        break;
+                    case Key.Delete:
+                        {
+                            //if (e.OriginalSource is TreeViewItem tvi && tvi.Header is IStructChild child)
+                            //    child.Parent.Children.Remove(child);
+                        }
+                        break;
+                    case Key.T:
+                        {
+                            //if (e.OriginalSource is TreeViewItem tvi && tvi.Header is IStructChild child)
+                            //    child.Hash40 = Hash40Util.LabelToHash40("null", StringToHashLabels);
+                        }
+                        break;
+                }
+            }
+            else //commands that require holding ctrl first
+            {
+                switch (e.Key)
+                {
+                    case Key.C:
+                        break;
+                    case Key.V:
+                        break;
+                }
+            }
         }
 
         private void Param_TreeView_KeyUp(object sender, KeyEventArgs e)

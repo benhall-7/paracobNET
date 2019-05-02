@@ -7,7 +7,7 @@ namespace prcEditor
     //Presenting...
     //The world's most complicated inheritance structure!!!
 
-    public abstract class VM_Param
+    public abstract class VM_Param : INotifyPropertyChanged
     {
         public IParam Param { get; set; }
         
@@ -137,42 +137,78 @@ namespace prcEditor
     public class VM_StructStruct : VM_ParamStruct, IStructChild
     {
         public VM_ParamStruct Parent { get; set; }
-        public ulong Hash40 { get; set; }
+        private ulong _hash40;
+        public ulong Hash40
+        {
+            get { return _hash40; }
+            set
+            {
+                if (_hash40 == value)
+                    return;
+                Util.ChangeStructChildHash40(this, ref _hash40, value);
+                NotifyPropertyChanged(nameof(Hash40));
+                NotifyPropertyChanged(nameof(Name));
+            }
+        }
 
         public override string Name => Util.GetStructChildName(Param, Hash40);
 
         public VM_StructStruct(ParamStruct struc, VM_ParamStruct parent, ulong hash40) : base(struc)
         {
             Parent = parent;
-            Hash40 = hash40;
+            _hash40 = hash40;
         }
     }
 
     public class VM_StructList : VM_ParamList, IStructChild
     {
         public VM_ParamStruct Parent { get; set; }
-        public ulong Hash40 { get; set; }
+        private ulong _hash40;
+        public ulong Hash40
+        {
+            get { return _hash40; }
+            set
+            {
+                if (_hash40 == value)
+                    return;
+                Util.ChangeStructChildHash40(this, ref _hash40, value);
+                NotifyPropertyChanged(nameof(Hash40));
+                NotifyPropertyChanged(nameof(Name));
+            }
+        }
 
         public override string Name => Util.GetStructChildName(Param, Hash40);
 
         public VM_StructList(ParamList list, VM_ParamStruct parent, ulong hash40) : base(list)
         {
             Parent = parent;
-            Hash40 = hash40;
+            _hash40 = hash40;
         }
     }
 
     public class VM_StructValue : VM_ParamValue, IStructChild
     {
         public VM_ParamStruct Parent { get; set; }
-        public ulong Hash40 { get; set; }
+        private ulong _hash40;
+        public ulong Hash40
+        {
+            get { return _hash40; }
+            set
+            {
+                if (_hash40 == value)
+                    return;
+                Util.ChangeStructChildHash40(this, ref _hash40, value);
+                NotifyPropertyChanged(nameof(Hash40));
+                NotifyPropertyChanged(nameof(Name));
+            }
+        }
 
         public override string Name => Util.GetStructChildName(Param, Hash40);
 
         public VM_StructValue(ParamValue value, VM_ParamStruct parent, ulong hash40) : base(value)
         {
             Parent = parent;
-            Hash40 = hash40;
+            _hash40 = hash40;
         }
     }
 

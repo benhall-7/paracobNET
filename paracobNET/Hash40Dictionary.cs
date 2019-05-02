@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace paracobNET
 {
-    public class Hash40Dictionary<T> : Dictionary<ulong, T>
+    public class Hash40Dictionary<T> : OrderedDictionary<ulong, T>
     {
         public Hash40Dictionary() : base() { }
         public Hash40Dictionary(int capacity) : base(capacity) { }
