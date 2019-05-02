@@ -23,7 +23,10 @@ namespace prcEditor
             set
             {
                 pFile = value;
-                ParamViewModel = value != null ? new VM_ParamStruct(value.Root, null) : null;
+                if (value == null)
+                    ParamViewModel = null;
+                else
+                    ParamViewModel = new VM_StructStruct(value.Root, null);
             }
         }
 
@@ -41,8 +44,8 @@ namespace prcEditor
 
         #region PROPERTY_BINDING
 
-        private VM_ParamStruct paramVM;
-        public VM_ParamStruct ParamViewModel
+        private VM_StructStruct paramVM;
+        public VM_StructStruct ParamViewModel
         {
             get { return paramVM; }
             set
@@ -51,13 +54,13 @@ namespace prcEditor
                 NotifyPropertyChanged(nameof(ParamViewModelList));
             }
         }
-        public List<VM_ParamStruct> ParamViewModelList
+        public List<VM_StructStruct> ParamViewModelList
         {
             get
             {
                 if (ParamViewModel == null)
-                    return new List<VM_ParamStruct>();
-                return new List<VM_ParamStruct>() { ParamViewModel };
+                    return new List<VM_StructStruct>();
+                return new List<VM_StructStruct>() { ParamViewModel };
             }
         }
 

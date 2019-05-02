@@ -53,21 +53,38 @@
                   VirtualizingStackPanel.VirtualizationMode="Recycling"
                   ItemsSource="{Binding Path=ParamViewModelList}">
             <TreeView.Resources>
-                <HierarchicalDataTemplate DataType="{x:Type local:VM_ParamStruct}"
+                <HierarchicalDataTemplate DataType="{x:Type local:VM_StructStruct}"
                                           ItemsSource="{Binding Path=Children}">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="Resources\struct_bw.png" Margin="0,2,4,2"/>
                         <TextBlock Text="{Binding Path=Param.TypeKey}"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type local:VM_ParamList}"
+                <HierarchicalDataTemplate DataType="{x:Type local:VM_StructList}"
                                           ItemsSource="{Binding Path=Children}">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="Resources\list_bw.png" Margin="0,2,4,2"/>
                         <TextBlock Text="{Binding Path=Param.TypeKey}"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
-                <DataTemplate DataType="{x:Type local:VM_ParamValue}">
+                <DataTemplate DataType="{x:Type local:VM_StructValue}">
+                    <TextBlock Text="{Binding Path=Param.TypeKey}"/>
+                </DataTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type local:VM_ListStruct}"
+                                          ItemsSource="{Binding Path=Children}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Resources\struct_bw.png" Margin="0,2,4,2"/>
+                        <TextBlock Text="{Binding Path=Param.TypeKey}"/>
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type local:VM_ListList}"
+                                          ItemsSource="{Binding Path=Children}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Resources\list_bw.png" Margin="0,2,4,2"/>
+                        <TextBlock Text="{Binding Path=Param.TypeKey}"/>
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+                <DataTemplate DataType="{x:Type local:VM_ListValue}">
                     <TextBlock Text="{Binding Path=Param.TypeKey}"/>
                 </DataTemplate>
             </TreeView.Resources>
