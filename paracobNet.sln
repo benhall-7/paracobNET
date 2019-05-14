@@ -1,13 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2016
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "paracobNET", "paracobNET\paracobNET.csproj", "{353F9F36-DF0C-40FE-ACA9-760B0913FB2B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ParamXML", "ParamXML\ParamXML.csproj", "{99322FDF-DE9E-48A0-B968-790109DBE439}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ParamCLI", "ParamCLI\ParamCLI.csproj", "{C2AD8FC1-CAC8-445E-BD26-CDA7424619A2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "prcEditor", "prcEditor\prcEditor.csproj", "{99955446-688C-431F-81C0-218335324830}"
 EndProject
@@ -25,10 +23,6 @@ Global
 		{99322FDF-DE9E-48A0-B968-790109DBE439}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{99322FDF-DE9E-48A0-B968-790109DBE439}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{99322FDF-DE9E-48A0-B968-790109DBE439}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C2AD8FC1-CAC8-445E-BD26-CDA7424619A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C2AD8FC1-CAC8-445E-BD26-CDA7424619A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C2AD8FC1-CAC8-445E-BD26-CDA7424619A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C2AD8FC1-CAC8-445E-BD26-CDA7424619A2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{99955446-688C-431F-81C0-218335324830}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{99955446-688C-431F-81C0-218335324830}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{99955446-688C-431F-81C0-218335324830}.Release|Any CPU.ActiveCfg = Release|Any CPU

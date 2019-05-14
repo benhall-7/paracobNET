@@ -231,11 +231,9 @@ namespace paracobNET
             if (fDictionary.TryGetValue(oldKey, out value))
             {
                 fDictionary.Remove(oldKey);
-                int index = fKeys.IndexOf(oldKey);
-                fKeys.RemoveAt(index);
-
                 fDictionary.Add(newKey, value);
-                fKeys.Insert(index, newKey);
+                int index = fKeys.IndexOf(oldKey);
+                fKeys[index] = newKey;
 
                 return true;
             }

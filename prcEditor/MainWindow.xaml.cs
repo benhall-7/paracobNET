@@ -247,9 +247,7 @@ namespace prcEditor
                 KeyCtrl = true;
                 return;
             }
-
-            //if (!(e.OriginalSource is TreeViewItem tvi && tvi.Header is ParamTreeItem ptItem))
-            //    return;
+            if (!(e.OriginalSource is TreeViewItem tvi)) return;
 
             if (!KeyCtrl)
             {
@@ -278,6 +276,22 @@ namespace prcEditor
                     case Key.C:
                         break;
                     case Key.V:
+                        break;
+                    case Key.K:
+                        {
+                            if (tvi.Header is IStructChild struc)
+                            {
+                                struc.Index--;
+                            }
+                        }
+                        break;
+                    case Key.M:
+                        {
+                            if (tvi.Header is IStructChild struc)
+                            {
+                                struc.Index++;
+                            }
+                        }
                         break;
                 }
             }
