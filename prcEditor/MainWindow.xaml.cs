@@ -281,7 +281,7 @@ namespace prcEditor
                         {
                             if (tvi.Header is IStructChild struc)
                             {
-                                struc.Index--;
+                                struc.Index_EventCaller--;
                             }
                         }
                         break;
@@ -289,7 +289,7 @@ namespace prcEditor
                         {
                             if (tvi.Header is IStructChild struc)
                             {
-                                struc.Index++;
+                                struc.Index_EventCaller++;
                             }
                         }
                         break;

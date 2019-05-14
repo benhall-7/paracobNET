@@ -44,17 +44,23 @@ namespace prcEditor
                 switch (node.Value.TypeKey)
                 {
                     case ParamType.@struct:
-                        Children.Add(new VM_StructStruct(node.Value as ParamStruct, this, node.Key) { _index = index });
+                        Children.Add(new VM_StructStruct(node.Value as ParamStruct, this, node.Key) { Index = index });
                         break;
                     case ParamType.list:
-                        Children.Add(new VM_StructList(node.Value as ParamList, this, node.Key) { _index = index });
+                        Children.Add(new VM_StructList(node.Value as ParamList, this, node.Key) { Index = index });
                         break;
                     default:
-                        Children.Add(new VM_StructValue(node.Value as ParamValue, this, node.Key) { _index = index });
+                        Children.Add(new VM_StructValue(node.Value as ParamValue, this, node.Key) { Index = index });
                         break;
                 }
                 index++;
             }
+        }
+
+        public void UpdateChildrenIndeces()
+        {
+            for (int i = 0; i < Children.Count; i++)
+                Children[i].Index = i;
         }
     }
 
@@ -92,6 +98,12 @@ namespace prcEditor
                 }
             }
         }
+
+        public void UpdateChildrenIndeces()
+        {
+            for (int i = 0; i < Children.Count; i++)
+                Children[i].Index = i;
+        }
     }
 
     /// <summary>
@@ -119,6 +131,7 @@ namespace prcEditor
         IParam Param { get; set; }
         VM_ParamStruct Parent { get; set; }
         int Index { get; set; }
+        int Index_EventCaller { get; set; }
         ulong Hash40 { get; set; }
     }
 
@@ -130,6 +143,7 @@ namespace prcEditor
         IParam Param { get; set; }
         VM_ParamList Parent { get; set; }
         int Index { get; set; }
+        int Index_EventCaller { get; set; }
     }
 
     public class VM_ParamRoot : VM_ParamStruct
@@ -143,15 +157,15 @@ namespace prcEditor
     {
         public VM_ParamStruct Parent { get; set; }
 
-        public int _index;
-        public int Index
+        public int Index { get; set; }
+        public int Index_EventCaller
         {
-            get { return _index; }
+            get { return Index; }
             set
             {
-                if (value == _index)
+                if (value == Index)
                     return;
-                Util.ChangeStructChildIndex(this, ref _index, value);
+                Util.ChangeStructChildIndex(this, value);
             }
         }
 
@@ -181,15 +195,15 @@ namespace prcEditor
     {
         public VM_ParamStruct Parent { get; set; }
 
-        public int _index;
-        public int Index
+        public int Index { get; set; }
+        public int Index_EventCaller
         {
-            get { return _index; }
+            get { return Index; }
             set
             {
-                if (value == _index)
+                if (value == Index)
                     return;
-                Util.ChangeStructChildIndex(this, ref _index, value);
+                Util.ChangeStructChildIndex(this, value);
             }
         }
 
@@ -219,15 +233,15 @@ namespace prcEditor
     {
         public VM_ParamStruct Parent { get; set; }
 
-        public int _index;
-        public int Index
+        public int Index { get; set; }
+        public int Index_EventCaller
         {
-            get { return _index; }
+            get { return Index; }
             set
             {
-                if (value == _index)
+                if (value == Index)
                     return;
-                Util.ChangeStructChildIndex(this, ref _index, value);
+                Util.ChangeStructChildIndex(this, value);
             }
         }
 
@@ -256,75 +270,75 @@ namespace prcEditor
     public class VM_ListStruct : VM_ParamStruct, IListChild
     {
         public VM_ParamList Parent { get; set; }
-        private int _index;
-        public int Index
+        public int Index { get; set; }
+        public int Index_EventCaller
         {
-            get { return _index; }
+            get { return Index; }
             set
             {
-                if (_index == value)
+                if (Index == value)
                     return;
-                Util.ChangeListChildIndex(this, ref _index, value);
+                Util.ChangeListChildIndex(this, value);
                 NotifyPropertyChanged(nameof(Name));
             }
         }
 
-        public override string Name => Util.GetListChildName(Param, Index);
+        public override string Name => Util.GetListChildName(Param, Index_EventCaller);
 
         public VM_ListStruct(ParamStruct struc, VM_ParamList parent, int index) : base(struc)
         {
             Parent = parent;
-            _index = index;
+            Index = index;
         }
     }
 
     public class VM_ListList : VM_ParamList, IListChild
     {
         public VM_ParamList Parent { get; set; }
-        private int _index;
-        public int Index
+        public int Index { get; set; }
+        public int Index_EventCaller
         {
-            get { return _index; }
+            get { return Index; }
             set
             {
-                if (_index == value)
+                if (Index == value)
                     return;
-                Util.ChangeListChildIndex(this, ref _index, value);
+                Util.ChangeListChildIndex(this, value);
                 NotifyPropertyChanged(nameof(Name));
             }
         }
 
-        public override string Name => Util.GetListChildName(Param, Index);
+        public override string Name => Util.GetListChildName(Param, Index_EventCaller);
 
         public VM_ListList(ParamList list, VM_ParamList parent, int index) : base(list)
         {
             Parent = parent;
-            _index = index;
+            Index = index;
         }
     }
 
     public class VM_ListValue : VM_ParamValue, IListChild
     {
         public VM_ParamList Parent { get; set; }
-        private int _index;
-        public int Index
+        public int Index { get; set; }
+        public int Index_EventCaller
         {
-            get { return _index; }
+            get { return Index; }
             set
             {
-                if (_index == value)
+                if (Index == value)
                     return;
-                Util.ChangeListChildIndex(this, ref _index, value);
+                Util.ChangeListChildIndex(this, value);
                 NotifyPropertyChanged(nameof(Name));
             }
         }
 
-        public override string Name => Util.GetListChildName(Param, Index);
+        public override string Name => Util.GetListChildName(Param, Index_EventCaller);
 
         public VM_ListValue(ParamValue value, VM_ParamList parent, int index) : base(value)
         {
             Parent = parent;
-            _index = index;
+            Index = index;
         }
     }
 }

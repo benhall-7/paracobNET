@@ -15,17 +15,28 @@ namespace prcEditor
             return $"{param.TypeKey} ({index})";
         }
 
-        public static void ChangeStructChildIndex(IStructChild node, ref int index, int value)
+        public static void ChangeStructChildIndex(IStructChild node, int value)
         {
             var parent = node.Parent;
             //ViewModel:
-            parent.Children.Move(index, value);
+            parent.Children.Move(node.Index, value);
             //underlying class:
             var parentParam = parent.Param;
-            parentParam.Nodes.RemoveAt(index);
+            parentParam.Nodes.RemoveAt(node.Index);
             parentParam.Nodes.Insert(value, node.Hash40, node.Param);
+            parent.UpdateChildrenIndeces();
+        }
 
-            index = value;
+        public static void ChangeListChildIndex(IListChild node, int value)
+        {
+            var parent = node.Parent;
+            //ViewModel:
+            parent.Children.Move(node.Index, value);
+            //underlying class:
+            var parentParam = parent.Param;
+            parentParam.Nodes.RemoveAt(node.Index);
+            parentParam.Nodes.Insert(value, node.Param);
+            parent.UpdateChildrenIndeces();
         }
 
         public static void ChangeStructChildHash40(IStructChild node, ref ulong hash40, ulong value)
@@ -33,14 +44,6 @@ namespace prcEditor
             ParamStruct parent = node.Parent.Param;
             parent.Nodes.ChangeKey(hash40, value);
             hash40 = value;
-        }
-
-        public static void ChangeListChildIndex(IListChild node, ref int index, int value)
-        {
-            //ParamList parent = node.Parent.Param;
-            //IParam param = parent.Nodes[index];
-            //parent.Nodes.RemoveAt(index);
-            //parent.Nodes.Insert(value, param);
         }
     }
 }
