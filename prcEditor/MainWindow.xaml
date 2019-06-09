@@ -47,17 +47,14 @@
         </StackPanel>
         <TreeView Grid.Row="1" Grid.Column="0"
                   x:Name="Param_TreeView" BorderThickness="0"
-                  KeyDown="Param_TreeView_KeyDown"
-                  KeyUp="Param_TreeView_KeyUp"
+                  PreviewKeyDown="Param_TreeView_PreviewKeyDown"
+                  PreviewKeyUp="Param_TreeView_PreviewKeyUp"
                   VirtualizingStackPanel.IsVirtualizing="True"
                   VirtualizingStackPanel.VirtualizationMode="Recycling"
                   ItemsSource="{Binding Path=ParamViewModelList}">
             <TreeView.ItemContainerStyle>
                 <Style TargetType="TreeViewItem">
-                    <EventSetter Event="MouseDown" Handler="TreeViewItem_MouseDown"/>
-                    <EventSetter Event="MouseMove" Handler="TreeViewItem_MouseMove"/>
-                    <EventSetter Event="DragOver" Handler="TreeViewItem_DragOver"/>
-                    <EventSetter Event="Drop" Handler="TreeViewItem_Drop"/>
+                    <EventSetter Event="PreviewKeyDown" Handler="TreeViewItem_PreviewKeyDown"/>
                 </Style>
             </TreeView.ItemContainerStyle>
             <TreeView.Resources>

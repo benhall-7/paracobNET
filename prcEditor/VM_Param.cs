@@ -4,8 +4,7 @@ using System.ComponentModel;
 
 namespace prcEditor
 {
-    //Presenting...
-    //The world's most complicated inheritance structure!!!
+    #region ABSTRACT_PARAM_MODEL
 
     public abstract class VM_Param : INotifyPropertyChanged
     {
@@ -123,29 +122,47 @@ namespace prcEditor
         }
     }
 
+    #endregion
+
+    #region PARAM_CHILD_INTERFACES
+
+    //these "base" interfaces used for copying params around
+    public interface IStructChildBase
+    {
+        IParam Param { get; set; }
+        ulong Hash40 { get; set; }
+    }
+
+    public interface IListChildBase
+    {
+        IParam Param { get; set; }
+    }
+
     /// <summary>
     /// Represents a generic child of a struct
     /// </summary>
-    public interface IStructChild
+    public interface IStructChild : IStructChildBase
     {
-        IParam Param { get; set; }
         VM_ParamStruct Parent { get; set; }
         int Index { get; set; }
         int Index_EventCaller { get; set; }
-        ulong Hash40 { get; set; }
     }
 
     /// <summary>
     /// Represents a generic child of a list
     /// </summary>
-    public interface IListChild
+    public interface IListChild : IListChildBase
     {
-        IParam Param { get; set; }
         VM_ParamList Parent { get; set; }
         int Index { get; set; }
         int Index_EventCaller { get; set; }
     }
 
+    #endregion
+
+    #region IMPLEMENTATIONS
+
+    //param with no parents (must be a struct)
     public class VM_ParamRoot : VM_ParamStruct
     {
         public override string Name => Param.TypeKey.ToString();
@@ -153,6 +170,7 @@ namespace prcEditor
         public VM_ParamRoot(ParamStruct struc) : base(struc) { }
     }
 
+    //params with a struct parent
     public class VM_StructStruct : VM_ParamStruct, IStructChild
     {
         public VM_ParamStruct Parent { get; set; }
@@ -267,6 +285,7 @@ namespace prcEditor
         }
     }
 
+    //params with a list parent
     public class VM_ListStruct : VM_ParamStruct, IListChild
     {
         public VM_ParamList Parent { get; set; }
@@ -341,4 +360,6 @@ namespace prcEditor
             Index = index;
         }
     }
+
+    #endregion
 }
