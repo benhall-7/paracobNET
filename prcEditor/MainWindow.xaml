@@ -52,6 +52,14 @@
                   VirtualizingStackPanel.IsVirtualizing="True"
                   VirtualizingStackPanel.VirtualizationMode="Recycling"
                   ItemsSource="{Binding Path=ParamViewModelList}">
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="TreeViewItem">
+                    <EventSetter Event="MouseDown" Handler="TreeViewItem_MouseDown"/>
+                    <EventSetter Event="MouseMove" Handler="TreeViewItem_MouseMove"/>
+                    <EventSetter Event="DragOver" Handler="TreeViewItem_DragOver"/>
+                    <EventSetter Event="Drop" Handler="TreeViewItem_Drop"/>
+                </Style>
+            </TreeView.ItemContainerStyle>
             <TreeView.Resources>
                 <HierarchicalDataTemplate DataType="{x:Type local:VM_ParamRoot}"
                                           ItemsSource="{Binding Path=Children}">

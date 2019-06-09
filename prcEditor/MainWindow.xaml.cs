@@ -36,7 +36,9 @@ namespace prcEditor
 
         IParam CopiedParam { get; set; }
 
-        private static bool KeyCtrl { get; set; }
+        private bool KeyCtrl { get; set; }
+
+        private Point _lastMousePos { get; set; }
 
         private static bool LabelsLoaded { get; set; }
         public static Dictionary<ulong, string> HashToStringLabels { get; set; }
@@ -104,7 +106,6 @@ namespace prcEditor
 
         static MainWindow()
         {
-            KeyCtrl = false;
             LabelsLoaded = false;
             HashToStringLabels = new Dictionary<ulong, string>();
             StringToHashLabels = new Dictionary<string, ulong>();
@@ -120,6 +121,8 @@ namespace prcEditor
             OpenFileButton.DataContext = this;
             SaveFileButton.DataContext = this;
             Param_TreeView.DataContext = this;
+
+            KeyCtrl = false;
         }
 
         private void StartWorkerThread()
@@ -309,6 +312,26 @@ namespace prcEditor
             int i = ((DataGrid)sender).Columns.Count;
             DataGridColumn column = ((DataGrid)sender).Columns[i - 1];
             column.Width = new DataGridLength(1, DataGridLengthUnitType.Star);
+        }
+
+        private void TreeViewItem_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        private void TreeViewItem_MouseMove(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        private void TreeViewItem_DragOver(object sender, DragEventArgs e)
+        {
+
+        }
+
+        private void TreeViewItem_Drop(object sender, DragEventArgs e)
+        {
+
         }
 
         #endregion
