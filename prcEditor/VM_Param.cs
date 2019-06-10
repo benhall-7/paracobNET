@@ -1,4 +1,5 @@
 ﻿using paracobNET;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
@@ -56,6 +57,13 @@ namespace prcEditor
             }
         }
 
+        public void RemoveAt(int index)
+        {
+            Param.Nodes.RemoveAt(index);
+            Children.RemoveAt(index);
+            UpdateChildrenIndeces();
+        }
+
         public void UpdateChildrenIndeces()
         {
             for (int i = 0; i < Children.Count; i++)
@@ -98,6 +106,13 @@ namespace prcEditor
             }
         }
 
+        public void RemoveAt(int index)
+        {
+            Param.Nodes.RemoveAt(index);
+            Children.RemoveAt(index);
+            UpdateChildrenIndeces();
+        }
+
         public void UpdateChildrenIndeces()
         {
             for (int i = 0; i < Children.Count; i++)
@@ -126,23 +141,13 @@ namespace prcEditor
 
     #region PARAM_CHILD_INTERFACES
 
-    //these "base" interfaces used for copying params around
-    public interface IStructChildBase
-    {
-        IParam Param { get; set; }
-        ulong Hash40 { get; set; }
-    }
-
-    public interface IListChildBase
-    {
-        IParam Param { get; set; }
-    }
-
     /// <summary>
     /// Represents a generic child of a struct
     /// </summary>
-    public interface IStructChild : IStructChildBase
+    public interface IStructChild
     {
+        IParam Param { get; set; }
+        ulong Hash40 { get; set; }
         VM_ParamStruct Parent { get; set; }
         int Index { get; set; }
         int Index_EventCaller { get; set; }
@@ -151,11 +156,38 @@ namespace prcEditor
     /// <summary>
     /// Represents a generic child of a list
     /// </summary>
-    public interface IListChild : IListChildBase
+    public interface IListChild
     {
+        IParam Param { get; set; }
         VM_ParamList Parent { get; set; }
         int Index { get; set; }
         int Index_EventCaller { get; set; }
+    }
+
+    #endregion
+
+    #region CLIPBOARD_COMPATIBLE
+
+    [Serializable]
+    public class SerializableParam
+    {
+        public IParam Param { get; set; }
+
+        public SerializableParam(IParam param)
+        {
+            Param = param;
+        }
+    }
+
+    [Serializable]
+    public class SerializableStructChild : SerializableParam
+    {
+        public ulong Hash40 { get; set; }
+
+        public SerializableStructChild(IStructChild structChild) : base(structChild.Param)
+        {
+            Hash40 = structChild.Hash40;
+        }
     }
 
     #endregion

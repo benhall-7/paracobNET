@@ -16,9 +16,6 @@ namespace prcEditor
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        static readonly string struct_child_type = "prc_struct_child";
-        static readonly string list_child_type = "prc_list_child";
-
         private ParamFile pFile;
         ParamFile PFile
         {
@@ -243,8 +240,9 @@ namespace prcEditor
 
         private void TreeViewItem_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (!(e.OriginalSource is TreeViewItem tvi)) return;
-            
+            if (!(sender is TreeViewItem tvi)) return;
+            if (!tvi.IsSelected) return;
+
             switch (e.Key)
             {
                 case Key.Enter:
@@ -252,24 +250,55 @@ namespace prcEditor
                     break;
                 case Key.Delete:
                     {
-                        //if (e.OriginalSource is TreeViewItem tvi && tvi.Header is IStructChild child)
-                        //    child.Parent.Children.Remove(child);
+                        if (tvi.Header is IStructChild structChild)
+                            structChild.Parent.RemoveAt(structChild.Index);
+                        else if (tvi.Header is IListChild listChild)
+                            listChild.Parent.RemoveAt(listChild.Index);
                     }
                     break;
                 case Key.C:
-                    if (!KeyCtrl) break;
-                    if (tvi.Header is IStructChildBase structChild)
-                        Clipboard.SetDataObject(new DataObject(struct_child_type, structChild), true);
-                    else if (tvi.Header is IListChildBase listChild)
-                        Clipboard.SetDataObject(new DataObject(list_child_type, listChild), true);
+                    {
+                        if (!KeyCtrl) break;
+
+                        Clipboard.Clear();
+                        if (tvi.Header is IStructChild structChild)
+                            Clipboard.SetDataObject(new DataObject(new SerializableStructChild(structChild)), true);
+                        else if (tvi.Header is IListChild listChild)
+                            Clipboard.SetDataObject(new DataObject(new SerializableParam(listChild.Param)), true);
+                    }
                     break;
                 case Key.X:
-                    if (!KeyCtrl) break;
-                    Clipboard.SetDataObject(tvi.Header, true);
-                    
+                    {
+                        if (!KeyCtrl) break;
+
+                        Clipboard.Clear();
+                        if (tvi.Header is IStructChild structChild)
+                        {
+                            Clipboard.SetDataObject(new DataObject(new SerializableStructChild(structChild)), true);
+                            structChild.Parent.RemoveAt(structChild.Index);
+                        }
+                        else if (tvi.Header is IListChild listChild)
+                        {
+                            Clipboard.SetDataObject(new DataObject(new SerializableParam(listChild.Param)), true);
+                            listChild.Parent.RemoveAt(listChild.Index);
+                        }
+                    }
                     break;
                 case Key.V:
                     if (!KeyCtrl) break;
+
+                    IDataObject dataObject = Clipboard.GetDataObject();
+                    if (dataObject.GetDataPresent(typeof(SerializableStructChild)))
+                    {
+                        var data = (SerializableStructChild)dataObject.GetData(typeof(SerializableStructChild));
+                        //stub
+                    }
+                    else if (dataObject.GetDataPresent(typeof(SerializableParam)))
+                    {
+                        var data = (SerializableStructChild)dataObject.GetData(typeof(SerializableParam));
+                        //stub
+                    }
+
                     break;
             }
         }

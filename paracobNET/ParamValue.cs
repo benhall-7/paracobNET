@@ -4,6 +4,7 @@ using System.IO;
 
 namespace paracobNET
 {
+    [Serializable]
     public class ParamValue : IParam
     {
         public ParamType TypeKey { get; set; }
