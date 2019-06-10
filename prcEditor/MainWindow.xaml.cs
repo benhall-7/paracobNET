@@ -263,9 +263,15 @@ namespace prcEditor
 
                         Clipboard.Clear();
                         if (tvi.Header is IStructChild structChild)
-                            Clipboard.SetDataObject(new DataObject(new SerializableStructChild(structChild)), true);
+                        {
+                            var data = new SerializableStructChild(structChild.Param.Clone(), structChild.Hash40);
+                            Clipboard.SetDataObject(new DataObject(data), true);
+                        }
                         else if (tvi.Header is IListChild listChild)
-                            Clipboard.SetDataObject(new DataObject(new SerializableParam(listChild.Param)), true);
+                        {
+                            var data = new SerializableParam(listChild.Param.Clone());
+                            Clipboard.SetDataObject(new DataObject(data), true);
+                        }
                     }
                     break;
                 case Key.X:
@@ -275,17 +281,19 @@ namespace prcEditor
                         Clipboard.Clear();
                         if (tvi.Header is IStructChild structChild)
                         {
-                            Clipboard.SetDataObject(new DataObject(new SerializableStructChild(structChild)), true);
+                            var data = new SerializableStructChild(structChild.Param.Clone(), structChild.Hash40);
+                            Clipboard.SetDataObject(new DataObject(data), true);
                             structChild.Parent.RemoveAt(structChild.Index);
                         }
                         else if (tvi.Header is IListChild listChild)
                         {
-                            Clipboard.SetDataObject(new DataObject(new SerializableParam(listChild.Param)), true);
+                            var data = new SerializableParam(listChild.Param.Clone());
+                            Clipboard.SetDataObject(new DataObject(data), true);
                             listChild.Parent.RemoveAt(listChild.Index);
                         }
                     }
                     break;
-                case Key.V:
+                case Key.V://paste into selected param
                     {
                         if (!KeyCtrl) break;
 
@@ -294,26 +302,60 @@ namespace prcEditor
                         {
                             var data = (SerializableStructChild)dataObject.GetData(typeof(SerializableStructChild));
 
-                            if (KeyShift)//try pasting to parent instead
+                            if (tvi.Header is VM_ParamStruct str)
                             {
-
+                                str.Add(data.Param, data.Hash40);
+                                str.UpdateChildrenIndeces();
                             }
-                            else
+                            else if (tvi.Header is VM_ParamList list)
                             {
-
+                                list.Add(data.Param);
                             }
                         }
                         else if (dataObject.GetDataPresent(typeof(SerializableParam)))
                         {
                             var data = (SerializableParam)dataObject.GetData(typeof(SerializableParam));
 
-                            if (KeyShift)
+                            if (tvi.Header is VM_ParamStruct str)
                             {
-
+                                //UNIMPLEMENTED, REQUIRES GETTING A NEW HASH
                             }
-                            else
+                            else if (tvi.Header is VM_ParamList list)
                             {
+                                list.Add(data.Param);
+                            }
+                        }
+                    }
+                    break;
+                case Key.P://paste into parent of selected param
+                    {
+                        if (!KeyCtrl) break;
 
+                        IDataObject dataObject = Clipboard.GetDataObject();
+                        if (dataObject.GetDataPresent(typeof(SerializableStructChild)))
+                        {
+                            var data = (SerializableStructChild)dataObject.GetData(typeof(SerializableStructChild));
+
+                            if (tvi.Header is IStructChild structChild)
+                            {
+                                structChild.Parent.Add(data.Param, data.Hash40);
+                            }
+                            else if (tvi.Header is IListChild listChild)
+                            {
+                                listChild.Parent.Add(data.Param);
+                            }
+                        }
+                        else if (dataObject.GetDataPresent(typeof(SerializableParam)))
+                        {
+                            var data = (SerializableParam)dataObject.GetData(typeof(SerializableParam));
+
+                            if (tvi.Header is IStructChild structChild)
+                            {
+                                //UNIMPLEMENTED, REQUIRES GETTING A NEW HASH
+                            }
+                            else if (tvi.Header is IListChild listChild)
+                            {
+                                listChild.Parent.Add(data.Param);
                             }
                         }
                     }

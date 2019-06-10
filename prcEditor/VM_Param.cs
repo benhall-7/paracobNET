@@ -38,22 +38,30 @@ namespace prcEditor
         {
             Param = param;
             Children = new ObservableCollection<IStructChild>();
-            int index = 0;
             foreach (var node in param.Nodes)
+                AddToChildren(node.Value, node.Key);
+            UpdateChildrenIndeces();
+        }
+
+        public void Add(IParam param, ulong hash40)
+        {
+            Param.Nodes.Add(hash40, param);
+            AddToChildren(param, hash40);
+        }
+
+        private void AddToChildren(IParam param, ulong hash40)
+        {
+            switch (param.TypeKey)
             {
-                switch (node.Value.TypeKey)
-                {
-                    case ParamType.@struct:
-                        Children.Add(new VM_StructStruct(node.Value as ParamStruct, this, node.Key) { Index = index });
-                        break;
-                    case ParamType.list:
-                        Children.Add(new VM_StructList(node.Value as ParamList, this, node.Key) { Index = index });
-                        break;
-                    default:
-                        Children.Add(new VM_StructValue(node.Value as ParamValue, this, node.Key) { Index = index });
-                        break;
-                }
-                index++;
+                case ParamType.@struct:
+                    Children.Add(new VM_StructStruct(param as ParamStruct, this, hash40));
+                    break;
+                case ParamType.list:
+                    Children.Add(new VM_StructList(param as ParamList, this, hash40));
+                    break;
+                default:
+                    Children.Add(new VM_StructValue(param as ParamValue, this, hash40));
+                    break;
             }
         }
 
@@ -88,21 +96,30 @@ namespace prcEditor
         {
             Param = param;
             Children = new ObservableCollection<IListChild>();
-            for (int i = 0; i < param.Nodes.Count; i++)
+            foreach (var node in param.Nodes)
+                AddToChildren(node);
+            UpdateChildrenIndeces();
+        }
+
+        public void Add(IParam param)
+        {
+            Param.Nodes.Add(param);
+            AddToChildren(param);
+        }
+
+        private void AddToChildren(IParam param)
+        {
+            switch (param.TypeKey)
             {
-                IParam node = param.Nodes[i];
-                switch (node.TypeKey)
-                {
-                    case ParamType.@struct:
-                        Children.Add(new VM_ListStruct(node as ParamStruct, this, i));
-                        break;
-                    case ParamType.list:
-                        Children.Add(new VM_ListList(node as ParamList, this, i));
-                        break;
-                    default:
-                        Children.Add(new VM_ListValue(node as ParamValue, this, i));
-                        break;
-                }
+                case ParamType.@struct:
+                    Children.Add(new VM_ListStruct(param as ParamStruct, this));
+                    break;
+                case ParamType.list:
+                    Children.Add(new VM_ListList(param as ParamList, this));
+                    break;
+                default:
+                    Children.Add(new VM_ListValue(param as ParamValue, this));
+                    break;
             }
         }
 
@@ -175,7 +192,7 @@ namespace prcEditor
 
         public SerializableParam(IParam param)
         {
-            Param = param.Clone();
+            Param = param;
         }
     }
 
@@ -184,9 +201,9 @@ namespace prcEditor
     {
         public ulong Hash40 { get; set; }
 
-        public SerializableStructChild(IStructChild structChild) : base(structChild.Param)
+        public SerializableStructChild(IParam param, ulong hash40) : base(param)
         {
-            Hash40 = structChild.Hash40;
+            Hash40 = hash40;
         }
     }
 
@@ -336,10 +353,9 @@ namespace prcEditor
 
         public override string Name => Util.GetListChildName(Param, Index_EventCaller);
 
-        public VM_ListStruct(ParamStruct struc, VM_ParamList parent, int index) : base(struc)
+        public VM_ListStruct(ParamStruct struc, VM_ParamList parent) : base(struc)
         {
             Parent = parent;
-            Index = index;
         }
     }
 
@@ -361,10 +377,9 @@ namespace prcEditor
 
         public override string Name => Util.GetListChildName(Param, Index_EventCaller);
 
-        public VM_ListList(ParamList list, VM_ParamList parent, int index) : base(list)
+        public VM_ListList(ParamList list, VM_ParamList parent) : base(list)
         {
             Parent = parent;
-            Index = index;
         }
     }
 
@@ -386,10 +401,9 @@ namespace prcEditor
 
         public override string Name => Util.GetListChildName(Param, Index_EventCaller);
 
-        public VM_ListValue(ParamValue value, VM_ParamList parent, int index) : base(value)
+        public VM_ListValue(ParamValue value, VM_ParamList parent) : base(value)
         {
             Parent = parent;
-            Index = index;
         }
     }
 

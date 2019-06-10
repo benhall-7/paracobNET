@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace paracobNET
 {
+    [Serializable]
     internal class RefTableEntry
     {
         public int RefTableOffset { get; set; }

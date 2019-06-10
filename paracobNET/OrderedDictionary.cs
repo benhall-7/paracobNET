@@ -40,6 +40,7 @@ namespace paracobNET
     /// </summary>
     /// <typeparam name="TKey">The type of keys. Musn't be <see cref="int"/></typeparam>
     /// <typeparam name="TValue">The type of values.</typeparam>
+    [Serializable]
     public class OrderedDictionary<TKey, TValue> : IOrderedDictionary<TKey, TValue>
     {
         /// <summary>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace paracobNET
 {
+    [Serializable]
     public class Hash40Dictionary<T> : OrderedDictionary<ulong, T>
     {
         public Hash40Dictionary() : base() { }
