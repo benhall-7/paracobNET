@@ -175,7 +175,7 @@ namespace prcEditor
 
         public SerializableParam(IParam param)
         {
-            Param = param;
+            Param = param.Clone();
         }
     }
 

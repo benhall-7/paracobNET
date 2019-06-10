@@ -238,10 +238,11 @@ namespace prcEditor
                 KeyCtrl = false;
         }
 
-        private void TreeViewItem_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void TreeViewItem_KeyDown(object sender, KeyEventArgs e)
         {
             if (!(sender is TreeViewItem tvi)) return;
-            if (!tvi.IsSelected) return;
+
+            e.Handled = true;//bubbling event, don't send the event upward
 
             switch (e.Key)
             {
@@ -285,20 +286,37 @@ namespace prcEditor
                     }
                     break;
                 case Key.V:
-                    if (!KeyCtrl) break;
-
-                    IDataObject dataObject = Clipboard.GetDataObject();
-                    if (dataObject.GetDataPresent(typeof(SerializableStructChild)))
                     {
-                        var data = (SerializableStructChild)dataObject.GetData(typeof(SerializableStructChild));
-                        //stub
-                    }
-                    else if (dataObject.GetDataPresent(typeof(SerializableParam)))
-                    {
-                        var data = (SerializableStructChild)dataObject.GetData(typeof(SerializableParam));
-                        //stub
-                    }
+                        if (!KeyCtrl) break;
 
+                        IDataObject dataObject = Clipboard.GetDataObject();
+                        if (dataObject.GetDataPresent(typeof(SerializableStructChild)))
+                        {
+                            var data = (SerializableStructChild)dataObject.GetData(typeof(SerializableStructChild));
+
+                            if (KeyShift)//try pasting to parent instead
+                            {
+
+                            }
+                            else
+                            {
+
+                            }
+                        }
+                        else if (dataObject.GetDataPresent(typeof(SerializableParam)))
+                        {
+                            var data = (SerializableParam)dataObject.GetData(typeof(SerializableParam));
+
+                            if (KeyShift)
+                            {
+
+                            }
+                            else
+                            {
+
+                            }
+                        }
+                    }
                     break;
             }
         }

@@ -54,7 +54,7 @@
                   ItemsSource="{Binding Path=ParamViewModelList}">
             <TreeView.ItemContainerStyle>
                 <Style TargetType="TreeViewItem">
-                    <EventSetter Event="PreviewKeyDown" Handler="TreeViewItem_PreviewKeyDown"/>
+                    <EventSetter Event="KeyDown" Handler="TreeViewItem_KeyDown"/>
                 </Style>
             </TreeView.ItemContainerStyle>
             <TreeView.Resources>
