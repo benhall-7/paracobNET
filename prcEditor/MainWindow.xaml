@@ -3,6 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:prc="clr-namespace:paracobNET;assembly=paracobNET"
+        xmlns:core="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:prcEditor"
         mc:Ignorable="d"
         Title="prcEditor v2.0"
@@ -17,7 +19,9 @@
             <Setter Property="Background" Value="Transparent"/>
         </Style>
         <DataTemplate x:Key="Hash40ComboBoxTemplate">
-            <ComboBox IsEditable="True" ItemsSource="{x:Static local:MainWindow.StringLabels}" SelectedValue="{Binding Value}">
+            <ComboBox IsEditable="True"
+                      ItemsSource="{x:Static local:MainWindow.StringLabels}"
+                      Text="{Binding Value, Mode=TwoWay}">
                 <ComboBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel/>
@@ -25,27 +29,32 @@
                 </ComboBox.ItemsPanel>
             </ComboBox>
         </DataTemplate>
-        <local:ParamValueTemplateSelector x:Key="CellValueTemplateSel"
-                                          Hash40Template="{StaticResource Hash40ComboBoxTemplate}">
-            <local:ParamValueTemplateSelector.BooleanTemplate>
+        <local:ValueTemplateSelector x:Key="CellValueTemplateSel"
+                                     Hash40Template="{StaticResource Hash40ComboBoxTemplate}">
+            <local:ValueTemplateSelector.BooleanTemplate>
                 <DataTemplate>
                     <CheckBox IsChecked="{Binding Value}"/>
                 </DataTemplate>
-            </local:ParamValueTemplateSelector.BooleanTemplate>
-            <local:ParamValueTemplateSelector.NumberTemplate>
+            </local:ValueTemplateSelector.BooleanTemplate>
+            <local:ValueTemplateSelector.NumberTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Value}" Margin="4,0,0,0"/>
+                </DataTemplate>
+            </local:ValueTemplateSelector.NumberTemplate>
+            <local:ValueTemplateSelector.StringTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Value}"/>
                 </DataTemplate>
-            </local:ParamValueTemplateSelector.NumberTemplate>
-            <local:ParamValueTemplateSelector.StringTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Value}"/>
-                </DataTemplate>
-            </local:ParamValueTemplateSelector.StringTemplate>
-            <local:ParamValueTemplateSelector.BlankTemplate>
+            </local:ValueTemplateSelector.StringTemplate>
+            <local:ValueTemplateSelector.BlankTemplate>
                 <DataTemplate />
-            </local:ParamValueTemplateSelector.BlankTemplate>
-        </local:ParamValueTemplateSelector>
+            </local:ValueTemplateSelector.BlankTemplate>
+        </local:ValueTemplateSelector>
+        <ObjectDataProvider x:Key="ParamTypeEnum" MethodName="GetValues" ObjectType="{x:Type core:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type Type="prc:ParamType"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
     </Window.Resources>
     <Grid x:Name="MainGrid">
         <Grid.Background>
@@ -149,8 +158,10 @@
                   ItemsSource="{Binding Struct_DataGrid_Source}"
                   Visibility="{Binding Struct_DataGrid_Visible}">
             <DataGrid.Columns>
-                <DataGridComboBoxColumn Header="Key" SelectedValueBinding="{Binding Value}"/>
-                <DataGridComboBoxColumn Header="Type" SelectedValueBinding="{Binding Type}"/>
+                <DataGridComboBoxColumn Header="Key"/>
+                <DataGridComboBoxColumn Header="Type"
+                                        ItemsSource="{Binding Source={StaticResource ParamTypeEnum}}"
+                                        SelectedItemBinding="{Binding Type}"/>
                 <DataGridTemplateColumn Header="Value" Width="*"
                                         CellTemplateSelector="{StaticResource CellValueTemplateSel}"/>
             </DataGrid.Columns>

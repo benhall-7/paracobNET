@@ -9,7 +9,7 @@ using System.Windows.Controls;
 
 namespace prcEditor
 {
-    public class ParamValueTemplateSelector : DataTemplateSelector
+    public class ValueTemplateSelector : DataTemplateSelector
     {
         public DataTemplate BooleanTemplate { get; set; }
         public DataTemplate NumberTemplate { get; set; }
