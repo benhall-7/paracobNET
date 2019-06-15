@@ -17,7 +17,7 @@
             <Setter Property="Background" Value="Transparent"/>
         </Style>
         <DataTemplate x:Key="Hash40ComboBoxTemplate">
-            <ComboBox IsEditable="True" ItemsSource="{x:Static local:MainWindow.StringLabels}">
+            <ComboBox IsEditable="True" ItemsSource="{x:Static local:MainWindow.StringLabels}" SelectedValue="{Binding Value}">
                 <ComboBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel/>
@@ -149,9 +149,10 @@
                   ItemsSource="{Binding Struct_DataGrid_Source}"
                   Visibility="{Binding Struct_DataGrid_Visible}">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Key" Binding="{Binding Hash40}"/>
+                <DataGridComboBoxColumn Header="Key" SelectedValueBinding="{Binding Value}"/>
                 <DataGridComboBoxColumn Header="Type" SelectedValueBinding="{Binding Type}"/>
-                <DataGridTemplateColumn Header="Value" Width="*" CellTemplateSelector="{StaticResource CellValueTemplateSel}"/>
+                <DataGridTemplateColumn Header="Value" Width="*"
+                                        CellTemplateSelector="{StaticResource CellValueTemplateSel}"/>
             </DataGrid.Columns>
         </DataGrid>
         <DataGrid x:Name="ParamList_DataGrid"
@@ -168,7 +169,8 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Index" Binding="{Binding Index_EventCaller}"/>
                 <DataGridComboBoxColumn Header="Type"/>
-                <DataGridTemplateColumn Header="Value" Width="*"/>
+                <DataGridTemplateColumn Header="Value" Width="*"
+                                        CellTemplateSelector="{StaticResource CellValueTemplateSel}"/>
             </DataGrid.Columns>
         </DataGrid>
         <StatusBar Grid.Row="2" Grid.ColumnSpan="3"
