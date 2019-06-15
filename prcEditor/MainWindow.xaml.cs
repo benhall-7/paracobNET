@@ -2,6 +2,7 @@
 using paracobNET;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Threading;
@@ -42,6 +43,11 @@ namespace prcEditor
         public static Dictionary<string, ulong> StringToHashLabels { get; set; }
 
         #region PROPERTY_BINDING
+
+        public static IEnumerable<string> StringLabels
+        {
+            get { return StringToHashLabels.Keys; }
+        }
 
         private VM_ParamRoot paramVM;
         public VM_ParamRoot ParamViewModel
@@ -97,6 +103,32 @@ namespace prcEditor
             }
         }
 
+        private ObservableCollection<IStructChild> _struct_source;
+        public ObservableCollection<IStructChild> Struct_DataGrid_Source
+        {
+            get { return _struct_source; }
+            set
+            {
+                _struct_source = value;
+                NotifyPropertyChanged(nameof(Struct_DataGrid_Source));
+                NotifyPropertyChanged(nameof(Struct_DataGrid_Visible));
+            }
+        }
+        public Visibility Struct_DataGrid_Visible => Struct_DataGrid_Source == null ? Visibility.Hidden : Visibility.Visible;
+
+        private ObservableCollection<IListChild> _list_source;
+        public ObservableCollection<IListChild> List_DataGrid_Source
+        {
+            get { return _list_source; }
+            set
+            {
+                _list_source = value;
+                NotifyPropertyChanged(nameof(List_DataGrid_Source));
+                NotifyPropertyChanged(nameof(List_DataGrid_Visible));
+            }
+        }
+        public Visibility List_DataGrid_Visible => List_DataGrid_Source == null ? Visibility.Hidden : Visibility.Visible;
+
         #endregion
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -118,6 +150,8 @@ namespace prcEditor
             OpenFileButton.DataContext = this;
             SaveFileButton.DataContext = this;
             Param_TreeView.DataContext = this;
+            ParamStruct_DataGrid.DataContext = this;
+            ParamList_DataGrid.DataContext = this;
 
             KeyCtrl = false;
         }
@@ -247,7 +281,18 @@ namespace prcEditor
             switch (e.Key)
             {
                 case Key.Enter:
-                    //TO DO: re-add the data grid and such
+                    {
+                        if (tvi.Header is VM_ParamStruct str)
+                        {
+                            Struct_DataGrid_Source = str.Children;
+                            List_DataGrid_Source = null;
+                        }
+                        else if (tvi.Header is VM_ParamList list)
+                        {
+                            List_DataGrid_Source = list.Children;
+                            Struct_DataGrid_Source = null;
+                        }
+                    }
                     break;
                 case Key.Delete:
                     {

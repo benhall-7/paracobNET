@@ -4,6 +4,10 @@ using System.Linq;
 
 namespace paracobNET
 {
+    //NOTE TO SELF / TO DO:
+    //REMOVE THIS CLASS, IT DOESN'T NEED TO EXIST
+    //DO THE THING I DID WITH THE LUA_PARAMS ALGO
+
     [Serializable]
     internal class RefTableEntry
     {

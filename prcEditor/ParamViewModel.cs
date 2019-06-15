@@ -10,6 +10,12 @@ namespace prcEditor
     public abstract class VM_Param : INotifyPropertyChanged
     {
         public IParam Param { get; set; }
+
+        public ParamType Type
+        {
+            get { return Param.TypeKey; }
+            set { }
+        }
         
         public abstract string Name { get; }
 
@@ -148,6 +154,12 @@ namespace prcEditor
             set => base.Param = value;
         }
 
+        public string Value
+        {
+            get { return Param.ToString(MainWindow.HashToStringLabels); }
+            set { Param.SetValue(value, MainWindow.StringToHashLabels); }
+        }
+
         public VM_ParamValue(ParamValue param)
         {
             Param = param;
@@ -164,6 +176,7 @@ namespace prcEditor
     public interface IStructChild
     {
         IParam Param { get; set; }
+        ParamType Type { get; set; }
         ulong Hash40 { get; set; }
         VM_ParamStruct Parent { get; set; }
         int Index { get; set; }
