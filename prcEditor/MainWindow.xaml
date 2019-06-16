@@ -29,27 +29,42 @@
                 </ComboBox.ItemsPanel>
             </ComboBox>
         </DataTemplate>
-        <local:ValueTemplateSelector x:Key="CellValueTemplateSel"
-                                     Hash40Template="{StaticResource Hash40ComboBoxTemplate}">
+        <local:ValueTemplateSelector x:Key="CellValueTemplateSel">
             <local:ValueTemplateSelector.BooleanTemplate>
                 <DataTemplate>
                     <CheckBox IsChecked="{Binding Value}"/>
                 </DataTemplate>
             </local:ValueTemplateSelector.BooleanTemplate>
-            <local:ValueTemplateSelector.NumberTemplate>
+            <local:ValueTemplateSelector.StandardTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Value}" Margin="4,0,0,0"/>
                 </DataTemplate>
-            </local:ValueTemplateSelector.NumberTemplate>
-            <local:ValueTemplateSelector.StringTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Value}"/>
-                </DataTemplate>
-            </local:ValueTemplateSelector.StringTemplate>
+            </local:ValueTemplateSelector.StandardTemplate>
             <local:ValueTemplateSelector.BlankTemplate>
                 <DataTemplate />
             </local:ValueTemplateSelector.BlankTemplate>
         </local:ValueTemplateSelector>
+        <local:ValueEditTemplateSelector x:Key="CellValueEditTemplateSel"
+                                     Hash40Template="{StaticResource Hash40ComboBoxTemplate}">
+            <local:ValueEditTemplateSelector.BooleanTemplate>
+                <DataTemplate>
+                    <CheckBox IsChecked="{Binding Value}"/>
+                </DataTemplate>
+            </local:ValueEditTemplateSelector.BooleanTemplate>
+            <local:ValueEditTemplateSelector.NumberTemplate>
+                <DataTemplate>
+                    <TextBox Text="{Binding Value}"/>
+                </DataTemplate>
+            </local:ValueEditTemplateSelector.NumberTemplate>
+            <local:ValueEditTemplateSelector.StringTemplate>
+                <DataTemplate>
+                    <TextBox Text="{Binding Value}"/>
+                </DataTemplate>
+            </local:ValueEditTemplateSelector.StringTemplate>
+            <local:ValueEditTemplateSelector.BlankTemplate>
+                <DataTemplate />
+            </local:ValueEditTemplateSelector.BlankTemplate>
+        </local:ValueEditTemplateSelector>
         <ObjectDataProvider x:Key="ParamTypeEnum" MethodName="GetValues" ObjectType="{x:Type core:Enum}">
             <ObjectDataProvider.MethodParameters>
                 <x:Type Type="prc:ParamType"/>
@@ -159,13 +174,14 @@
                   Visibility="{Binding Struct_DataGrid_Visible}">
             <DataGrid.Columns>
                 <DataGridComboBoxColumn Header="Key"
-                                        ItemsSource="{Binding Source={x:Static local:MainWindow.StringLabels}}"
-                                        SelectedItemBinding="{Binding Key}"/>
+                                        ItemsSource="{x:Static local:MainWindow.StringLabels}"
+                                        TextBinding="{Binding Key}"/>
                 <DataGridComboBoxColumn Header="Type"
                                         ItemsSource="{Binding Source={StaticResource ParamTypeEnum}}"
                                         SelectedItemBinding="{Binding Type}"/>
                 <DataGridTemplateColumn Header="Value" Width="*"
-                                        CellTemplateSelector="{StaticResource CellValueTemplateSel}"/>
+                                        CellTemplateSelector="{StaticResource CellValueTemplateSel}"
+                                        CellEditingTemplateSelector="{StaticResource CellValueEditTemplateSel}"/>
             </DataGrid.Columns>
         </DataGrid>
         <DataGrid x:Name="ParamList_DataGrid"
@@ -181,9 +197,12 @@
                   Visibility="{Binding List_DataGrid_Visible}">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Index" Binding="{Binding Index_EventCaller}"/>
-                <DataGridComboBoxColumn Header="Type"/>
+                <DataGridComboBoxColumn Header="Type"
+                                        ItemsSource="{Binding Source={StaticResource ParamTypeEnum}}"
+                                        SelectedItemBinding="{Binding Type}"/>
                 <DataGridTemplateColumn Header="Value" Width="*"
-                                        CellTemplateSelector="{StaticResource CellValueTemplateSel}"/>
+                                        CellTemplateSelector="{StaticResource CellValueTemplateSel}"
+                                        CellEditingTemplateSelector="{StaticResource CellValueEditTemplateSel}"/>
             </DataGrid.Columns>
         </DataGrid>
         <StatusBar Grid.Row="2" Grid.ColumnSpan="3"

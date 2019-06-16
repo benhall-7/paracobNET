@@ -65,6 +65,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ValueEditTemplateSelector.cs" />
     <Compile Include="ValueTemplateSelector.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="ParamViewModel.cs" />

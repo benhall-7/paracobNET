@@ -190,6 +190,7 @@ namespace prcEditor
     public interface IListChild
     {
         IParam Param { get; set; }
+        ParamType Type { get; set; }
         VM_ParamList Parent { get; set; }
         int Index { get; set; }
         int Index_EventCaller { get; set; }

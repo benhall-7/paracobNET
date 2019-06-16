@@ -4,10 +4,12 @@ using System.Windows.Controls;
 
 namespace prcEditor
 {
-    public class ValueTemplateSelector : DataTemplateSelector
+    class ValueEditTemplateSelector : DataTemplateSelector
     {
         public DataTemplate BooleanTemplate { get; set; }
-        public DataTemplate StandardTemplate { get; set; }
+        public DataTemplate NumberTemplate { get; set; }
+        public DataTemplate Hash40Template { get; set; }
+        public DataTemplate StringTemplate { get; set; }
         public DataTemplate BlankTemplate { get; set; }
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
@@ -32,9 +34,11 @@ namespace prcEditor
                 case ParamType.@int:
                 case ParamType.@uint:
                 case ParamType.@float:
+                    return NumberTemplate;
                 case ParamType.hash40:
+                    return Hash40Template;
                 case ParamType.@string:
-                    return StandardTemplate;
+                    return StringTemplate;
                 default:
                     return BlankTemplate;
             }
