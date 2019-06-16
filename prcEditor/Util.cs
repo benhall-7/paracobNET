@@ -5,14 +5,14 @@ namespace prcEditor
 {
     static class Util
     {
-        public static string GetStructChildName(IParam param, ulong hash40)
+        public static string GetStructChildName(IStructChild sc)
         {
-            return $"{param.TypeKey} ({Hash40Util.FormatToString(hash40, MainWindow.HashToStringLabels)})";
+            return $"{sc.Param.TypeKey} ({sc.Key})";
         }
 
-        public static string GetListChildName(IParam param, int index)
+        public static string GetListChildName(IListChild lc)
         {
-            return $"{param.TypeKey} ({index})";
+            return $"{lc.Param.TypeKey} ({lc.Index})";
         }
 
         public static void ChangeStructChildIndex(IStructChild node, int value)

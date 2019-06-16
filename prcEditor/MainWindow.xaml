@@ -21,7 +21,7 @@
         <DataTemplate x:Key="Hash40ComboBoxTemplate">
             <ComboBox IsEditable="True"
                       ItemsSource="{x:Static local:MainWindow.StringLabels}"
-                      Text="{Binding Value, Mode=TwoWay}">
+                      Text="{Binding Value}">
                 <ComboBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel/>
@@ -158,7 +158,9 @@
                   ItemsSource="{Binding Struct_DataGrid_Source}"
                   Visibility="{Binding Struct_DataGrid_Visible}">
             <DataGrid.Columns>
-                <DataGridComboBoxColumn Header="Key"/>
+                <DataGridComboBoxColumn Header="Key"
+                                        ItemsSource="{Binding Source={x:Static local:MainWindow.StringLabels}}"
+                                        SelectedItemBinding="{Binding Key}"/>
                 <DataGridComboBoxColumn Header="Type"
                                         ItemsSource="{Binding Source={StaticResource ParamTypeEnum}}"
                                         SelectedItemBinding="{Binding Type}"/>

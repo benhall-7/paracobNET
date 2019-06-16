@@ -11,7 +11,7 @@ namespace prcEditor
     {
         public IParam Param { get; set; }
 
-        public ParamType Type
+        public virtual ParamType Type
         {
             get { return Param.TypeKey; }
             set { }
@@ -178,6 +178,7 @@ namespace prcEditor
         IParam Param { get; set; }
         ParamType Type { get; set; }
         ulong Hash40 { get; set; }
+        string Key { get; set; }
         VM_ParamStruct Parent { get; set; }
         int Index { get; set; }
         int Index_EventCaller { get; set; }
@@ -258,11 +259,18 @@ namespace prcEditor
                 if (_hash40 == value)
                     return;
                 Util.ChangeStructChildHash40(this, ref _hash40, value);
+                NotifyPropertyChanged(nameof(Key));
                 NotifyPropertyChanged(nameof(Name));
             }
         }
 
-        public override string Name => Util.GetStructChildName(Param, Hash40);
+        public string Key
+        {
+            get { return Hash40Util.FormatToString(Hash40, MainWindow.HashToStringLabels); }
+            set { Hash40 = Hash40Util.LabelToHash40(value, MainWindow.StringToHashLabels); }
+        }
+
+        public override string Name => Util.GetStructChildName(this);
 
         public VM_StructStruct(ParamStruct struc, VM_ParamStruct parent, ulong hash40) : base(struc)
         {
@@ -296,11 +304,18 @@ namespace prcEditor
                 if (_hash40 == value)
                     return;
                 Util.ChangeStructChildHash40(this, ref _hash40, value);
+                NotifyPropertyChanged(nameof(Key));
                 NotifyPropertyChanged(nameof(Name));
             }
         }
 
-        public override string Name => Util.GetStructChildName(Param, Hash40);
+        public string Key
+        {
+            get { return Hash40Util.FormatToString(Hash40, MainWindow.HashToStringLabels); }
+            set { Hash40 = Hash40Util.LabelToHash40(value, MainWindow.StringToHashLabels); }
+        }
+
+        public override string Name => Util.GetStructChildName(this);
 
         public VM_StructList(ParamList list, VM_ParamStruct parent, ulong hash40) : base(list)
         {
@@ -334,11 +349,18 @@ namespace prcEditor
                 if (_hash40 == value)
                     return;
                 Util.ChangeStructChildHash40(this, ref _hash40, value);
+                NotifyPropertyChanged(nameof(Key));
                 NotifyPropertyChanged(nameof(Name));
             }
         }
 
-        public override string Name => Util.GetStructChildName(Param, Hash40);
+        public string Key
+        {
+            get { return Hash40Util.FormatToString(Hash40, MainWindow.HashToStringLabels); }
+            set { Hash40 = Hash40Util.LabelToHash40(value, MainWindow.StringToHashLabels); }
+        }
+
+        public override string Name => Util.GetStructChildName(this);
 
         public VM_StructValue(ParamValue value, VM_ParamStruct parent, ulong hash40) : base(value)
         {
@@ -364,7 +386,7 @@ namespace prcEditor
             }
         }
 
-        public override string Name => Util.GetListChildName(Param, Index_EventCaller);
+        public override string Name => Util.GetListChildName(this);
 
         public VM_ListStruct(ParamStruct struc, VM_ParamList parent) : base(struc)
         {
@@ -388,7 +410,7 @@ namespace prcEditor
             }
         }
 
-        public override string Name => Util.GetListChildName(Param, Index_EventCaller);
+        public override string Name => Util.GetListChildName(this);
 
         public VM_ListList(ParamList list, VM_ParamList parent) : base(list)
         {
@@ -412,7 +434,7 @@ namespace prcEditor
             }
         }
 
-        public override string Name => Util.GetListChildName(Param, Index_EventCaller);
+        public override string Name => Util.GetListChildName(this);
 
         public VM_ListValue(ParamValue value, VM_ParamList parent) : base(value)
         {
