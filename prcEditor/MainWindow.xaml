@@ -29,15 +29,14 @@
                 </ComboBox.ItemsPanel>
             </ComboBox>
         </DataTemplate>
-        <local:ValueTemplateSelector x:Key="CellValueTemplateSel">
-            <local:ValueTemplateSelector.BooleanTemplate>
-                <DataTemplate>
-                    <CheckBox IsChecked="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                </DataTemplate>
-            </local:ValueTemplateSelector.BooleanTemplate>
+        <DataTemplate x:Key="BooleanValueTemplate">
+            <CheckBox IsChecked="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        </DataTemplate>
+        <local:ValueTemplateSelector x:Key="CellValueTemplateSel"
+                                     BooleanTemplate="{StaticResource BooleanValueTemplate}">
             <local:ValueTemplateSelector.StandardTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Value}" Margin="4,0,0,0"/>
+                    <TextBlock Text="{Binding Value}" Margin="2,0,2,0"/>
                 </DataTemplate>
             </local:ValueTemplateSelector.StandardTemplate>
             <local:ValueTemplateSelector.BlankTemplate>
@@ -45,12 +44,8 @@
             </local:ValueTemplateSelector.BlankTemplate>
         </local:ValueTemplateSelector>
         <local:ValueEditTemplateSelector x:Key="CellValueEditTemplateSel"
-                                     Hash40Template="{StaticResource Hash40ComboBoxTemplate}">
-            <local:ValueEditTemplateSelector.BooleanTemplate>
-                <DataTemplate>
-                    <CheckBox IsChecked="{Binding Value}"/>
-                </DataTemplate>
-            </local:ValueEditTemplateSelector.BooleanTemplate>
+                                         BooleanTemplate="{StaticResource BooleanValueTemplate}"
+                                         Hash40Template="{StaticResource Hash40ComboBoxTemplate}">
             <local:ValueEditTemplateSelector.NumberTemplate>
                 <DataTemplate>
                     <TextBox Text="{Binding Value}"/>
@@ -173,9 +168,26 @@
                   ItemsSource="{Binding Struct_DataGrid_Source}"
                   Visibility="{Binding Struct_DataGrid_Visible}">
             <DataGrid.Columns>
-                <DataGridComboBoxColumn Header="Key"
-                                        ItemsSource="{x:Static local:MainWindow.StringLabels}"
-                                        TextBinding="{Binding Key}"/>
+                <DataGridTemplateColumn Header="Key">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Key}" Margin="2,0,2,0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <ComboBox IsEditable="True"
+                                      ItemsSource="{x:Static local:MainWindow.StringLabels}"
+                                      Text="{Binding Key}">
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel/>
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                            </ComboBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
                 <DataGridComboBoxColumn Header="Type"
                                         ItemsSource="{Binding Source={StaticResource ParamTypeEnum}}"
                                         SelectedItemBinding="{Binding Type}"/>
