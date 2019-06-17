@@ -32,7 +32,7 @@
         <local:ValueTemplateSelector x:Key="CellValueTemplateSel">
             <local:ValueTemplateSelector.BooleanTemplate>
                 <DataTemplate>
-                    <CheckBox IsChecked="{Binding Value}"/>
+                    <CheckBox IsChecked="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </DataTemplate>
             </local:ValueTemplateSelector.BooleanTemplate>
             <local:ValueTemplateSelector.StandardTemplate>
