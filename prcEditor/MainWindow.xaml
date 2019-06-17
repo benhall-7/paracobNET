@@ -21,6 +21,7 @@
         <DataTemplate x:Key="Hash40ComboBoxTemplate">
             <ComboBox IsEditable="True"
                       ItemsSource="{x:Static local:MainWindow.StringLabels}"
+                      SelectedItem="{Binding Value}"
                       Text="{Binding Value}">
                 <ComboBox.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -178,6 +179,7 @@
                         <DataTemplate>
                             <ComboBox IsEditable="True"
                                       ItemsSource="{x:Static local:MainWindow.StringLabels}"
+                                      SelectedItem="{Binding Key}"
                                       Text="{Binding Key}">
                                 <ComboBox.ItemsPanel>
                                     <ItemsPanelTemplate>
