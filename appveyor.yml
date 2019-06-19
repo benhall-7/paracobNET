@@ -1,0 +1,42 @@
+version: 1.0.{build}
+image: Visual Studio 2019
+configuration: Release
+platform: Any CPU
+before_build:
+- cmd: dotnet restore
+build:
+  verbosity: normal
+after_build:
+- cmd: >-
+    mkdir %APPVEYOR_BUILD_FOLDER%\build
+
+    mkdir %APPVEYOR_BUILD_FOLDER%\build\ParamXML
+
+    mkdir %APPVEYOR_BUILD_FOLDER%\build\prcEditor
+
+    xcopy %APPVEYOR_BUILD_FOLDER%\ParamXML\bin\%CONFIGURATION%\netcoreapp2.1 %APPVEYOR_BUILD_FOLDER%\build\ParamXML
+
+    xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\paracobNET.dll %APPVEYOR_BUILD_FOLDER%\build\prcEditor
+
+    xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\paracobNET.pdb %APPVEYOR_BUILD_FOLDER%\build\prcEditor
+
+    xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\prcEditor.exe %APPVEYOR_BUILD_FOLDER%\build\prcEditor
+
+    xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\prcEditor.exe.config %APPVEYOR_BUILD_FOLDER%\build\prcEditor
+
+    xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\prcEditor.pdb %APPVEYOR_BUILD_FOLDER%\build\prcEditor
+
+    7z a paracobNET.zip .\build\*
+
+    appveyor PushArtifact paracobNET.zip
+deploy:
+- provider: GitHub
+  tag: v2.∞
+  release: paracobNET (to-date)
+  description: 'Continuous-integration build, updated every commit. May be unstable.\nTimestamp: $(APPVEYOR_REPO_COMMIT_TIMESTAMP)'
+  auth_token:
+    secure: HzJBzil1ZFH9SbYQowaI8czAc0tVGO//+TX3qZz7TwTg9pLCQXKEnCe5HWojNeZ7
+  repository: BenHall-7/paracobNET
+  artifact: paracobNET.zip
+  on:
+    branch: master
