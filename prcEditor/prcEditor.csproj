@@ -110,14 +110,10 @@
     <Resource Include="Resources\FoxLogo.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\list_bw.png" />
-    <Resource Include="Resources\list_color.png" />
+    <Resource Include="Resources\list.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\struct_bw.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\struct_color.png" />
+    <Resource Include="Resources\struct.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

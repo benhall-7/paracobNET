@@ -7,12 +7,16 @@ namespace prcEditor
     {
         public static string GetStructChildName(IStructChild sc)
         {
-            return $"{sc.Param.TypeKey} ({sc.Key})";
+            if (sc.Param is ParamStruct || sc.Param is ParamList)
+                return sc.Key;
+            return $"{sc.Key} ({sc.Param.TypeKey})";
         }
 
         public static string GetListChildName(IListChild lc)
         {
-            return $"{lc.Param.TypeKey} ({lc.Index})";
+            if (lc.Param is ParamStruct || lc.Param is ParamList)
+                return lc.Index.ToString();
+            return $"{lc.Index} ({lc.Param.TypeKey})";
         }
 
         public static void ChangeStructChildIndex(IStructChild node, int value)

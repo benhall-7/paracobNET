@@ -229,7 +229,7 @@ namespace prcEditor
     //param with no parents (must be a struct)
     public class VM_ParamRoot : VM_ParamStruct
     {
-        public override string Name => Param.TypeKey.ToString();
+        public override string Name => "Root";
 
         public VM_ParamRoot(ParamStruct struc) : base(struc) { }
     }
