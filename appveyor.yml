@@ -5,7 +5,7 @@ platform: Any CPU
 before_build:
 - cmd: dotnet restore
 build:
-  verbosity: normal
+  verbosity: minimal
 after_build:
 - cmd: >-
     mkdir %APPVEYOR_BUILD_FOLDER%\build
