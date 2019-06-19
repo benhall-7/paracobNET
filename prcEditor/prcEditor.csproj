@@ -65,16 +65,16 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ParamListEntry.cs" />
-    <Compile Include="ParamStructEntry.cs" />
+    <Compile Include="ValueEditTemplateSelector.cs" />
+    <Compile Include="ValueTemplateSelector.cs" />
+    <Compile Include="Util.cs" />
+    <Compile Include="ParamViewModel.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ParamTreeItem.cs" />
-    <Compile Include="ParamValueData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -105,6 +105,15 @@
       <Project>{353f9f36-df0c-40fe-aca9-760b0913fb2b}</Project>
       <Name>paracobNET</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\FoxLogo.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\list.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\struct.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

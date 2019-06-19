@@ -5,6 +5,7 @@ using System.Linq;
 
 namespace paracobNET
 {
+    [Serializable]
     public class ParamStruct : IParam
     {
         public ParamType TypeKey { get; } = ParamType.@struct;

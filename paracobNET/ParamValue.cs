@@ -4,6 +4,7 @@ using System.IO;
 
 namespace paracobNET
 {
+    [Serializable]
     public class ParamValue : IParam
     {
         public ParamType TypeKey { get; set; }
@@ -136,6 +137,128 @@ namespace paracobNET
                     break;
                 case ParamType.@string:
                     Value = value;
+                    break;
+            }
+        }
+
+        public void SetType(ParamType type)
+        {
+            if (TypeKey == type)
+                return;
+            switch (type)
+            {
+                case ParamType.list:
+                case ParamType.@struct:
+                    throw new ArgumentException($"ParamType '{type.ToString()}' is invalid for ParamValue instances");
+            }
+            switch (TypeKey)
+            {
+                case ParamType.@bool:
+                case ParamType.@sbyte:
+                case ParamType.@byte:
+                case ParamType.@short:
+                case ParamType.@ushort:
+                case ParamType.@int:
+                case ParamType.@uint:
+                case ParamType.@float:
+                    try
+                    {
+                        switch (type)
+                        {
+                            case ParamType.@bool:
+                                Value = (bool)Value;
+                                break;
+                            case ParamType.@sbyte:
+                                Value = (sbyte)Value;
+                                break;
+                            case ParamType.@byte:
+                                Value = (byte)Value;
+                                break;
+                            case ParamType.@short:
+                                Value = (short)Value;
+                                break;
+                            case ParamType.@ushort:
+                                Value = (ushort)Value;
+                                break;
+                            case ParamType.@int:
+                                Value = (int)Value;
+                                break;
+                            case ParamType.@uint:
+                                Value = (uint)Value;
+                                break;
+                            case ParamType.@float:
+                                Value = (float)Value;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    catch
+                    {
+                        Value = 0;
+                    }
+                    break;
+                case ParamType.hash40:
+                    {
+                        switch (type)
+                        {
+                            case ParamType.@bool:
+                            case ParamType.@sbyte:
+                            case ParamType.@byte:
+                            case ParamType.@short:
+                            case ParamType.@ushort:
+                            case ParamType.@int:
+                            case ParamType.@uint:
+                            case ParamType.@float:
+                                Value = 0;
+                                break;
+                            case ParamType.@string:
+                                Value = "";
+                                break;
+                        }
+                    }
+                    break;
+                case ParamType.@string:
+                    {
+                        try
+                        {
+                            string str = (string)Value;
+                            switch (type)
+                            {
+                                case ParamType.@bool:
+                                    Value = bool.Parse(str);
+                                    break;
+                                case ParamType.@sbyte:
+                                    Value = sbyte.Parse(str);
+                                    break;
+                                case ParamType.@byte:
+                                    Value = byte.Parse(str);
+                                    break;
+                                case ParamType.@short:
+                                    Value = short.Parse(str);
+                                    break;
+                                case ParamType.@ushort:
+                                    Value = ushort.Parse(str);
+                                    break;
+                                case ParamType.@int:
+                                    Value = int.Parse(str);
+                                    break;
+                                case ParamType.@uint:
+                                    Value = uint.Parse(str);
+                                    break;
+                                case ParamType.@float:
+                                    Value = float.Parse(str);
+                                    break;
+                                case ParamType.hash40:
+                                    Value = 0;
+                                    break;
+                            }
+                        }
+                        catch
+                        {
+                            Value = 0;
+                        }
+                    }
                     break;
             }
         }

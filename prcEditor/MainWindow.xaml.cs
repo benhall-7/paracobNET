@@ -2,6 +2,7 @@
 using paracobNET;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Threading;
@@ -16,15 +17,26 @@ namespace prcEditor
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        ParamFile PFile { get; set; }
+        private ParamFile pFile;
+        ParamFile PFile
+        {
+            get { return pFile; }
+            set
+            {
+                pFile = value;
+                if (value == null)
+                    ParamViewModel = null;
+                else
+                    ParamViewModel = new VM_ParamRoot(value.Root);
+            }
+        }
 
         Thread WorkerThread { get; set; }
         Queue<EnqueuableStatus> WorkerQueue { get; set; }
         readonly object WorkerThreadLock = new object();
 
-        IParam CopiedParam { get; set; }
-
-        private static bool KeyCtrl { get; set; }
+        private bool KeyCtrl { get; set; }
+        private bool KeyShift { get; set; }
 
         private static bool LabelsLoaded { get; set; }
         public static Dictionary<ulong, string> HashToStringLabels { get; set; }
@@ -32,23 +44,28 @@ namespace prcEditor
 
         #region PROPERTY_BINDING
 
-        private ParamTreeItem paramTI;
-        public ParamTreeItem ParamTI
+        public static IEnumerable<string> StringLabels
         {
-            get { return paramTI; }
+            get { return StringToHashLabels.Keys; }
+        }
+
+        private VM_ParamRoot paramVM;
+        public VM_ParamRoot ParamViewModel
+        {
+            get { return paramVM; }
             set
             {
-                paramTI = value;
-                NotifyPropertyChanged(nameof(ParamTreeRootContainer));
+                paramVM = value;
+                NotifyPropertyChanged(nameof(ParamViewModelList));
             }
         }
-        public List<ParamTreeItem> ParamTreeRootContainer
+        public List<VM_ParamRoot> ParamViewModelList
         {
             get
             {
-                if (ParamTI == null)
-                    return new List<ParamTreeItem>();
-                return new List<ParamTreeItem>() { ParamTI };
+                if (ParamViewModel == null)
+                    return new List<VM_ParamRoot>();
+                return new List<VM_ParamRoot>() { ParamViewModel };
             }
         }
 
@@ -86,13 +103,49 @@ namespace prcEditor
             }
         }
 
+        private bool isLabelSaveEnabled = false;
+        public bool IsLabelSaveEnabled
+        {
+            get { return isLabelSaveEnabled; }
+            set
+            {
+                isLabelSaveEnabled = value;
+                NotifyPropertyChanged(nameof(IsLabelSaveEnabled));
+            }
+        }
+
+        private ObservableCollection<IStructChild> _struct_source;
+        public ObservableCollection<IStructChild> Struct_DataGrid_Source
+        {
+            get { return _struct_source; }
+            set
+            {
+                _struct_source = value;
+                NotifyPropertyChanged(nameof(Struct_DataGrid_Source));
+                NotifyPropertyChanged(nameof(Struct_DataGrid_Visible));
+            }
+        }
+        public Visibility Struct_DataGrid_Visible => Struct_DataGrid_Source == null ? Visibility.Hidden : Visibility.Visible;
+
+        private ObservableCollection<IListChild> _list_source;
+        public ObservableCollection<IListChild> List_DataGrid_Source
+        {
+            get { return _list_source; }
+            set
+            {
+                _list_source = value;
+                NotifyPropertyChanged(nameof(List_DataGrid_Source));
+                NotifyPropertyChanged(nameof(List_DataGrid_Visible));
+            }
+        }
+        public Visibility List_DataGrid_Visible => List_DataGrid_Source == null ? Visibility.Hidden : Visibility.Visible;
+
         #endregion
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         static MainWindow()
         {
-            KeyCtrl = false;
             LabelsLoaded = false;
             HashToStringLabels = new Dictionary<ulong, string>();
             StringToHashLabels = new Dictionary<string, ulong>();
@@ -107,7 +160,12 @@ namespace prcEditor
             StatusTB.DataContext = this;
             OpenFileButton.DataContext = this;
             SaveFileButton.DataContext = this;
-            ParamTV.DataContext = this;
+            SaveLabelButton.DataContext = this;
+            Param_TreeView.DataContext = this;
+            ParamStruct_DataGrid.DataContext = this;
+            ParamList_DataGrid.DataContext = this;
+
+            KeyCtrl = false;
         }
 
         private void StartWorkerThread()
@@ -133,36 +191,7 @@ namespace prcEditor
 
         private void NotifyPropertyChanged(string propName)
         {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propName));
-        }
-
-        private void SetupDataGrid(ParamTreeItem ptItem)
-        {
-            IParam param = ptItem.Param;
-            if (param is ParamStruct paramStruct)
-            {
-                var entries = new List<ParamStructEntry>();
-                foreach (var node in paramStruct.Nodes)
-                {
-                    if (node.Value is ParamValue pValue)
-                        entries.Add(new ParamStructEntry(node.Key, pValue));
-                }
-                ParamData.Tag = ptItem;
-                ParamData.ItemsSource = entries;
-            }
-            else if (param is ParamList paramList)
-            {
-                var entries = new List<ParamListEntry>();
-                for (int i = 0; i < paramList.Nodes.Count; i++)
-                {
-                    var node = paramList.Nodes[i];
-                    if (node is ParamValue pValue)
-                        entries.Add(new ParamListEntry(i, pValue));
-                }
-                ParamData.Tag = ptItem;
-                ParamData.ItemsSource = entries;
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }
 
         #region EVENT_HANDLERS
@@ -178,7 +207,9 @@ namespace prcEditor
                 {
                     HashToStringLabels = LabelIO.GetHashStringDict(autoLoadName);
                     StringToHashLabels = LabelIO.GetStringHashDict(autoLoadName);
+                    LabelsLoaded = true;
                     IsOpenEnabled = true;
+                    IsLabelSaveEnabled = true;
                 }, "Loading label dictionaries"));
                 StartWorkerThread();
             }
@@ -192,7 +223,7 @@ namespace prcEditor
             bool? result = ofd.ShowDialog();
             if (result == true)
             {
-                ParamData.ItemsSource = null;
+                //ParamData.ItemsSource = null;
                 
                 IsOpenEnabled = false;
                 IsSaveEnabled = false;
@@ -200,7 +231,6 @@ namespace prcEditor
                 WorkerQueue.Enqueue(new EnqueuableStatus(() =>
                 {
                     PFile = new ParamFile(ofd.FileName);
-                    ParamTI = new ParamTreeItem(PFile.Root, null, null);
                     IsOpenEnabled = true;
                     IsSaveEnabled = true;
                 }, "Loading param file"));
@@ -229,58 +259,163 @@ namespace prcEditor
             }
         }
 
-        private void ParamTV_KeyDown(object sender, KeyEventArgs e)
+        private void SaveLabelButton_Click(object sender, RoutedEventArgs e)
         {
-            if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
-            {
-                KeyCtrl = true;
-                return;
-            }
-
-            if (!(e.OriginalSource is TreeViewItem tvi && tvi.Header is ParamTreeItem ptItem))
-                return;
-
-            if (!KeyCtrl)
-            {
-                switch (e.Key)
-                {
-                    case Key.Enter:
-                        SetupDataGrid(ptItem);
-                        break;
-                    case Key.Delete:
-                        if (ParamData.Tag as ParamTreeItem == ptItem)
-                            ParamData.ItemsSource = null;
-                        ptItem.Remove();
-                        break;
-                }
-            }
-            else //commands that require holding ctrl first
-            {
-                switch (e.Key)
-                {
-                    case Key.C:
-                        CopiedParam = ptItem.Param.Clone();
-                        break;
-                    case Key.V:
-                        if (CopiedParam != null)
-                            ptItem.Add(CopiedParam);
-                        break;
-                }
-            }
+            LabelIO.WriteLabels("ParamLabels.csv", HashToStringLabels);
         }
 
-        private void ParamTV_KeyUp(object sender, KeyEventArgs e)
+        private void Param_TreeView_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
+                KeyCtrl = true;
+
+            if (e.Key == Key.LeftShift || e.Key == Key.RightShift)
+                KeyShift = true;
+        }
+
+        private void Param_TreeView_PreviewKeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyboardDevice.IsKeyUp(Key.LeftCtrl) && e.KeyboardDevice.IsKeyUp(Key.RightCtrl))
                 KeyCtrl = false;
+
+            if (e.KeyboardDevice.IsKeyUp(Key.LeftShift) && e.KeyboardDevice.IsKeyUp(Key.RightShift))
+                KeyCtrl = false;
         }
 
-        private void ParamData_AutoGeneratedColumns(object sender, EventArgs e)
+        private void TreeViewItem_KeyDown(object sender, KeyEventArgs e)
         {
-            //Thanks to Sylwester Santorowski: https://stackoverflow.com/a/49285981
-            int i = ((DataGrid)sender).Columns.Count;
-            DataGridColumn column = ((DataGrid)sender).Columns[i - 1];
-            column.Width = new DataGridLength(1, DataGridLengthUnitType.Star);
+            if (!(sender is TreeViewItem tvi)) return;
+
+            e.Handled = true;//bubbling event, don't send the event upward
+
+            switch (e.Key)
+            {
+                case Key.Enter:
+                    {
+                        if (tvi.Header is VM_ParamStruct str)
+                        {
+                            Struct_DataGrid_Source = str.Children;
+                            List_DataGrid_Source = null;
+                        }
+                        else if (tvi.Header is VM_ParamList list)
+                        {
+                            List_DataGrid_Source = list.Children;
+                            Struct_DataGrid_Source = null;
+                        }
+                    }
+                    break;
+                case Key.Delete:
+                    {
+                        if (tvi.Header is IStructChild structChild)
+                            structChild.Parent.RemoveAt(structChild.Index);
+                        else if (tvi.Header is IListChild listChild)
+                            listChild.Parent.RemoveAt(listChild.Index);
+                    }
+                    break;
+                case Key.C:
+                    {
+                        if (!KeyCtrl) break;
+
+                        Clipboard.Clear();
+                        if (tvi.Header is IStructChild structChild)
+                        {
+                            var data = new SerializableStructChild(structChild.Param.Clone(), structChild.Hash40);
+                            Clipboard.SetDataObject(new DataObject(data), true);
+                        }
+                        else if (tvi.Header is IListChild listChild)
+                        {
+                            var data = new SerializableParam(listChild.Param.Clone());
+                            Clipboard.SetDataObject(new DataObject(data), true);
+                        }
+                    }
+                    break;
+                case Key.X:
+                    {
+                        if (!KeyCtrl) break;
+
+                        Clipboard.Clear();
+                        if (tvi.Header is IStructChild structChild)
+                        {
+                            var data = new SerializableStructChild(structChild.Param.Clone(), structChild.Hash40);
+                            Clipboard.SetDataObject(new DataObject(data), true);
+                            structChild.Parent.RemoveAt(structChild.Index);
+                        }
+                        else if (tvi.Header is IListChild listChild)
+                        {
+                            var data = new SerializableParam(listChild.Param.Clone());
+                            Clipboard.SetDataObject(new DataObject(data), true);
+                            listChild.Parent.RemoveAt(listChild.Index);
+                        }
+                    }
+                    break;
+                case Key.V://paste into selected param
+                    {
+                        if (!KeyCtrl) break;
+
+                        IDataObject dataObject = Clipboard.GetDataObject();
+                        if (dataObject.GetDataPresent(typeof(SerializableStructChild)))
+                        {
+                            var data = (SerializableStructChild)dataObject.GetData(typeof(SerializableStructChild));
+
+                            if (tvi.Header is VM_ParamStruct str)
+                            {
+                                str.Add(data.Param, data.Hash40);
+                                str.UpdateChildrenIndeces();
+                            }
+                            else if (tvi.Header is VM_ParamList list)
+                            {
+                                list.Add(data.Param);
+                            }
+                        }
+                        else if (dataObject.GetDataPresent(typeof(SerializableParam)))
+                        {
+                            var data = (SerializableParam)dataObject.GetData(typeof(SerializableParam));
+
+                            if (tvi.Header is VM_ParamStruct str)
+                            {
+                                //UNIMPLEMENTED, REQUIRES GETTING A NEW HASH
+                            }
+                            else if (tvi.Header is VM_ParamList list)
+                            {
+                                list.Add(data.Param);
+                            }
+                        }
+                    }
+                    break;
+                case Key.P://paste into parent of selected param
+                    {
+                        if (!KeyCtrl) break;
+
+                        IDataObject dataObject = Clipboard.GetDataObject();
+                        if (dataObject.GetDataPresent(typeof(SerializableStructChild)))
+                        {
+                            var data = (SerializableStructChild)dataObject.GetData(typeof(SerializableStructChild));
+
+                            if (tvi.Header is IStructChild structChild)
+                            {
+                                structChild.Parent.Add(data.Param, data.Hash40);
+                            }
+                            else if (tvi.Header is IListChild listChild)
+                            {
+                                listChild.Parent.Add(data.Param);
+                            }
+                        }
+                        else if (dataObject.GetDataPresent(typeof(SerializableParam)))
+                        {
+                            var data = (SerializableParam)dataObject.GetData(typeof(SerializableParam));
+
+                            if (tvi.Header is IStructChild structChild)
+                            {
+                                //UNIMPLEMENTED, REQUIRES GETTING A NEW HASH
+                            }
+                            else if (tvi.Header is IListChild listChild)
+                            {
+                                listChild.Parent.Add(data.Param);
+                            }
+                        }
+                    }
+                    break;
+            }
         }
 
         #endregion

@@ -1,8 +1,10 @@
-﻿using System.IO;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace paracobNET
 {
+    [Serializable]
     public class ParamList : IParam
     {
         public ParamType TypeKey { get; } = ParamType.list;

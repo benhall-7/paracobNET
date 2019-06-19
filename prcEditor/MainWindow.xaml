@@ -3,9 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:prc="clr-namespace:paracobNET;assembly=paracobNET"
+        xmlns:core="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:prcEditor"
         mc:Ignorable="d"
-        Title="prcEditor v1.9" Height="600" Width="800"
+        Title="prcEditor v2.0"
+        Icon="Resources\FoxLogo.ico"
+        Height="600" Width="800"
         ContentRendered="Window_ContentRendered">
     <Window.Resources>
         <Style TargetType="Button">
@@ -14,10 +18,58 @@
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Background" Value="Transparent"/>
         </Style>
+        <DataTemplate x:Key="Hash40ComboBoxTemplate">
+            <ComboBox IsEditable="True"
+                      ItemsSource="{x:Static local:MainWindow.StringLabels}"
+                      SelectedItem="{Binding Value}"
+                      Text="{Binding Value}">
+                <ComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel/>
+                    </ItemsPanelTemplate>
+                </ComboBox.ItemsPanel>
+            </ComboBox>
+        </DataTemplate>
+        <DataTemplate x:Key="BooleanValueTemplate">
+            <CheckBox IsChecked="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        </DataTemplate>
+        <local:ValueTemplateSelector x:Key="CellValueTemplateSel"
+                                     BooleanTemplate="{StaticResource BooleanValueTemplate}">
+            <local:ValueTemplateSelector.StandardTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Value}" Margin="2,0,2,0"/>
+                </DataTemplate>
+            </local:ValueTemplateSelector.StandardTemplate>
+            <local:ValueTemplateSelector.BlankTemplate>
+                <DataTemplate />
+            </local:ValueTemplateSelector.BlankTemplate>
+        </local:ValueTemplateSelector>
+        <local:ValueEditTemplateSelector x:Key="CellValueEditTemplateSel"
+                                         BooleanTemplate="{StaticResource BooleanValueTemplate}"
+                                         Hash40Template="{StaticResource Hash40ComboBoxTemplate}">
+            <local:ValueEditTemplateSelector.NumberTemplate>
+                <DataTemplate>
+                    <TextBox Text="{Binding Value}"/>
+                </DataTemplate>
+            </local:ValueEditTemplateSelector.NumberTemplate>
+            <local:ValueEditTemplateSelector.StringTemplate>
+                <DataTemplate>
+                    <TextBox Text="{Binding Value}"/>
+                </DataTemplate>
+            </local:ValueEditTemplateSelector.StringTemplate>
+            <local:ValueEditTemplateSelector.BlankTemplate>
+                <DataTemplate />
+            </local:ValueEditTemplateSelector.BlankTemplate>
+        </local:ValueEditTemplateSelector>
+        <ObjectDataProvider x:Key="ParamTypeEnum" MethodName="GetValues" ObjectType="{x:Type core:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type Type="prc:ParamType"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
     </Window.Resources>
     <Grid x:Name="MainGrid">
         <Grid.Background>
-            <LinearGradientBrush EndPoint="0,0.5" MappingMode="RelativeToBoundingBox" StartPoint="1,0.5">
+            <LinearGradientBrush StartPoint="1,0.5" EndPoint="0,0.5" MappingMode="RelativeToBoundingBox">
                 <GradientStop Color="White"/>
                 <GradientStop Color="LightGray" Offset="1"/>
             </LinearGradientBrush>
@@ -32,30 +84,76 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Row="0" Grid.ColumnSpan="3"
-                 Orientation="Horizontal">
+        <StackPanel Grid.Row="0" Grid.ColumnSpan="3" Orientation="Horizontal">
             <Button x:Name="OpenFileButton"
                     Content="Open"
                     Click="OpenFileButton_Click"
-                    IsEnabled="{Binding Path=IsOpenEnabled}"/>
+                    IsEnabled="{Binding IsOpenEnabled}"/>
             <Button x:Name="SaveFileButton"
                     Content="Save"
                     Click="SaveFileButton_Click"
-                    IsEnabled="{Binding Path=IsSaveEnabled}"/>
+                    IsEnabled="{Binding IsSaveEnabled}"/>
+            <Rectangle VerticalAlignment="Stretch" Width="1" Margin="4" Stroke="Gray"/>
+            <Button x:Name="SaveLabelButton"
+                    Content="Save Labels"
+                    Click="SaveLabelButton_Click"
+                    IsEnabled="{Binding IsLabelSaveEnabled}"/>
         </StackPanel>
         <TreeView Grid.Row="1" Grid.Column="0"
-                  x:Name="ParamTV" BorderThickness="0"
-                  KeyDown="ParamTV_KeyDown"
-                  KeyUp="ParamTV_KeyUp"
+                  x:Name="Param_TreeView" BorderThickness="0"
+                  PreviewKeyDown="Param_TreeView_PreviewKeyDown"
+                  PreviewKeyUp="Param_TreeView_PreviewKeyUp"
                   VirtualizingStackPanel.IsVirtualizing="True"
                   VirtualizingStackPanel.VirtualizationMode="Recycling"
-                  ItemsSource="{Binding Path=ParamTreeRootContainer}">
-            <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type local:ParamTreeItem}"
-                                          ItemsSource="{Binding Path=Items}">
-                    <TextBlock Text="{Binding Path=Name}"/>
+                  ItemsSource="{Binding ParamViewModelList}">
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="TreeViewItem">
+                    <EventSetter Event="KeyDown" Handler="TreeViewItem_KeyDown"/>
+                </Style>
+            </TreeView.ItemContainerStyle>
+            <TreeView.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type local:VM_ParamRoot}"
+                                          ItemsSource="{Binding Children}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Resources\struct.png" Margin="0,2,4,2"/>
+                        <TextBlock Text="{Binding Name}"/>
+                    </StackPanel>
                 </HierarchicalDataTemplate>
-            </TreeView.ItemTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type local:VM_StructStruct}"
+                                          ItemsSource="{Binding Children}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Resources\struct.png" Margin="0,2,4,2"/>
+                        <TextBlock Text="{Binding Name}"/>
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type local:VM_StructList}"
+                                          ItemsSource="{Binding Children}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Resources\list.png" Margin="0,2,4,2"/>
+                        <TextBlock Text="{Binding Name}"/>
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+                <DataTemplate DataType="{x:Type local:VM_StructValue}">
+                    <TextBlock Text="{Binding Name}"/>
+                </DataTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type local:VM_ListStruct}"
+                                          ItemsSource="{Binding Children}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Resources\struct.png" Margin="0,2,4,2"/>
+                        <TextBlock Text="{Binding Name}"/>
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type local:VM_ListList}"
+                                          ItemsSource="{Binding Children}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Resources\list.png" Margin="0,2,4,2"/>
+                        <TextBlock Text="{Binding Name}"/>
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+                <DataTemplate DataType="{x:Type local:VM_ListValue}">
+                    <TextBlock Text="{Binding Name}"/>
+                </DataTemplate>
+            </TreeView.Resources>
         </TreeView>
         <GridSplitter Grid.Row="1" Grid.Column="1"
                       HorizontalAlignment="Right"
@@ -63,17 +161,71 @@
                       Width="5"
                       ResizeBehavior="PreviousAndNext"
                       Background="Transparent"/>
-        <DataGrid x:Name="ParamData"
+        <DataGrid x:Name="ParamStruct_DataGrid"
                   Grid.Row="1" Grid.Column="2"
                   BorderThickness="0"
                   Background="White"
                   AlternatingRowBackground="LightBlue"
+                  AutoGenerateColumns="False"
                   CanUserSortColumns="False"
-                  AutoGeneratedColumns="ParamData_AutoGeneratedColumns">
+                  SelectionMode="Extended"
+                  SelectionUnit="Cell"
+                  ItemsSource="{Binding Struct_DataGrid_Source}"
+                  Visibility="{Binding Struct_DataGrid_Visible}">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="Key">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Key}" Margin="2,0,2,0"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <ComboBox IsEditable="True"
+                                      ItemsSource="{x:Static local:MainWindow.StringLabels}"
+                                      SelectedItem="{Binding Key}"
+                                      Text="{Binding Key}">
+                                <ComboBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <VirtualizingStackPanel/>
+                                    </ItemsPanelTemplate>
+                                </ComboBox.ItemsPanel>
+                            </ComboBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
+                <DataGridComboBoxColumn Header="Type"
+                                        ItemsSource="{Binding Source={StaticResource ParamTypeEnum}}"
+                                        SelectedItemBinding="{Binding Type}"/>
+                <DataGridTemplateColumn Header="Value" Width="*"
+                                        CellTemplateSelector="{StaticResource CellValueTemplateSel}"
+                                        CellEditingTemplateSelector="{StaticResource CellValueEditTemplateSel}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <DataGrid x:Name="ParamList_DataGrid"
+                  Grid.Row="1" Grid.Column="2"
+                  BorderThickness="0"
+                  Background="White"
+                  AlternatingRowBackground="LightBlue"
+                  AutoGenerateColumns="False"
+                  CanUserSortColumns="False"
+                  SelectionMode="Extended"
+                  SelectionUnit="Cell"
+                  ItemsSource="{Binding List_DataGrid_Source}"
+                  Visibility="{Binding List_DataGrid_Visible}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Index" Binding="{Binding Index_EventCaller}"/>
+                <DataGridComboBoxColumn Header="Type"
+                                        ItemsSource="{Binding Source={StaticResource ParamTypeEnum}}"
+                                        SelectedItemBinding="{Binding Type}"/>
+                <DataGridTemplateColumn Header="Value" Width="*"
+                                        CellTemplateSelector="{StaticResource CellValueTemplateSel}"
+                                        CellEditingTemplateSelector="{StaticResource CellValueEditTemplateSel}"/>
+            </DataGrid.Columns>
         </DataGrid>
         <StatusBar Grid.Row="2" Grid.ColumnSpan="3"
                    Background="Transparent">
-            <TextBlock x:Name="StatusTB" Text="{Binding Path=StatusMessage}"/>
+            <TextBlock x:Name="StatusTB" Text="{Binding StatusMessage}"/>
         </StatusBar>
     </Grid>
 </Window>
