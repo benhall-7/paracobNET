@@ -157,6 +157,7 @@ namespace prcEditor
 
             Thread.CurrentThread.Name = "Main";
             WorkerQueue = new Queue<EnqueuableStatus>();
+
             StatusTB.DataContext = this;
             OpenFileButton.DataContext = this;
             SaveFileButton.DataContext = this;
@@ -199,20 +200,19 @@ namespace prcEditor
         private void Window_ContentRendered(object sender, EventArgs e)
         {
             string autoLoadName = "ParamLabels.csv";
-            if (!LabelsLoaded && File.Exists(autoLoadName))
+            WorkerQueue.Enqueue(new EnqueuableStatus(() =>
             {
-                IsOpenEnabled = false;
-
-                WorkerQueue.Enqueue(new EnqueuableStatus(() =>
+                if (!LabelsLoaded && File.Exists(autoLoadName))
                 {
                     HashToStringLabels = LabelIO.GetHashStringDict(autoLoadName);
                     StringToHashLabels = LabelIO.GetStringHashDict(autoLoadName);
-                    LabelsLoaded = true;
-                    IsOpenEnabled = true;
-                    IsLabelSaveEnabled = true;
-                }, "Loading label dictionaries"));
-                StartWorkerThread();
-            }
+                }
+                LabelsLoaded = true;
+                IsOpenEnabled = true;
+                IsLabelSaveEnabled = true;
+            }, "Loading label dictionaries"));
+            StartWorkerThread();
+            
         }
 
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
@@ -257,6 +257,12 @@ namespace prcEditor
                 }, "Saving param file"));
                 StartWorkerThread();
             }
+        }
+
+        private void LabelEditButton_Click(object sender, RoutedEventArgs e)
+        {
+            LabelEditor editor = new LabelEditor();
+            editor.ShowDialog();
         }
 
         private void SaveLabelButton_Click(object sender, RoutedEventArgs e)

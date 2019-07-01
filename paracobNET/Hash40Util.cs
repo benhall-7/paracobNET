@@ -36,7 +36,7 @@ namespace paracobNET
                 return val;
             if (labels.TryGetValue(hash40, out val))
                 return val;
-            throw new InvalidLabelException($"The provided string is not valid hexadecimal and has no matching label") { Label = hash40 };
+            throw new InvalidLabelException($"The provided string is not valid hexadecimal and has no matching label", hash40);
         }
     }
 }

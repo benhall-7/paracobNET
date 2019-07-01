@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace paracobNET
 {
@@ -8,19 +6,19 @@ namespace paracobNET
     {
         public string Label { get; set; }
 
-        public override string Message
+        public override string Message => $"{base.Message} (Label = '{Label}')";
+
+        public InvalidLabelException(string label) : base() { Label = label; }
+
+        public InvalidLabelException(string message, string label): base(message)
         {
-            get
-            {
-                if (string.IsNullOrEmpty(Label))
-                    return base.Message;
-                else
-                    return $"{base.Message} (Label = '{Label}')";
-            }
+            Label = label;
         }
 
-        public InvalidLabelException() : base() { }
-        public InvalidLabelException(string message) : base(message) { }
-        public InvalidLabelException(string message, Exception innerException) : base(message, innerException) { }
+        public InvalidLabelException(string message, Exception innerException, string label)
+            : base(message, innerException)
+        {
+            Label = label;
+        }
     }
 }

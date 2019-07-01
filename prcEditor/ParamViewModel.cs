@@ -157,7 +157,24 @@ namespace prcEditor
         public string Value
         {
             get { return Param.ToString(MainWindow.HashToStringLabels); }
-            set { Param.SetValue(value, MainWindow.StringToHashLabels); }
+            set
+            {
+                try { Param.SetValue(value, MainWindow.StringToHashLabels); }
+                catch (InvalidLabelException e)
+                {
+                    //the label is either not formatted to hexadecimal
+                    //or is not present in the dictionary
+
+                    //LabelEditor editor = new LabelEditor(e.Label);
+                    //bool? corrected = editor.ShowDialog();
+                    //if (corrected == true)
+                    //{
+                    //    //the user added the value to the dictionary
+                    //    //with a corresponding hash (either automatic or manual)
+                    //    Param.SetValue(e.Label, MainWindow.StringToHashLabels);
+                    //}
+                }
+            }
         }
 
         public VM_ParamValue(ParamValue param)

@@ -57,6 +57,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="EnqueuableStatus.cs" />
+    <Page Include="LabelEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -64,6 +68,9 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LabelEditor.xaml.cs">
+      <DependentUpon>LabelEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="ValueEditTemplateSelector.cs" />
     <Compile Include="ValueTemplateSelector.cs" />
