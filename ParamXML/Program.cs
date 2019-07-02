@@ -17,8 +17,8 @@ namespace ParamXML
         static ParamFile file { get; set; }
         static XmlDocument xml { get; set; }
         static string labelName { get; set; }
-        static Dictionary<ulong, string> hashToStringLabels { get; set; }
-        static Dictionary<string, ulong> stringToHashLabels { get; set; }
+        static OrderedDictionary<ulong, string> hashToStringLabels { get; set; }
+        static OrderedDictionary<string, ulong> stringToHashLabels { get; set; }
         static Stopwatch stopwatch { get; set; }
 
         static void Main(string[] args)
@@ -65,7 +65,7 @@ namespace ParamXML
                 {
                     if (string.IsNullOrEmpty(output))
                         output = Path.GetFileNameWithoutExtension(input) + ".xml";
-                    hashToStringLabels = new Dictionary<ulong, string>();
+                    hashToStringLabels = new OrderedDictionary<ulong, string>();
                     if (!string.IsNullOrEmpty(labelName))
                         hashToStringLabels = LabelIO.GetHashStringDict(labelName);
 
@@ -86,7 +86,7 @@ namespace ParamXML
                 {
                     if (string.IsNullOrEmpty(output))
                         output = Path.GetFileNameWithoutExtension(input) + ".prc";
-                    stringToHashLabels = new Dictionary<string, ulong>();
+                    stringToHashLabels = new OrderedDictionary<string, ulong>();
                     if (!string.IsNullOrEmpty(labelName))
                         stringToHashLabels = LabelIO.GetStringHashDict(labelName);
 

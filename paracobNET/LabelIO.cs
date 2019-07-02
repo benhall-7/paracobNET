@@ -7,9 +7,9 @@ namespace paracobNET
 {
     public static class LabelIO
     {
-        public static Dictionary<ulong, string> GetHashStringDict(string filepath)
+        public static OrderedDictionary<ulong, string> GetHashStringDict(string filepath)
         {
-            Dictionary<ulong, string> labels = new Dictionary<ulong, string>();
+            OrderedDictionary<ulong, string> labels = new OrderedDictionary<ulong, string>();
             foreach (var line in File.ReadAllLines(filepath))
             {
                 string[] splits = line.Split(',');
@@ -30,9 +30,9 @@ namespace paracobNET
             return labels;
         }
 
-        public static Dictionary<string, ulong> GetStringHashDict(string filepath)
+        public static OrderedDictionary<string, ulong> GetStringHashDict(string filepath)
         {
-            Dictionary<string, ulong> labels = new Dictionary<string, ulong>();
+            OrderedDictionary<string, ulong> labels = new OrderedDictionary<string, ulong>();
             foreach (var line in File.ReadAllLines(filepath))
             {
                 string[] splits = line.Split(',');
@@ -53,7 +53,7 @@ namespace paracobNET
             return labels;
         }
 
-        public static void WriteLabels(string filepath, Dictionary<ulong, string> labels)
+        public static void WriteLabels(string filepath, OrderedDictionary<ulong, string> labels)
         {
             List<string> lines = new List<string>();
             foreach (var label in labels)

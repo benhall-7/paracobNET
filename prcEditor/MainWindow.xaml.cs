@@ -39,8 +39,8 @@ namespace prcEditor
         private bool KeyShift { get; set; }
 
         private static bool LabelsLoaded { get; set; }
-        public static Dictionary<ulong, string> HashToStringLabels { get; set; }
-        public static Dictionary<string, ulong> StringToHashLabels { get; set; }
+        public static OrderedDictionary<ulong, string> HashToStringLabels { get; set; }
+        public static OrderedDictionary<string, ulong> StringToHashLabels { get; set; }
 
         #region PROPERTY_BINDING
 
@@ -147,8 +147,8 @@ namespace prcEditor
         static MainWindow()
         {
             LabelsLoaded = false;
-            HashToStringLabels = new Dictionary<ulong, string>();
-            StringToHashLabels = new Dictionary<string, ulong>();
+            HashToStringLabels = new OrderedDictionary<ulong, string>();
+            StringToHashLabels = new OrderedDictionary<string, ulong>();
         }
 
         public MainWindow()

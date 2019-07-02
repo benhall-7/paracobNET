@@ -28,7 +28,7 @@ namespace paracobNET
                 }
             }
         }
-        public T this[string keyName, Dictionary<string, ulong> labels]
+        public T this[string keyName, IDictionary<string, ulong> labels]
         {
             get
             {
@@ -52,7 +52,7 @@ namespace paracobNET
         {
             return ContainsKey(Hash40Util.StringToHash40(keyName));
         }
-        public bool ContainsKey(string keyName, Dictionary<string, ulong> labels)
+        public bool ContainsKey(string keyName, IDictionary<string, ulong> labels)
         {
             return ContainsKey(Hash40Util.LabelToHash40(keyName, labels));
         }
@@ -65,7 +65,7 @@ namespace paracobNET
                 throw new ArgumentException($"An item with the key '{keyName}' has already been added");
             }
         }
-        public void Add(string keyName, Dictionary<string, ulong> labels, T value)
+        public void Add(string keyName, IDictionary<string, ulong> labels, T value)
         {
             try { Add(Hash40Util.LabelToHash40(keyName, labels), value); }
             catch (ArgumentException)

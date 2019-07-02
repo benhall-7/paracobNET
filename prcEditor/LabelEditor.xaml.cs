@@ -31,6 +31,8 @@ namespace prcEditor
                 NotifyPropertyChanged(nameof(Label));
                 if (autoCalcHash)
                     HashText = Hash40Util.FormatToString(AutoCalculatedHash);
+                else if (MainWindow.StringToHashLabels.TryGetValue(value, out ulong hash))
+                    HashText = Hash40Util.FormatToString(hash);
             }
         }
 

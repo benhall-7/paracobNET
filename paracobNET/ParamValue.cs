@@ -97,14 +97,14 @@ namespace paracobNET
             }
         }
 
-        public string ToString(Dictionary<ulong, string> labels)
+        public string ToString(IDictionary<ulong, string> labels)
         {
             if (TypeKey == ParamType.hash40)
                 return Hash40Util.FormatToString((ulong)Value, labels);
             return Value.ToString();
         }
 
-        public void SetValue(string value, Dictionary<string, ulong> labels)
+        public void SetValue(string value, IDictionary<string, ulong> labels)
         {
             switch (TypeKey)
             {
