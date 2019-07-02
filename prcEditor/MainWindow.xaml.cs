@@ -308,6 +308,22 @@ namespace prcEditor
                             List_DataGrid_Source = list.Children;
                             Struct_DataGrid_Source = null;
                         }
+                        else if (tvi.Header is IStructChild strc)
+                        {
+                            Struct_DataGrid_Source = strc.Parent.Children;
+                            List_DataGrid_Source = null;
+
+                            ParamStruct_DataGrid.SelectedItem = strc;
+                            ParamStruct_DataGrid.ScrollIntoView(strc);
+                        }
+                        else if (tvi.Header is IListChild listc)
+                        {
+                            List_DataGrid_Source = listc.Parent.Children;
+                            Struct_DataGrid_Source = null;
+
+                            ParamList_DataGrid.SelectedItem = listc;
+                            ParamList_DataGrid.ScrollIntoView(listc);
+                        }
                     }
                     break;
                 case Key.Delete:

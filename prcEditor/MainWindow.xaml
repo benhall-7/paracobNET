@@ -173,7 +173,7 @@
                   AutoGenerateColumns="False"
                   CanUserSortColumns="False"
                   SelectionMode="Extended"
-                  SelectionUnit="Cell"
+                  SelectionUnit="CellOrRowHeader"
                   ItemsSource="{Binding Struct_DataGrid_Source}"
                   Visibility="{Binding Struct_DataGrid_Visible}">
             <DataGrid.Columns>
@@ -205,6 +205,9 @@
                                         CellTemplateSelector="{StaticResource CellValueTemplateSel}"
                                         CellEditingTemplateSelector="{StaticResource CellValueEditTemplateSel}"/>
             </DataGrid.Columns>
+            <DataGrid.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="Gray"/>
+            </DataGrid.Resources>
         </DataGrid>
         <DataGrid x:Name="ParamList_DataGrid"
                   Grid.Row="1" Grid.Column="2"
@@ -214,7 +217,7 @@
                   AutoGenerateColumns="False"
                   CanUserSortColumns="False"
                   SelectionMode="Extended"
-                  SelectionUnit="Cell"
+                  SelectionUnit="CellOrRowHeader"
                   ItemsSource="{Binding List_DataGrid_Source}"
                   Visibility="{Binding List_DataGrid_Visible}">
             <DataGrid.Columns>
@@ -226,6 +229,9 @@
                                         CellTemplateSelector="{StaticResource CellValueTemplateSel}"
                                         CellEditingTemplateSelector="{StaticResource CellValueEditTemplateSel}"/>
             </DataGrid.Columns>
+            <DataGrid.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="Gray"/>
+            </DataGrid.Resources>
         </DataGrid>
         <StatusBar Grid.Row="2" Grid.ColumnSpan="3"
                    Background="Transparent">
