@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Globalization;
 
 namespace prcEditor
 {
@@ -29,21 +30,23 @@ namespace prcEditor
             {
                 label = value;
                 NotifyPropertyChanged(nameof(Label));
-                if (autoCalcHash)
-                    HashText = Hash40Util.FormatToString(AutoCalculatedHash);
-                else if (MainWindow.StringToHashLabels.TryGetValue(value, out ulong hash))
+                if (MainWindow.StringToHashLabels.TryGetValue(Label, out ulong hash))
                     HashText = Hash40Util.FormatToString(hash);
+                else if (autoCalcHash)
+                    HashText = Hash40Util.FormatToString(AutoCalculatedHash);
+                NotifyPropertyChanged(nameof(CanAddLabel));
             }
         }
 
         private string hashText { get; set; }
         public string HashText
         {
-            get { return hashText; }
+            get { return hashText == null ? "" : hashText; }
             set
             {
                 hashText = value;
                 NotifyPropertyChanged(nameof(HashText));
+                NotifyPropertyChanged(nameof(CanAddLabel));
             }
         }
 
@@ -61,6 +64,35 @@ namespace prcEditor
         }
         public ulong AutoCalculatedHash => Hash40Util.StringToHash40(Label);
 
+        public ulong CurrentHash { get; set; }
+
+        public bool IsCurrentHashTextValid
+        {
+            get
+            {
+                if (TryParseHash(HashText, out ulong hash))
+                {
+                    CurrentHash = hash;
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        public bool CanAddLabel
+        {
+            get
+            {
+                if (!IsCurrentHashTextValid
+                    || MainWindow.StringToHashLabels.ContainsKey(Label)
+                    || MainWindow.HashToStringLabels.ContainsKey(CurrentHash))
+                {
+                    return false;
+                }
+                return true;
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public LabelEditor()
@@ -70,11 +102,35 @@ namespace prcEditor
             Label_ComboBox.DataContext = this;
             Hash_TextBox.DataContext = this;
             AutoCalcHash_CheckBox.DataContext = this;
+
+            Add_Button.DataContext = this;
+            Delete_Button.DataContext = this;
+            
         }
 
         private void NotifyPropertyChanged(string propName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+        }
+
+        private bool TryParseHash(string hashText, out ulong hash)
+        {
+            hash = 0;
+            if (!hashText.StartsWith("0x"))
+                return false;
+            try
+            {
+                hash = ulong.Parse(hashText.Substring(2), NumberStyles.HexNumber);
+                return true;
+            }
+            catch { return false; }
+        }
+
+        private void Hash_TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var tb = sender as TextBox;
+            hashText = tb.Text;
+            NotifyPropertyChanged(nameof(CanAddLabel));
         }
 
         private void Label_MouseDown(object sender, MouseButtonEventArgs e)
