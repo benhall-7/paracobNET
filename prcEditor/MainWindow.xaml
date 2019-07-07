@@ -94,10 +94,10 @@
                     Click="SaveFileButton_Click"
                     IsEnabled="{Binding IsSaveEnabled}"/>
             <Rectangle VerticalAlignment="Stretch" Width="1" Margin="4" Stroke="Gray"/>
-            <Button x:Name="LabelEditButton"
+            <Button x:Name="EditLabelButton"
                     Content="Edit Labels"
-                    Click="LabelEditButton_Click"
-                    />
+                    Click="EditLabelButton_Click"
+                    IsEnabled="{Binding IsLabelEditEnabled}"/>
             <Button x:Name="SaveLabelButton"
                     Content="Save Labels"
                     Click="SaveLabelButton_Click"
