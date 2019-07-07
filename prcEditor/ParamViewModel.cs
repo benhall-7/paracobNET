@@ -317,7 +317,7 @@ namespace prcEditor
                     LabelEditor editor = new LabelEditor(e.Label);
                     bool? fix = editor.ShowDialog();
                     if (fix == true)
-                        Hash40 = Hash40Util.LabelToHash40(e.Label, MainWindow.StringToHashLabels);
+                        Hash40 = editor.CurrentHash;
                 }
             }
         }
@@ -379,7 +379,7 @@ namespace prcEditor
                     LabelEditor editor = new LabelEditor(e.Label);
                     bool? fix = editor.ShowDialog();
                     if (fix == true)
-                        Hash40 = Hash40Util.LabelToHash40(e.Label, MainWindow.StringToHashLabels);
+                        Hash40 = editor.CurrentHash;
                 }
             }
         }
@@ -441,7 +441,7 @@ namespace prcEditor
                     LabelEditor editor = new LabelEditor(e.Label);
                     bool? fix = editor.ShowDialog();
                     if (fix == true)
-                        Hash40 = Hash40Util.LabelToHash40(e.Label, MainWindow.StringToHashLabels);
+                        Hash40 = editor.CurrentHash;
                 }
             }
         }
