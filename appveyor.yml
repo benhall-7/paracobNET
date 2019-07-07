@@ -6,7 +6,7 @@ environment:
   TIMESTAMP: n/a
 before_build:
 - cmd: >-
-    set TIMESTAMP=%date% %time
+    set TIMESTAMP=%date% %time%
 
     dotnet restore
 build:
