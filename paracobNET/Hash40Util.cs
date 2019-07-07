@@ -22,13 +22,13 @@ namespace paracobNET
         {
             return "0x" + hash40.ToString("x10");
         }
-        public static string FormatToString(ulong hash40, Dictionary<ulong, string> labels)
+        public static string FormatToString(ulong hash40, IDictionary<ulong, string> labels)
         {
             if (labels.TryGetValue(hash40, out string val))
                 return val;
             else return FormatToString(hash40);
         }
-        public static ulong LabelToHash40(string hash40, Dictionary<string, ulong> labels)
+        public static ulong LabelToHash40(string hash40, IDictionary<string, ulong> labels)
         {
             ulong val;
             if (hash40.StartsWith("0x") &&
@@ -36,7 +36,7 @@ namespace paracobNET
                 return val;
             if (labels.TryGetValue(hash40, out val))
                 return val;
-            throw new InvalidLabelException($"The provided string is not valid hexadecimal and has no matching label") { Label = hash40 };
+            throw new InvalidLabelException($"The provided string is not valid hexadecimal and has no matching label", hash40);
         }
     }
 }

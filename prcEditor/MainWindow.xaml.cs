@@ -38,9 +38,8 @@ namespace prcEditor
         private bool KeyCtrl { get; set; }
         private bool KeyShift { get; set; }
 
-        private static bool LabelsLoaded { get; set; }
-        public static Dictionary<ulong, string> HashToStringLabels { get; set; }
-        public static Dictionary<string, ulong> StringToHashLabels { get; set; }
+        public static OrderedDictionary<ulong, string> HashToStringLabels { get; set; }
+        public static OrderedDictionary<string, ulong> StringToHashLabels { get; set; }
 
         #region PROPERTY_BINDING
 
@@ -103,7 +102,7 @@ namespace prcEditor
             }
         }
 
-        private bool isLabelSaveEnabled = false;
+        private bool isLabelSaveEnabled = true;
         public bool IsLabelSaveEnabled
         {
             get { return isLabelSaveEnabled; }
@@ -111,6 +110,17 @@ namespace prcEditor
             {
                 isLabelSaveEnabled = value;
                 NotifyPropertyChanged(nameof(IsLabelSaveEnabled));
+            }
+        }
+
+        private bool isLabelEditEnabled = true;
+        public bool IsLabelEditEnabled
+        {
+            get { return isLabelEditEnabled; }
+            set
+            {
+                isLabelEditEnabled = value;
+                NotifyPropertyChanged(nameof(IsLabelEditEnabled));
             }
         }
 
@@ -146,9 +156,8 @@ namespace prcEditor
 
         static MainWindow()
         {
-            LabelsLoaded = false;
-            HashToStringLabels = new Dictionary<ulong, string>();
-            StringToHashLabels = new Dictionary<string, ulong>();
+            HashToStringLabels = new OrderedDictionary<ulong, string>();
+            StringToHashLabels = new OrderedDictionary<string, ulong>();
         }
 
         public MainWindow()
@@ -157,10 +166,14 @@ namespace prcEditor
 
             Thread.CurrentThread.Name = "Main";
             WorkerQueue = new Queue<EnqueuableStatus>();
+
             StatusTB.DataContext = this;
             OpenFileButton.DataContext = this;
             SaveFileButton.DataContext = this;
+
             SaveLabelButton.DataContext = this;
+            EditLabelButton.DataContext = this;
+
             Param_TreeView.DataContext = this;
             ParamStruct_DataGrid.DataContext = this;
             ParamList_DataGrid.DataContext = this;
@@ -198,21 +211,25 @@ namespace prcEditor
 
         private void Window_ContentRendered(object sender, EventArgs e)
         {
-            string autoLoadName = "ParamLabels.csv";
-            if (!LabelsLoaded && File.Exists(autoLoadName))
+            //load label dictionaries (and make it visible to user)
+            string labelFileName = "ParamLabels.csv";
+            WorkerQueue.Enqueue(new EnqueuableStatus(() =>
             {
-                IsOpenEnabled = false;
-
-                WorkerQueue.Enqueue(new EnqueuableStatus(() =>
+                if (File.Exists(labelFileName))
                 {
-                    HashToStringLabels = LabelIO.GetHashStringDict(autoLoadName);
-                    StringToHashLabels = LabelIO.GetStringHashDict(autoLoadName);
-                    LabelsLoaded = true;
+                    IsOpenEnabled = false;
+                    IsLabelSaveEnabled = false;
+                    IsLabelEditEnabled = false;
+
+                    HashToStringLabels = LabelIO.GetHashStringDict(labelFileName);
+                    StringToHashLabels = LabelIO.GetStringHashDict(labelFileName);
+
                     IsOpenEnabled = true;
                     IsLabelSaveEnabled = true;
-                }, "Loading label dictionaries"));
-                StartWorkerThread();
-            }
+                    IsLabelEditEnabled = true;
+                }
+            }, "Loading label dictionaries"));
+            StartWorkerThread();
         }
 
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
@@ -259,6 +276,13 @@ namespace prcEditor
             }
         }
 
+        private void EditLabelButton_Click(object sender, RoutedEventArgs e)
+        {
+            LabelEditor editor = new LabelEditor();
+            editor.ShowDialog();
+            paramVM.UpdateHashes();
+        }
+
         private void SaveLabelButton_Click(object sender, RoutedEventArgs e)
         {
             LabelIO.WriteLabels("ParamLabels.csv", HashToStringLabels);
@@ -301,6 +325,22 @@ namespace prcEditor
                         {
                             List_DataGrid_Source = list.Children;
                             Struct_DataGrid_Source = null;
+                        }
+                        else if (tvi.Header is IStructChild strc)
+                        {
+                            Struct_DataGrid_Source = strc.Parent.Children;
+                            List_DataGrid_Source = null;
+
+                            ParamStruct_DataGrid.SelectedItem = strc;
+                            ParamStruct_DataGrid.ScrollIntoView(strc);
+                        }
+                        else if (tvi.Header is IListChild listc)
+                        {
+                            List_DataGrid_Source = listc.Parent.Children;
+                            Struct_DataGrid_Source = null;
+
+                            ParamList_DataGrid.SelectedItem = listc;
+                            ParamList_DataGrid.ScrollIntoView(listc);
                         }
                     }
                     break;

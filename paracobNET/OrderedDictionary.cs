@@ -59,7 +59,7 @@ namespace paracobNET
         public OrderedDictionary()
         {
             if (typeof(TKey) == typeof(int))
-                throw new NotSupportedException("Integer-like type is not appropriate for keys in an ordered dictionary - accessing values by key or index would be confusing.");
+                throw new NotSupportedException("Integer-like type is not appropriate for keys in an ordered dictionary - accessing values by key or index is ambiguous.");
 
             fDictionary = new Dictionary<TKey, TValue>();
             fKeys = new List<TKey>();
@@ -68,7 +68,7 @@ namespace paracobNET
         public OrderedDictionary(int capacity)
         {
             if (typeof(TKey) == typeof(int))
-                throw new NotSupportedException("Integer-like type is not appropriate for keys in an ordered dictionary - accessing values by key or index would be confusing.");
+                throw new NotSupportedException("Integer-like type is not appropriate for keys in an ordered dictionary - accessing values by key or index is ambiguous.");
 
             fDictionary = new Dictionary<TKey, TValue>(capacity);
             fKeys = new List<TKey>(capacity);
