@@ -28,13 +28,15 @@ namespace prcEditor
             get { return label == null ? "" : label; }
             set
             {
+                if (value == null) return;
                 label = value;
-                NotifyPropertyChanged(nameof(Label));
                 if (MainWindow.StringToHashLabels.TryGetValue(Label, out ulong hash))
                     HashText = Hash40Util.FormatToString(hash);
                 else if (autoCalcHash)
                     HashText = Hash40Util.FormatToString(AutoCalculatedHash);
+                NotifyPropertyChanged(nameof(Label));
                 NotifyPropertyChanged(nameof(CanAddLabel));
+                NotifyPropertyChanged(nameof(CanDeleteLabel));
             }
         }
 
@@ -79,19 +81,11 @@ namespace prcEditor
             }
         }
 
-        public bool CanAddLabel
-        {
-            get
-            {
-                if (!IsCurrentHashTextValid
-                    || MainWindow.StringToHashLabels.ContainsKey(Label)
-                    || MainWindow.HashToStringLabels.ContainsKey(CurrentHash))
-                {
-                    return false;
-                }
-                return true;
-            }
-        }
+        public bool CanAddLabel => IsCurrentHashTextValid
+                    && !MainWindow.StringToHashLabels.ContainsKey(Label)
+                    && !MainWindow.HashToStringLabels.ContainsKey(CurrentHash);
+
+        public bool CanDeleteLabel => MainWindow.StringToHashLabels.ContainsKey(Label);
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -105,7 +99,6 @@ namespace prcEditor
 
             Add_Button.DataContext = this;
             Delete_Button.DataContext = this;
-            
         }
 
         private void NotifyPropertyChanged(string propName)
@@ -131,6 +124,7 @@ namespace prcEditor
             var tb = sender as TextBox;
             hashText = tb.Text;
             NotifyPropertyChanged(nameof(CanAddLabel));
+            NotifyPropertyChanged(nameof(CanDeleteLabel));
         }
 
         private void Label_MouseDown(object sender, MouseButtonEventArgs e)
@@ -140,12 +134,41 @@ namespace prcEditor
 
         private void Add_Button_Click(object sender, RoutedEventArgs e)
         {
-            
+            string label = Label;
+            ulong hash = CurrentHash;
+            int count = MainWindow.HashToStringLabels.Count;
+            //insert the label in alphabetical order
+            int position = 0;
+            while (position < count)
+            {
+                if (MainWindow.HashToStringLabels[position].CompareTo(label) > 0)
+                    break;
+                position++;
+            }
+            MainWindow.HashToStringLabels.Insert(position, hash, label);
+            MainWindow.StringToHashLabels.Insert(position, label, hash);
+            NotifyPropertyChanged(nameof(Label));
+            NotifyPropertyChanged(nameof(CanAddLabel));
+            NotifyPropertyChanged(nameof(CanDeleteLabel));
         }
 
         private void Delete_Button_Click(object sender, RoutedEventArgs e)
         {
+            string label = Label;
+            //guaranteed to exist from CanDeleteLabel
+            int position = MainWindow.StringToHashLabels.IndexOf(label) - 1;
+            if (position < 0) position = 0;
+            ulong hash = MainWindow.StringToHashLabels[label];
 
+            MainWindow.StringToHashLabels.Remove(label);
+            MainWindow.HashToStringLabels.Remove(hash);
+            try { Label = MainWindow.HashToStringLabels[position]; }
+            catch
+            {
+                NotifyPropertyChanged(nameof(Label));
+                NotifyPropertyChanged(nameof(CanAddLabel));
+                NotifyPropertyChanged(nameof(CanDeleteLabel));
+            }
         }
     }
 }
