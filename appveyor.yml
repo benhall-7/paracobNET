@@ -7,21 +7,32 @@ environment:
 before_build:
 - cmd: >-
     set TIMESTAMP=%date% %time
+
     dotnet restore
 build:
   verbosity: minimal
 after_build:
 - cmd: >-
     mkdir %APPVEYOR_BUILD_FOLDER%\build
+
     mkdir %APPVEYOR_BUILD_FOLDER%\build\ParamXML
+
     mkdir %APPVEYOR_BUILD_FOLDER%\build\prcEditor
+    
     xcopy %APPVEYOR_BUILD_FOLDER%\ParamXML\bin\%CONFIGURATION%\netcoreapp2.1 %APPVEYOR_BUILD_FOLDER%\build\ParamXML
+    
     xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\paracobNET.dll %APPVEYOR_BUILD_FOLDER%\build\prcEditor
+    
     xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\paracobNET.pdb %APPVEYOR_BUILD_FOLDER%\build\prcEditor
+    
     xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\prcEditor.exe %APPVEYOR_BUILD_FOLDER%\build\prcEditor
+    
     xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\prcEditor.exe.config %APPVEYOR_BUILD_FOLDER%\build\prcEditor
+    
     xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\prcEditor.pdb %APPVEYOR_BUILD_FOLDER%\build\prcEditor
+    
     7z a paracobNET.zip .\build\*
+    
     appveyor PushArtifact paracobNET.zip
 deploy:
 - provider: GitHub
