@@ -45,7 +45,8 @@
                   VerticalContentAlignment="Center"
                   ItemsSource="{x:Static local:MainWindow.StringLabels}"
                   SelectedItem="{Binding Label}"
-                  Text="{Binding Label}">
+                  Text="{Binding Label}"
+                  IsEnabled="{Binding IsLabelEditable}">
             <ComboBox.ItemsPanel>
                 <ItemsPanelTemplate>
                     <VirtualizingStackPanel/>
@@ -84,8 +85,9 @@
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Bottom">
-            <Button Content="OK"/>
-            <Button Content="Cancel"/>
+            <Button x:Name="Close_Button"
+                    Content="Close"
+                    Click="Close_Button_Click"/>
         </StackPanel>
     </Grid>
 </Window>

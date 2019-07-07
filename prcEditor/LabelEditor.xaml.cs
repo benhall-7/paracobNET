@@ -22,6 +22,8 @@ namespace prcEditor
     /// </summary>
     public partial class LabelEditor : Window, INotifyPropertyChanged
     {
+        public EditMode Mode { get; set; }
+
         private string label { get; set; }
         public string Label
         {
@@ -52,7 +54,7 @@ namespace prcEditor
             }
         }
 
-        private bool autoCalcHash { get; set; }
+        private bool autoCalcHash = false;
         public bool AutoCalculateHash
         {
             get { return autoCalcHash; }
@@ -82,14 +84,26 @@ namespace prcEditor
         }
 
         public bool CanAddLabel => IsCurrentHashTextValid
-                    && !MainWindow.StringToHashLabels.ContainsKey(Label)
-                    && !MainWindow.HashToStringLabels.ContainsKey(CurrentHash);
+            && !MainWindow.StringToHashLabels.ContainsKey(Label)
+            && !MainWindow.HashToStringLabels.ContainsKey(CurrentHash);
 
-        public bool CanDeleteLabel => MainWindow.StringToHashLabels.ContainsKey(Label);
+        public bool CanDeleteLabel => Mode == EditMode.General
+            && MainWindow.StringToHashLabels.ContainsKey(Label);
+
+        private bool isLabelEditable = true;
+        public bool IsLabelEditable
+        {
+            get { return isLabelEditable; }
+            set
+            {
+                isLabelEditable = value;
+                NotifyPropertyChanged(nameof(IsLabelEditable));
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public LabelEditor()
+        private void Initialize()
         {
             InitializeComponent();
 
@@ -99,6 +113,20 @@ namespace prcEditor
 
             Add_Button.DataContext = this;
             Delete_Button.DataContext = this;
+        }
+
+        public LabelEditor()
+        {
+            Initialize();
+            Mode = EditMode.General;
+        }
+
+        public LabelEditor(string newLabel)
+        {
+            Initialize();
+            Mode = EditMode.AddLabel;
+            Label = newLabel;
+            IsLabelEditable = false;
         }
 
         private void NotifyPropertyChanged(string propName)
@@ -150,6 +178,12 @@ namespace prcEditor
             NotifyPropertyChanged(nameof(Label));
             NotifyPropertyChanged(nameof(CanAddLabel));
             NotifyPropertyChanged(nameof(CanDeleteLabel));
+
+            if (Mode == EditMode.AddLabel)
+            {
+                DialogResult = true;
+                Close();
+            }
         }
 
         private void Delete_Button_Click(object sender, RoutedEventArgs e)
@@ -169,6 +203,18 @@ namespace prcEditor
                 NotifyPropertyChanged(nameof(CanAddLabel));
                 NotifyPropertyChanged(nameof(CanDeleteLabel));
             }
+        }
+
+        private void Close_Button_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = false;
+            Close();
+        }
+
+        public enum EditMode
+        {
+            General,
+            AddLabel
         }
     }
 }

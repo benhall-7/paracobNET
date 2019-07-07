@@ -165,14 +165,14 @@ namespace prcEditor
                     //the label is either not formatted to hexadecimal
                     //or is not present in the dictionary
 
-                    //LabelEditor editor = new LabelEditor(e.Label);
-                    //bool? corrected = editor.ShowDialog();
-                    //if (corrected == true)
-                    //{
-                    //    //the user added the value to the dictionary
-                    //    //with a corresponding hash (either automatic or manual)
-                    //    Param.SetValue(e.Label, MainWindow.StringToHashLabels);
-                    //}
+                    LabelEditor editor = new LabelEditor(e.Label);
+                    bool? corrected = editor.ShowDialog();
+                    if (corrected == true)
+                    {
+                        //the user added the value to the dictionary
+                        //with a corresponding hash
+                        Param.SetValue(e.Label, MainWindow.StringToHashLabels);
+                    }
                 }
             }
         }
