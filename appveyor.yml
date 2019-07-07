@@ -2,8 +2,6 @@ version: 1.0.{build}
 image: Visual Studio 2019
 configuration: Release
 platform: Any CPU
-environment:
-  TIMESTAMP: "%date% %time%"
 before_build:
 - cmd: dotnet restore
 build:
@@ -31,13 +29,11 @@ after_build:
     7z a paracobNET.zip .\build\*
 
     appveyor PushArtifact paracobNET.zip
-
-    echo %TIMESTAMP%
 deploy:
 - provider: GitHub
   tag: v2.∞
   release: paracobNET (to-date)
-  description: 'Continuous-integration build, updated every commit. May be unstable.\nDatetime: $(TIMESTAMP)'
+  description: 'Continuous-integration build, updated every commit. May be unstable.
   auth_token:
     secure: HzJBzil1ZFH9SbYQowaI8czAc0tVGO//+TX3qZz7TwTg9pLCQXKEnCe5HWojNeZ7
   repository: BenHall-7/paracobNET
