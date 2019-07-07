@@ -83,6 +83,12 @@ namespace prcEditor
             for (int i = 0; i < Children.Count; i++)
                 Children[i].Index = i;
         }
+
+        public virtual void UpdateHashes()
+        {
+            foreach (var child in Children)
+                child.UpdateHashes();
+        }
     }
 
     /// <summary>
@@ -141,6 +147,12 @@ namespace prcEditor
             for (int i = 0; i < Children.Count; i++)
                 Children[i].Index = i;
         }
+
+        public virtual void UpdateHashes()
+        {
+            foreach (var child in Children)
+                child.UpdateHashes();
+        }
     }
 
     /// <summary>
@@ -181,6 +193,14 @@ namespace prcEditor
         {
             Param = param;
         }
+
+        public virtual void UpdateHashes()
+        {
+            if (Param.TypeKey == ParamType.hash40)
+            {
+                NotifyPropertyChanged(nameof(Value));
+            }
+        }
     }
 
     #endregion
@@ -199,6 +219,8 @@ namespace prcEditor
         VM_ParamStruct Parent { get; set; }
         int Index { get; set; }
         int Index_EventCaller { get; set; }
+
+        void UpdateHashes();
     }
 
     /// <summary>
@@ -211,6 +233,8 @@ namespace prcEditor
         VM_ParamList Parent { get; set; }
         int Index { get; set; }
         int Index_EventCaller { get; set; }
+
+        void UpdateHashes();
     }
 
     #endregion
@@ -285,7 +309,17 @@ namespace prcEditor
         public string Key
         {
             get { return Hash40Util.FormatToString(Hash40, MainWindow.HashToStringLabels); }
-            set { Hash40 = Hash40Util.LabelToHash40(value, MainWindow.StringToHashLabels); }
+            set
+            {
+                try { Hash40 = Hash40Util.LabelToHash40(value, MainWindow.StringToHashLabels); }
+                catch (InvalidLabelException e) 
+                {
+                    LabelEditor editor = new LabelEditor(e.Label);
+                    bool? fix = editor.ShowDialog();
+                    if (fix == true)
+                        Hash40 = Hash40Util.LabelToHash40(e.Label, MainWindow.StringToHashLabels);
+                }
+            }
         }
 
         public override string Name => Util.GetStructChildName(this);
@@ -294,6 +328,13 @@ namespace prcEditor
         {
             Parent = parent;
             _hash40 = hash40;
+        }
+
+        public override void UpdateHashes()
+        {
+            NotifyPropertyChanged(nameof(Key));
+            NotifyPropertyChanged(nameof(Name));
+            base.UpdateHashes();
         }
     }
 
@@ -330,7 +371,17 @@ namespace prcEditor
         public string Key
         {
             get { return Hash40Util.FormatToString(Hash40, MainWindow.HashToStringLabels); }
-            set { Hash40 = Hash40Util.LabelToHash40(value, MainWindow.StringToHashLabels); }
+            set
+            {
+                try { Hash40 = Hash40Util.LabelToHash40(value, MainWindow.StringToHashLabels); }
+                catch (InvalidLabelException e)
+                {
+                    LabelEditor editor = new LabelEditor(e.Label);
+                    bool? fix = editor.ShowDialog();
+                    if (fix == true)
+                        Hash40 = Hash40Util.LabelToHash40(e.Label, MainWindow.StringToHashLabels);
+                }
+            }
         }
 
         public override string Name => Util.GetStructChildName(this);
@@ -339,6 +390,13 @@ namespace prcEditor
         {
             Parent = parent;
             _hash40 = hash40;
+        }
+
+        public override void UpdateHashes()
+        {
+            NotifyPropertyChanged(nameof(Key));
+            NotifyPropertyChanged(nameof(Name));
+            base.UpdateHashes();
         }
     }
 
@@ -375,7 +433,17 @@ namespace prcEditor
         public string Key
         {
             get { return Hash40Util.FormatToString(Hash40, MainWindow.HashToStringLabels); }
-            set { Hash40 = Hash40Util.LabelToHash40(value, MainWindow.StringToHashLabels); }
+            set
+            {
+                try { Hash40 = Hash40Util.LabelToHash40(value, MainWindow.StringToHashLabels); }
+                catch (InvalidLabelException e)
+                {
+                    LabelEditor editor = new LabelEditor(e.Label);
+                    bool? fix = editor.ShowDialog();
+                    if (fix == true)
+                        Hash40 = Hash40Util.LabelToHash40(e.Label, MainWindow.StringToHashLabels);
+                }
+            }
         }
 
         public override string Name => Util.GetStructChildName(this);
@@ -384,6 +452,13 @@ namespace prcEditor
         {
             Parent = parent;
             _hash40 = hash40;
+        }
+
+        public override void UpdateHashes()
+        {
+            NotifyPropertyChanged(nameof(Key));
+            NotifyPropertyChanged(nameof(Name));
+            base.UpdateHashes();
         }
     }
 
