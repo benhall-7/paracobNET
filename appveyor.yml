@@ -4,6 +4,8 @@ configuration: Release
 platform: Any CPU
 before_build:
 - cmd: dotnet restore
+environment:
+  TIMESTAMP: echo %date% %time%
 build:
   verbosity: minimal
 after_build:
@@ -33,10 +35,11 @@ deploy:
 - provider: GitHub
   tag: v2.∞
   release: paracobNET (to-date)
-  description: 'Continuous-integration build, updated every commit. May be unstable.'
+  description: 'Continuous-integration build, updated every commit. May be unstable.\nDate-time: $(TIMESTAMP)'
   auth_token:
     secure: HzJBzil1ZFH9SbYQowaI8czAc0tVGO//+TX3qZz7TwTg9pLCQXKEnCe5HWojNeZ7
   repository: BenHall-7/paracobNET
   artifact: paracobNET.zip
+  force_update: true
   on:
     branch: master
