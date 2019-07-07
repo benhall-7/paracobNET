@@ -280,7 +280,7 @@ namespace prcEditor
         {
             LabelEditor editor = new LabelEditor();
             editor.ShowDialog();
-            paramVM.UpdateHashes();
+            paramVM?.UpdateHashes();
         }
 
         private void SaveLabelButton_Click(object sender, RoutedEventArgs e)
