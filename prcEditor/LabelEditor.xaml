@@ -85,6 +85,11 @@
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Bottom">
+            <Button x:Name="Accept_Button"
+                    Content="Accept"
+                    Visibility="{Binding AcceptVisibility}"
+                    IsEnabled="{Binding CanAcceptLabel}"
+                    Click="Accept_Button_Click"/>
             <Button x:Name="Close_Button"
                     Content="Close"
                     Click="Close_Button_Click"/>

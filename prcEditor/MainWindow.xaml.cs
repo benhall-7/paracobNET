@@ -278,7 +278,7 @@ namespace prcEditor
 
         private void EditLabelButton_Click(object sender, RoutedEventArgs e)
         {
-            LabelEditor editor = new LabelEditor();
+            LabelEditor editor = new LabelEditor(false);
             editor.ShowDialog();
             paramVM?.UpdateHashes();
         }
@@ -413,7 +413,13 @@ namespace prcEditor
 
                             if (tvi.Header is VM_ParamStruct str)
                             {
-                                //UNIMPLEMENTED, REQUIRES GETTING A NEW HASH
+                                LabelEditor le = new LabelEditor(true);
+                                if (le.ShowDialog() == true)
+                                {
+                                    str.Add(data.Param, StringToHashLabels[le.Label]);
+                                    str.UpdateChildrenIndeces();
+                                    str.UpdateHashes();
+                                }
                             }
                             else if (tvi.Header is VM_ParamList list)
                             {
@@ -446,7 +452,13 @@ namespace prcEditor
 
                             if (tvi.Header is IStructChild structChild)
                             {
-                                //UNIMPLEMENTED, REQUIRES GETTING A NEW HASH
+                                LabelEditor le = new LabelEditor(true);
+                                if (le.ShowDialog() == true)
+                                {
+                                    structChild.Parent.Add(data.Param, StringToHashLabels[le.Label]);
+                                    structChild.Parent.UpdateChildrenIndeces();
+                                    structChild.Parent.UpdateHashes();
+                                }
                             }
                             else if (tvi.Header is IListChild listChild)
                             {

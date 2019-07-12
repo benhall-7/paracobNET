@@ -39,6 +39,7 @@ namespace prcEditor
                 NotifyPropertyChanged(nameof(Label));
                 NotifyPropertyChanged(nameof(CanAddLabel));
                 NotifyPropertyChanged(nameof(CanDeleteLabel));
+                NotifyPropertyChanged(nameof(CanAcceptLabel));
             }
         }
 
@@ -68,6 +69,9 @@ namespace prcEditor
         }
         public ulong AutoCalculatedHash => Hash40Util.StringToHash40(Label);
 
+        /// <summary>
+        /// Call IsCurrentHashTextValid before retrieving this value
+        /// </summary>
         public ulong CurrentHash { get; set; }
 
         public bool IsCurrentHashTextValid
@@ -87,8 +91,10 @@ namespace prcEditor
             && !MainWindow.StringToHashLabels.ContainsKey(Label)
             && !MainWindow.HashToStringLabels.ContainsKey(CurrentHash);
 
-        public bool CanDeleteLabel => Mode == EditMode.General
+        public bool CanDeleteLabel => Mode == EditMode.General || Mode == EditMode.SelectLabel
             && MainWindow.StringToHashLabels.ContainsKey(Label);
+
+        public bool CanAcceptLabel => MainWindow.StringToHashLabels.ContainsKey(Label);
 
         private bool isLabelEditable = true;
         public bool IsLabelEditable
@@ -100,6 +106,8 @@ namespace prcEditor
                 NotifyPropertyChanged(nameof(IsLabelEditable));
             }
         }
+
+        public Visibility AcceptVisibility => Mode == EditMode.SelectLabel ? Visibility.Visible : Visibility.Collapsed;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -113,14 +121,25 @@ namespace prcEditor
 
             Add_Button.DataContext = this;
             Delete_Button.DataContext = this;
+            Accept_Button.DataContext = this;
+            //we don't use bindings for Close_Button but it's better to stay consistent
+            Close_Button.DataContext = this;
         }
 
-        public LabelEditor()
+        /// <summary>
+        /// LabelEditor constructor, sets the EditMode to either General or SelectLabel.
+        /// </summary>
+        /// <param name="allowAccept">Whether the LabelEditor is opened in SelectLabel mode</param>
+        public LabelEditor(bool allowAccept)
         {
             Initialize();
-            Mode = EditMode.General;
+            Mode = allowAccept ? EditMode.SelectLabel : EditMode.General;
         }
 
+        /// <summary>
+        /// LabelEditor constructor, sets the EditMode to AddLabel
+        /// </summary>
+        /// <param name="newLabel"></param>
         public LabelEditor(string newLabel)
         {
             Initialize();
@@ -152,7 +171,6 @@ namespace prcEditor
             var tb = sender as TextBox;
             hashText = tb.Text;
             NotifyPropertyChanged(nameof(CanAddLabel));
-            NotifyPropertyChanged(nameof(CanDeleteLabel));
         }
 
         private void Label_MouseDown(object sender, MouseButtonEventArgs e)
@@ -179,7 +197,7 @@ namespace prcEditor
             NotifyPropertyChanged(nameof(CanAddLabel));
             NotifyPropertyChanged(nameof(CanDeleteLabel));
 
-            if (Mode == EditMode.AddLabel)
+            if (Mode == EditMode.AddLabel || Mode == EditMode.SelectLabel)
             {
                 DialogResult = true;
                 Close();
@@ -202,7 +220,14 @@ namespace prcEditor
                 NotifyPropertyChanged(nameof(Label));
                 NotifyPropertyChanged(nameof(CanAddLabel));
                 NotifyPropertyChanged(nameof(CanDeleteLabel));
+                NotifyPropertyChanged(nameof(CanAcceptLabel));
             }
+        }
+
+        private void Accept_Button_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = true;
+            Close();
         }
 
         private void Close_Button_Click(object sender, RoutedEventArgs e)
@@ -214,7 +239,8 @@ namespace prcEditor
         public enum EditMode
         {
             General,
-            AddLabel
+            AddLabel,
+            SelectLabel
         }
     }
 }
