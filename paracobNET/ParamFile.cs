@@ -11,27 +11,28 @@ namespace paracobNET
         public ParamStruct Root { get; private set; }
 
         #region global_disasm
-        static internal BinaryReader Reader { get; set; }
-        static internal ulong[] DisasmHashTable { get; set; }
-        static internal uint HashTableSize { get; set; }
-        static internal uint RefTableSize { get; set; }
-        static internal uint HashStart { get { return 0x10; } }
-        static internal uint RefStart { get { return 0x10 + HashTableSize; } }
-        static internal uint ParamStart { get { return 0x10 + HashTableSize + RefTableSize; } }
-        static internal Dictionary<uint, SortedDictionary<int, int>> DisasmRefEntries { get; set; }
+        internal static BinaryReader Reader { get; set; }
+        internal static ulong[] DisasmHashTable { get; set; }
+        internal static uint HashTableSize { get; set; }
+        internal static uint RefTableSize { get; set; }
+        internal static uint HashStart { get { return 0x10; } }
+        internal static uint RefStart { get { return 0x10 + HashTableSize; } }
+        internal static uint ParamStart { get { return 0x10 + HashTableSize + RefTableSize; } }
+        internal static Dictionary<uint, SortedDictionary<int, int>> DisasmRefEntries { get; set; }
         #endregion
 
         #region global_asm
-        static internal FileStream FileStream { get; set; }
-        static internal BinaryWriter WriterHeader { get; set; }//header stream
-        static internal List<ulong> AsmHashTable { get; set; }//list of hashes appended to
-        static internal BinaryWriter WriterHash { get; set; }//hash table stream
-        static internal List<object> AsmRefEntries { get; set; }//reference entry classes, and strings
-        static internal BinaryWriter WriterRef { get; set; }//reference table stream
-        static internal BinaryWriter WriterParam { get; set; }//param stream
-        static internal List<Tuple<int, ParamStruct>> UnresolvedStructs { get; set; }
-        static internal List<Tuple<int, string>> UnresolvedStrings { get; set; }
-        static internal Dictionary<string, int> RefStringEntries { get; set; }
+        internal static FileStream FileStream { get; set; }
+        internal static BinaryWriter WriterHeader { get; set; }//header stream
+        internal static List<ulong> AsmHashTable { get; set; }//list of hashes appended to
+        internal static BinaryWriter WriterHash { get; set; }//hash table stream
+        internal static List<object> AsmRefEntries { get; set; }//reference entry classes, and strings
+        internal static BinaryWriter WriterRef { get; set; }//reference table stream
+        internal static BinaryWriter WriterParam { get; set; }//param stream
+        internal static List<Tuple<int, ParamStruct>> UnresolvedStructs { get; set; }
+
+        internal static List<Tuple<int, string>> UnresolvedStrings { get; set; }
+        internal static Dictionary<string, int> RefStringEntries { get; set; }
         #endregion
 
         public ParamFile(string filepath)

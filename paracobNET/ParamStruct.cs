@@ -37,7 +37,8 @@ namespace paracobNET
                 {
                     int hashIndex = reader.ReadInt32();
                     int paramOffset = reader.ReadInt32();
-                    hashOffsets.Add(hashIndex, paramOffset);
+                    try { hashOffsets.Add(hashIndex, paramOffset); }
+                    catch { }
                 }
                 ParamFile.DisasmRefEntries.Add(structRefOffset, hashOffsets);
             }
