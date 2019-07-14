@@ -6,6 +6,8 @@ namespace paracobNET
 {
     internal class Disassembler
     {
+        string Filepath { get; set; }
+
         BinaryReader Reader { get; set; }
         ulong[] HashTable { get; set; }
         Dictionary<int, SortedDictionary<int, int>> RefEntries { get; set; }
@@ -16,14 +18,18 @@ namespace paracobNET
         int RefStart { get { return 0x10 + HashTableSize; } }
         int ParamStart { get { return 0x10 + HashTableSize + RefTableSize; } }
 
-        public Disassembler(string filepath, out ParamStruct root)
+        public Disassembler(string filepath)
         {
-            root = null;
+            Filepath = filepath;
+            RefEntries = new Dictionary<int, SortedDictionary<int, int>>();
+        }
 
-            using (Reader = new BinaryReader(File.OpenRead(filepath)))
+        public ParamStruct Start()
+        {
+            using (Reader = new BinaryReader(File.OpenRead(Filepath)))
             {
                 if (Reader.BaseStream.Length < ParamFile.Magic.Length)
-                    throw new InvalidDataException("File contains an invalid header");
+                    throw new InvalidDataException("File size is too small");
                 if (!IsValidMagic())
                 {
                     //TODO: use events instead of exceptions to allow
@@ -38,12 +44,11 @@ namespace paracobNET
 
                 SetHashTable();
 
-                RefEntries = new Dictionary<int, SortedDictionary<int, int>>();
                 Reader.BaseStream.Seek(ParamStart, SeekOrigin.Begin);
                 if ((ParamType)Reader.ReadByte() == ParamType.@struct)
                 {
                     Reader.BaseStream.Position -= 1;
-                    root = Read() as ParamStruct;
+                    return Read() as ParamStruct;
                 }
                 else
                     throw new InvalidDataException("File does not have a root");

@@ -20,47 +20,6 @@ namespace paracobNET
             Value = value;
         }
 
-        internal void Write(BinaryWriter writer)
-        {
-            switch (TypeKey)
-            {
-                case ParamType.@bool:
-                    writer.Write((bool)Value);
-                    break;
-                case ParamType.@sbyte:
-                    writer.Write((sbyte)Value);
-                    break;
-                case ParamType.@byte:
-                    writer.Write((byte)Value);
-                    break;
-                case ParamType.@short:
-                    writer.Write((short)Value);
-                    break;
-                case ParamType.@ushort:
-                    writer.Write((ushort)Value);
-                    break;
-                case ParamType.@int:
-                    writer.Write((int)Value);
-                    break;
-                case ParamType.@uint:
-                    writer.Write((uint)Value);
-                    break;
-                case ParamType.@float:
-                    writer.Write((float)Value);
-                    break;
-                case ParamType.hash40:
-                    writer.Write(ParamFile.AsmHashTable.IndexOf((ulong)Value));
-                    break;
-                case ParamType.@string:
-                    string word = (string)Value;
-                    ParamFile.UnresolvedStrings.Add(new Tuple<int, string>((int)writer.BaseStream.Position, word));
-
-                    Util.AppendRefTableString(word);
-                    writer.Write((int)0);
-                    break;
-            }
-        }
-
         public string ToString(IDictionary<ulong, string> labels)
         {
             if (TypeKey == ParamType.hash40)

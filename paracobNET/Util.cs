@@ -3,7 +3,7 @@ using System.IO;
 
 namespace paracobNET
 {
-    static class Util
+    internal static class Util
     {
         internal static string ReadStringAt(BinaryReader reader, int position)
         {
@@ -14,119 +14,6 @@ namespace paracobNET
                 s += c;
             reader.BaseStream.Seek(returnTo, SeekOrigin.Begin);
             return s;
-        }
-        internal static void IterateHashes(IParam param)
-        {
-            switch (param.TypeKey)
-            {
-                case ParamType.@struct:
-                    foreach (var item in (param as ParamStruct).Nodes)
-                    {
-                        WriteHash(item.Key);
-                        IterateHashes(item.Value);
-                    }
-                    break;
-                case ParamType.list:
-                    foreach (var item in (param as ParamList).Nodes)
-                        IterateHashes(item);
-                    break;
-                case ParamType.hash40:
-                    WriteHash((ulong)(param as ParamValue).Value);
-                    break;
-            }
-        }
-        internal static void WriteParam(IParam param, BinaryWriter writer)
-        {
-            writer.Write((byte)param.TypeKey);
-            switch (param.TypeKey)
-            {
-                case ParamType.@struct:
-                    (param as ParamStruct).Write(writer);
-                    break;
-                case ParamType.list:
-                    (param as ParamList).Write(writer);
-                    break;
-                default:
-                    (param as ParamValue).Write(writer);
-                    break;
-            }
-        }
-        internal static void WriteHash(ulong hash)
-        {
-            if (!ParamFile.AsmHashTable.Contains(hash))
-            {
-                ParamFile.WriterHash.Write(hash);
-                ParamFile.AsmHashTable.Add(hash);
-            }
-        }
-        internal static void AppendRefTableString(string word)
-        {
-            var entries = ParamFile.AsmRefEntries;
-            if (!entries.Contains(word))
-                entries.Add(word);
-        }
-        internal static void MergeRefTables()
-        {
-            var entries = ParamFile.AsmRefEntries;
-            
-            for (int current_index = 0; current_index < entries.Count; current_index++)
-            {
-                if (!(entries[current_index] is RefTableEntry currentTableEntry))
-                    continue;
-
-                //We check if there's aleady an entry prior in the list with the same HashOffsets
-                //if so, we merge
-                int firstOccur = entries.IndexOf(currentTableEntry);
-                if (firstOccur < current_index)
-                {
-                    var first = entries[firstOccur] as RefTableEntry;
-                    //change the corresponding struct reference
-                    currentTableEntry.CorrespondingStruct.RefEntry = first;
-                    //remove the duplicate from the list
-                    entries.RemoveAt(current_index--);
-                    currentTableEntry = null;
-                }
-            }
-        }
-        /// <summary>
-        /// Writes the list of RefTableEntries into the WriterRef stream and records offsets needed to resolve strings and structs later
-        /// </summary>
-        internal static void WriteRefTables()
-        {
-            var writer = ParamFile.WriterRef;
-            foreach (var entry in ParamFile.AsmRefEntries)
-            {
-                if (entry is RefTableEntry refEntry)
-                {
-                    refEntry.RefTableOffset = (int)writer.BaseStream.Position;
-                    foreach (var pair in refEntry.HashOffsets)
-                    {
-                        writer.Write(pair.Key);
-                        writer.Write(pair.Value);
-                    }
-                }
-                else if (entry is string word)
-                {
-                    ParamFile.RefStringEntries.Add(word, (int)writer.BaseStream.Position);
-                    for (int c = 0; c < word.Length; c++)
-                        writer.Write((byte)word[c]);
-                    writer.Write((byte)0);
-                }
-            }
-        }
-        internal static void ResolveStructStringRefs()
-        {
-            var writer = ParamFile.WriterParam;
-            foreach (var tup in ParamFile.UnresolvedStructs)
-            {
-                writer.BaseStream.Seek(tup.Item1, SeekOrigin.Begin);
-                writer.Write(tup.Item2.RefEntry.RefTableOffset);
-            }
-            foreach (var tup in ParamFile.UnresolvedStrings)
-            {
-                writer.BaseStream.Seek(tup.Item1, SeekOrigin.Begin);
-                writer.Write(ParamFile.RefStringEntries[tup.Item2]);
-            }
         }
         internal static uint CRC32(string word)
         {

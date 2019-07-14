@@ -28,27 +28,6 @@ namespace paracobNET
             Nodes = nodes;
         }
 
-        internal void Write(BinaryWriter writer)
-        {
-            RefEntry = new RefTableEntry(this);
-            ParamFile.AsmRefEntries.Add(RefEntry);//reserve a space in the file's RefEntries so they stay in order
-
-            var start = writer.BaseStream.Position - 1;
-            writer.Write(Nodes.Count);
-
-            ParamFile.UnresolvedStructs.Add(new Tuple<int, ParamStruct>((int)writer.BaseStream.Position, this));
-            writer.Write(0);
-
-            foreach (var node in Nodes.OrderBy(x => x.Key))
-            {
-                int hashIndex = ParamFile.AsmHashTable.IndexOf(node.Key);
-                int relOffset = (int)(writer.BaseStream.Position - start);
-                RefEntry.HashOffsets.Add(hashIndex, relOffset);
-
-                Util.WriteParam(node.Value, writer);
-            }
-        }
-
         public IParam Clone()
         {
             ParamStruct clone = new ParamStruct(Nodes.Count);
