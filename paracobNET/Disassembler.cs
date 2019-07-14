@@ -42,6 +42,7 @@ namespace paracobNET
                 Reader.BaseStream.Seek(ParamStart, SeekOrigin.Begin);
                 if ((ParamType)Reader.ReadByte() == ParamType.@struct)
                 {
+                    Reader.BaseStream.Position -= 1;
                     root = Read() as ParamStruct;
                 }
                 else
