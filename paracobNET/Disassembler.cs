@@ -62,12 +62,11 @@ namespace paracobNET
             {
                 case ParamType.@struct:
                     {
-                        var str = new ParamStruct();
-
                         int startPos = (int)Reader.BaseStream.Position - 1;
                         int size = Reader.ReadInt32();
                         int structRefOffset = Reader.ReadInt32();
-                        str.Nodes = new Hash40Dictionary<IParam>(size);
+
+                        var str = new ParamStruct(size);
 
                         SortedDictionary<int, int> hashOffsets;
                         if (RefEntries.TryGetValue(structRefOffset, out var refEntry))
@@ -102,12 +101,11 @@ namespace paracobNET
                     }
                 case ParamType.list:
                     {
-                        var list = new ParamList();
-
                         int startPos = (int)Reader.BaseStream.Position - 1;
                         int count = Reader.ReadInt32();
-                        list.Nodes = new List<IParam>(count);
                         uint[] offsets = new uint[count];
+
+                        var list = new ParamList(count);
 
                         //all elements should be the same type but it's not enforced
 

@@ -11,7 +11,14 @@ namespace paracobNET
         
         public List<IParam> Nodes { get; set; }
 
-        public ParamList() { }
+        public ParamList()
+        {
+            Nodes = new List<IParam>();
+        }
+        public ParamList(int capacity)
+        {
+            Nodes = new List<IParam>(capacity);
+        }
         public ParamList(List<IParam> nodes)
         {
             Nodes = nodes;
@@ -42,8 +49,7 @@ namespace paracobNET
 
         public IParam Clone()
         {
-            ParamList clone = new ParamList();
-            clone.Nodes = new List<IParam>(Nodes.Count);
+            ParamList clone = new ParamList(Nodes.Count);
             foreach (var node in Nodes)
                 clone.Nodes.Add(node.Clone());
             return clone;

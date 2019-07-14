@@ -15,7 +15,14 @@ namespace paracobNET
         //this property only used when rebuilding
         internal RefTableEntry RefEntry { get; set; }
 
-        public ParamStruct() { }
+        public ParamStruct()
+        {
+            Nodes = new Hash40Dictionary<IParam>();
+        }
+        public ParamStruct(int capacity)
+        {
+            Nodes = new Hash40Dictionary<IParam>(capacity);
+        }
         public ParamStruct(Hash40Dictionary<IParam> nodes)
         {
             Nodes = nodes;
@@ -44,8 +51,7 @@ namespace paracobNET
 
         public IParam Clone()
         {
-            ParamStruct clone = new ParamStruct();
-            clone.Nodes = new Hash40Dictionary<IParam>(Nodes.Count);
+            ParamStruct clone = new ParamStruct(Nodes.Count);
             foreach (var node in Nodes)
                 clone.Nodes.Add(node.Key, node.Value.Clone());
             return clone;
