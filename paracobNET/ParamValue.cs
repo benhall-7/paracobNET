@@ -20,10 +20,6 @@ namespace paracobNET
             Value = value;
         }
 
-        internal void Read(BinaryReader reader)
-        {
-            
-        }
         internal void Write(BinaryWriter writer)
         {
             switch (TypeKey)

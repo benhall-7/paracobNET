@@ -21,10 +21,6 @@ namespace paracobNET
             Nodes = nodes;
         }
 
-        internal void Read(BinaryReader reader)
-        {
-            
-        }
         internal void Write(BinaryWriter writer)
         {
             RefEntry = new RefTableEntry(this);

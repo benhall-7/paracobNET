@@ -17,10 +17,6 @@ namespace paracobNET
             Nodes = nodes;
         }
 
-        internal void Read(BinaryReader reader)
-        {
-            
-        }
         internal void Write(BinaryWriter writer)
         {
             uint startPos = (uint)writer.BaseStream.Position - 1;

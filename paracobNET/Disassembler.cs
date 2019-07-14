@@ -126,7 +126,6 @@ namespace paracobNET
                 default:
                     {
                         var value = new ParamValue(type);
-
                         object v = null;
 
                         switch (type)
