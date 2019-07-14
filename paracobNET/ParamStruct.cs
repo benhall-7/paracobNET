@@ -10,6 +10,8 @@ namespace paracobNET
     {
         public ParamType TypeKey { get; } = ParamType.@struct;
         public Hash40Dictionary<IParam> Nodes { get; set; }
+
+        //TODO: vvv REMOVE vvv
         //this property only used when rebuilding
         internal RefTableEntry RefEntry { get; set; }
 
@@ -21,35 +23,7 @@ namespace paracobNET
 
         internal void Read(BinaryReader reader)
         {
-            uint startPos = (uint)reader.BaseStream.Position - 1;
-            int size = reader.ReadInt32();
-            uint structRefOffset = reader.ReadUInt32();
-            Nodes = new Hash40Dictionary<IParam>(size);
-
-            SortedDictionary<int, int> hashOffsets;
-            if (ParamFile.DisasmRefEntries.TryGetValue(structRefOffset, out var refEntry))
-                hashOffsets = refEntry;
-            else
-            {
-                hashOffsets = new SortedDictionary<int, int>();
-                reader.BaseStream.Seek(structRefOffset + ParamFile.RefStart, SeekOrigin.Begin);
-                for (int i = 0; i < size; i++)
-                {
-                    int hashIndex = reader.ReadInt32();
-                    int paramOffset = reader.ReadInt32();
-                    try { hashOffsets.Add(hashIndex, paramOffset); }
-                    catch { }
-                }
-                ParamFile.DisasmRefEntries.Add(structRefOffset, hashOffsets);
-            }
-
-            foreach (var pair in hashOffsets)
-            {
-                reader.BaseStream.Seek(startPos + pair.Value, SeekOrigin.Begin);
-                ulong hash = ParamFile.DisasmHashTable[pair.Key];
-                IParam param = Util.ReadParam(reader);
-                Nodes.Add(hash, param);
-            }
+            
         }
         internal void Write(BinaryWriter writer)
         {

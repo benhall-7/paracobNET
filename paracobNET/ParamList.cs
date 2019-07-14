@@ -9,7 +9,7 @@ namespace paracobNET
     {
         public ParamType TypeKey { get; } = ParamType.list;
         
-        public List<IParam> Nodes { get; private set; }
+        public List<IParam> Nodes { get; set; }
 
         public ParamList() { }
         public ParamList(List<IParam> nodes)
@@ -19,20 +19,7 @@ namespace paracobNET
 
         internal void Read(BinaryReader reader)
         {
-            uint startPos = (uint)reader.BaseStream.Position - 1;
-            int count = reader.ReadInt32();
-            Nodes = new List<IParam>(count);
-            uint[] offsets = new uint[count];
-
-            //all elements should be the same type but it's not enforced
-
-            for (int i = 0; i < offsets.Length; i++)
-                offsets[i] = reader.ReadUInt32();
-            for (int i = 0; i < count; i++)
-            {
-                reader.BaseStream.Seek(startPos + offsets[i], SeekOrigin.Begin);
-                Nodes.Add(Util.ReadParam(reader));
-            }
+            
         }
         internal void Write(BinaryWriter writer)
         {

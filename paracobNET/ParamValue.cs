@@ -22,39 +22,7 @@ namespace paracobNET
 
         internal void Read(BinaryReader reader)
         {
-            switch (TypeKey)
-            {
-                case ParamType.@bool:
-                    Value = reader.ReadByte() != 0;
-                    break;
-                case ParamType.@sbyte:
-                    Value = reader.ReadSByte();
-                    break;
-                case ParamType.@byte:
-                    Value = reader.ReadByte();
-                    break;
-                case ParamType.@short:
-                    Value = reader.ReadInt16();
-                    break;
-                case ParamType.@ushort:
-                    Value = reader.ReadUInt16();
-                    break;
-                case ParamType.@int:
-                    Value = reader.ReadInt32();
-                    break;
-                case ParamType.@uint:
-                    Value = reader.ReadUInt32();
-                    break;
-                case ParamType.@float:
-                    Value = reader.ReadSingle();
-                    break;
-                case ParamType.hash40:
-                    Value = ParamFile.DisasmHashTable[reader.ReadUInt32()];
-                    break;
-                case ParamType.@string:
-                    Value = Util.ReadStringAsync(reader, ParamFile.RefStart + reader.ReadUInt32());
-                    break;
-            }
+            
         }
         internal void Write(BinaryWriter writer)
         {

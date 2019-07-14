@@ -5,31 +5,7 @@ namespace paracobNET
 {
     static class Util
     {
-        internal static IParam ReadParam(BinaryReader reader)
-        {
-            byte key = reader.ReadByte();
-            if (!Enum.IsDefined(typeof(ParamType), key))
-                throw new NotImplementedException($"Unimplemented param type '{key}' at {reader.BaseStream.Position - 1}");
-            ParamType type = (ParamType)key;
-            IParam param;
-            switch (type)
-            {
-                case ParamType.@struct:
-                    param = new ParamStruct();
-                    (param as ParamStruct).Read(reader);
-                    break;
-                case ParamType.list:
-                    param = new ParamList();
-                    (param as ParamList).Read(reader);
-                    break;
-                default:
-                    param = new ParamValue(type);
-                    (param as ParamValue).Read(reader);
-                    break;
-            }
-            return param;
-        }
-        internal static string ReadStringAsync(BinaryReader reader, uint position)
+        internal static string ReadStringAt(BinaryReader reader, int position)
         {
             long returnTo = reader.BaseStream.Position;
             reader.BaseStream.Seek(position, SeekOrigin.Begin);
