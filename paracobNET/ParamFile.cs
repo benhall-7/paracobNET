@@ -5,14 +5,16 @@
         public const string Magic = "paracobn";
         public ParamStruct Root { get; set; }
 
-        public ParamFile(string filepath)
-        {
-            Disassembler disassembler = new Disassembler(filepath);
-            Root = disassembler.Start();
-        }
+        public ParamFile() { }
         public ParamFile(ParamStruct root)
         {
             Root = root;
+        }
+
+        public void Open(string filepath)
+        {
+            Disassembler disassembler = new Disassembler(filepath);
+            Root = disassembler.Start();
         }
 
         public void Save(string filepath)

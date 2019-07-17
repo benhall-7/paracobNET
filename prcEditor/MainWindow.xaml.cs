@@ -247,7 +247,8 @@ namespace prcEditor
 
                 WorkerQueue.Enqueue(new EnqueuableStatus(() =>
                 {
-                    PFile = new ParamFile(ofd.FileName);
+                    PFile = new ParamFile();
+                    PFile.Open(ofd.FileName);
                     IsOpenEnabled = true;
                     IsSaveEnabled = true;
                 }, "Loading param file"));

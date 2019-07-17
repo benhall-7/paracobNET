@@ -71,7 +71,8 @@ namespace ParamXML
 
                     Console.WriteLine("Initializing...");
                     stopwatch.Start();
-                    file = new ParamFile(input);
+                    file = new ParamFile();
+                    file.Open(input);
                     Console.WriteLine("Disassembling...");
                     xml = new XmlDocument();
                     xml.AppendChild(xml.CreateXmlDeclaration("1.0", "UTF-8", null));
