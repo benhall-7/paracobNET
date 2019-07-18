@@ -19,9 +19,8 @@ namespace prcEditor
     {
         ParamFile PFile { get; set; }
 
-        Thread WorkerThread { get; set; }
         Queue<EnqueuableStatus> WorkerQueue { get; set; }
-        readonly object WorkerThreadLock = new object();
+        readonly object WorkerQueueLock = new object();
 
         private bool KeyCtrl { get; set; }
         private bool KeyShift { get; set; }
@@ -172,18 +171,20 @@ namespace prcEditor
 
         private void StartWorkerThread()
         {
-            WorkerThread = new Thread(() =>
+            var WorkerThread = new Thread(() =>
             {
-                EnqueuableStatus status;
-                while (WorkerQueue.Count > 0)
-                {
-                    status = WorkerQueue.Dequeue();
+                lock (WorkerQueueLock) {
+                    EnqueuableStatus status;
+                    while (WorkerQueue.Count > 0)
+                    {
+                        status = WorkerQueue.Dequeue();
 
-                    StatusMessage = status.Message;
-                    status.Action.Invoke();
+                        StatusMessage = status.Message;
+                        status.Action.Invoke();
+                    }
+
+                    StatusMessage = "Idle";
                 }
-
-                StatusMessage = "Idle";
             });
             WorkerThread.Name = "Worker";
             WorkerThread.IsBackground = true;
