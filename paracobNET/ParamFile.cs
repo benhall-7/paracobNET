@@ -5,7 +5,10 @@
         public const string Magic = "paracobn";
         public ParamStruct Root { get; set; }
 
-        public ParamFile() { }
+        public ParamFile()
+        {
+            Root = new ParamStruct();
+        }
         public ParamFile(ParamStruct root)
         {
             Root = root;

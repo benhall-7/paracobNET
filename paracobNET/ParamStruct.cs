@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 namespace paracobNET
 {
@@ -10,10 +7,6 @@ namespace paracobNET
     {
         public ParamType TypeKey { get; } = ParamType.@struct;
         public Hash40Dictionary<IParam> Nodes { get; set; }
-
-        //TODO: vvv REMOVE vvv
-        //this property only used when rebuilding
-        internal RefTableEntry RefEntry { get; set; }
 
         public ParamStruct()
         {

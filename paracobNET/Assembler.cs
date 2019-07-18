@@ -19,8 +19,9 @@ namespace paracobNET
 
         List<ulong> AsmHashTable { get; set; }//list of hashes appended to
         List<object> AsmRefEntries { get; set; }//reference entry classes, and strings
-        List<Tuple<int, ParamStruct>> UnresolvedStructs { get; set; }
+        Dictionary<ParamStruct, RefTableEntry> StructRefEntries { get; set; }
 
+        List<Tuple<int, ParamStruct>> UnresolvedStructs { get; set; }
         List<Tuple<int, string>> UnresolvedStrings { get; set; }
         Dictionary<string, int> RefStringEntries { get; set; }
 
@@ -31,6 +32,7 @@ namespace paracobNET
 
             AsmHashTable = new List<ulong>();
             AsmRefEntries = new List<object>();
+            StructRefEntries = new Dictionary<ParamStruct, RefTableEntry>();
             UnresolvedStructs = new List<Tuple<int, ParamStruct>>();
             UnresolvedStrings = new List<Tuple<int, string>>();
             RefStringEntries = new Dictionary<string, int>();
@@ -74,10 +76,10 @@ namespace paracobNET
             {
                 case ParamType.@struct:
                     {
-                        ParamStruct str = param as ParamStruct;
-
-                        str.RefEntry = new RefTableEntry(str);
-                        AsmRefEntries.Add(str.RefEntry);//reserve a space in the file's RefEntries so they stay in order
+                        var str = param as ParamStruct;
+                        var entry = new RefTableEntry(str); 
+                        StructRefEntries.Add(str, entry);
+                        AsmRefEntries.Add(entry);//reserve a space in the file's RefEntries so they stay in order
 
                         var start = WriterParam.BaseStream.Position - 1;
                         WriterParam.Write(str.Nodes.Count);
@@ -89,7 +91,7 @@ namespace paracobNET
                         {
                             int hashIndex = AsmHashTable.IndexOf(node.Key);
                             int relOffset = (int)(WriterParam.BaseStream.Position - start);
-                            str.RefEntry.HashOffsets.Add(hashIndex, relOffset);
+                            entry.HashOffsets.Add(hashIndex, relOffset);
 
                             Write(node.Value);
                         }
@@ -212,7 +214,7 @@ namespace paracobNET
                 {
                     var first = entries[firstOccur] as RefTableEntry;
                     //change the corresponding struct reference
-                    currentTableEntry.CorrespondingStruct.RefEntry = first;
+                    StructRefEntries[currentTableEntry.CorrespondingStruct] = first;
                     //remove the duplicate from the list
                     entries.RemoveAt(current_index--);
                 }
@@ -255,7 +257,7 @@ namespace paracobNET
             foreach (var tup in UnresolvedStructs)
             {
                 writer.BaseStream.Seek(tup.Item1, SeekOrigin.Begin);
-                writer.Write(tup.Item2.RefEntry.RefTableOffset);
+                writer.Write(StructRefEntries[tup.Item2].RefTableOffset);
             }
             foreach (var tup in UnresolvedStrings)
             {
