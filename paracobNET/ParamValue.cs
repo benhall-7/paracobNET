@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace paracobNET
 {
     [Serializable]
     public class ParamValue : IParam
     {
-        public ParamType TypeKey { get; set; }
+        public ParamType TypeKey { get; private set; }
         public object Value { get; set; }
 
         public ParamValue(ParamType type)
@@ -18,83 +17,6 @@ namespace paracobNET
         {
             TypeKey = type;
             Value = value;
-        }
-
-        internal void Read(BinaryReader reader)
-        {
-            switch (TypeKey)
-            {
-                case ParamType.@bool:
-                    Value = reader.ReadByte() != 0;
-                    break;
-                case ParamType.@sbyte:
-                    Value = reader.ReadSByte();
-                    break;
-                case ParamType.@byte:
-                    Value = reader.ReadByte();
-                    break;
-                case ParamType.@short:
-                    Value = reader.ReadInt16();
-                    break;
-                case ParamType.@ushort:
-                    Value = reader.ReadUInt16();
-                    break;
-                case ParamType.@int:
-                    Value = reader.ReadInt32();
-                    break;
-                case ParamType.@uint:
-                    Value = reader.ReadUInt32();
-                    break;
-                case ParamType.@float:
-                    Value = reader.ReadSingle();
-                    break;
-                case ParamType.hash40:
-                    Value = ParamFile.DisasmHashTable[reader.ReadUInt32()];
-                    break;
-                case ParamType.@string:
-                    Value = Util.ReadStringAsync(reader, ParamFile.RefStart + reader.ReadUInt32());
-                    break;
-            }
-        }
-        internal void Write(BinaryWriter writer)
-        {
-            switch (TypeKey)
-            {
-                case ParamType.@bool:
-                    writer.Write((bool)Value);
-                    break;
-                case ParamType.@sbyte:
-                    writer.Write((sbyte)Value);
-                    break;
-                case ParamType.@byte:
-                    writer.Write((byte)Value);
-                    break;
-                case ParamType.@short:
-                    writer.Write((short)Value);
-                    break;
-                case ParamType.@ushort:
-                    writer.Write((ushort)Value);
-                    break;
-                case ParamType.@int:
-                    writer.Write((int)Value);
-                    break;
-                case ParamType.@uint:
-                    writer.Write((uint)Value);
-                    break;
-                case ParamType.@float:
-                    writer.Write((float)Value);
-                    break;
-                case ParamType.hash40:
-                    writer.Write(ParamFile.AsmHashTable.IndexOf((ulong)Value));
-                    break;
-                case ParamType.@string:
-                    string word = (string)Value;
-                    ParamFile.UnresolvedStrings.Add(new Tuple<int, string>((int)writer.BaseStream.Position, word));
-
-                    Util.AppendRefTableString(word);
-                    writer.Write((int)0);
-                    break;
-            }
         }
 
         public string ToString(IDictionary<ulong, string> labels)
@@ -141,19 +63,54 @@ namespace paracobNET
             }
         }
 
-        public void SetType(ParamType type)
+        public void ChangeType(ParamType to)
         {
-            if (TypeKey == type)
+            ParamType from = TypeKey;
+            if (from == to)
                 return;
-            switch (type)
+            if (to == ParamType.list || to == ParamType.@struct)
+                throw new ArgumentException($"ParamType '{to.ToString()}' is invalid for ParamValue instances");
+            else if (IsNumber(from) && IsNumber(to))
             {
-                case ParamType.list:
-                case ParamType.@struct:
-                    throw new ArgumentException($"ParamType '{type.ToString()}' is invalid for ParamValue instances");
+                switch (to)
+                {
+                    case ParamType.@sbyte:
+                        Value = (sbyte)Value;
+                        break;
+                    case ParamType.@byte:
+                        Value = (byte)Value;
+                        break;
+                    case ParamType.@short:
+                        Value = (short)Value;
+                        break;
+                    case ParamType.@ushort:
+                        Value = (ushort)Value;
+                        break;
+                    case ParamType.@int:
+                        Value = (int)Value;
+                        break;
+                    case ParamType.@uint:
+                        Value = (uint)Value;
+                        break;
+                    case ParamType.@float:
+                        Value = (float)Value;
+                        break;
+                }
             }
-            switch (TypeKey)
+            else
+            {
+                SetDefaultValue(to);
+            }
+            TypeKey = to;
+        }
+
+        private void SetDefaultValue(ParamType to)
+        {
+            switch (to)
             {
                 case ParamType.@bool:
+                    Value = false;
+                    break;
                 case ParamType.@sbyte:
                 case ParamType.@byte:
                 case ParamType.@short:
@@ -161,105 +118,29 @@ namespace paracobNET
                 case ParamType.@int:
                 case ParamType.@uint:
                 case ParamType.@float:
-                    try
-                    {
-                        switch (type)
-                        {
-                            case ParamType.@bool:
-                                Value = (bool)Value;
-                                break;
-                            case ParamType.@sbyte:
-                                Value = (sbyte)Value;
-                                break;
-                            case ParamType.@byte:
-                                Value = (byte)Value;
-                                break;
-                            case ParamType.@short:
-                                Value = (short)Value;
-                                break;
-                            case ParamType.@ushort:
-                                Value = (ushort)Value;
-                                break;
-                            case ParamType.@int:
-                                Value = (int)Value;
-                                break;
-                            case ParamType.@uint:
-                                Value = (uint)Value;
-                                break;
-                            case ParamType.@float:
-                                Value = (float)Value;
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    catch
-                    {
-                        Value = 0;
-                    }
-                    break;
                 case ParamType.hash40:
-                    {
-                        switch (type)
-                        {
-                            case ParamType.@bool:
-                            case ParamType.@sbyte:
-                            case ParamType.@byte:
-                            case ParamType.@short:
-                            case ParamType.@ushort:
-                            case ParamType.@int:
-                            case ParamType.@uint:
-                            case ParamType.@float:
-                                Value = 0;
-                                break;
-                            case ParamType.@string:
-                                Value = "";
-                                break;
-                        }
-                    }
+                    Value = 0;
                     break;
                 case ParamType.@string:
-                    {
-                        try
-                        {
-                            string str = (string)Value;
-                            switch (type)
-                            {
-                                case ParamType.@bool:
-                                    Value = bool.Parse(str);
-                                    break;
-                                case ParamType.@sbyte:
-                                    Value = sbyte.Parse(str);
-                                    break;
-                                case ParamType.@byte:
-                                    Value = byte.Parse(str);
-                                    break;
-                                case ParamType.@short:
-                                    Value = short.Parse(str);
-                                    break;
-                                case ParamType.@ushort:
-                                    Value = ushort.Parse(str);
-                                    break;
-                                case ParamType.@int:
-                                    Value = int.Parse(str);
-                                    break;
-                                case ParamType.@uint:
-                                    Value = uint.Parse(str);
-                                    break;
-                                case ParamType.@float:
-                                    Value = float.Parse(str);
-                                    break;
-                                case ParamType.hash40:
-                                    Value = 0;
-                                    break;
-                            }
-                        }
-                        catch
-                        {
-                            Value = 0;
-                        }
-                    }
+                    Value = Value.ToString();
                     break;
+            }
+        }
+
+        private bool IsNumber(ParamType type)
+        {
+            switch (TypeKey)
+            {
+                case ParamType.@sbyte:
+                case ParamType.@byte:
+                case ParamType.@short:
+                case ParamType.@ushort:
+                case ParamType.@int:
+                case ParamType.@uint:
+                case ParamType.@float:
+                    return true;
+                default:
+                    return false;
             }
         }
 

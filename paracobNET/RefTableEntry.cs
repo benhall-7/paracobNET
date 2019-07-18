@@ -4,16 +4,10 @@ using System.Linq;
 
 namespace paracobNET
 {
-    //NOTE TO SELF / TO DO:
-    //REMOVE THIS CLASS, IT DOESN'T NEED TO EXIST
-    //DO THE THING I DID WITH THE LUA_PARAMS ALGO
-
-    [Serializable]
     internal class RefTableEntry
     {
         public int RefTableOffset { get; set; }
         public Dictionary<int, int> HashOffsets { get; set; }
-        //used on rebuild, when each struct is given its own table entry
         public ParamStruct CorrespondingStruct { get; set; }
 
         public RefTableEntry(ParamStruct correspondingStruct)
@@ -36,6 +30,11 @@ namespace paracobNET
             if (HashOffsets.Count == entry.HashOffsets.Count && !HashOffsets.Except(entry.HashOffsets).Any())
                 return true;
             return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 }

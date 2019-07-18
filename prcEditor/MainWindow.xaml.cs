@@ -17,19 +17,7 @@ namespace prcEditor
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private ParamFile pFile;
-        ParamFile PFile
-        {
-            get { return pFile; }
-            set
-            {
-                pFile = value;
-                if (value == null)
-                    ParamViewModel = null;
-                else
-                    ParamViewModel = new VM_ParamRoot(value.Root);
-            }
-        }
+        ParamFile PFile { get; set; }
 
         Thread WorkerThread { get; set; }
         Queue<EnqueuableStatus> WorkerQueue { get; set; }
@@ -55,6 +43,8 @@ namespace prcEditor
             set
             {
                 paramVM = value;
+                Struct_DataGrid_Source = null;
+                List_DataGrid_Source = null;
                 NotifyPropertyChanged(nameof(ParamViewModelList));
             }
         }
@@ -67,8 +57,7 @@ namespace prcEditor
                 return new List<VM_ParamRoot>() { ParamViewModel };
             }
         }
-
-        //Thanks to Greg Sansom: https://stackoverflow.com/a/5507826
+        
         private string statusMessage = "Idle";
         public string StatusMessage
         {
@@ -247,7 +236,9 @@ namespace prcEditor
 
                 WorkerQueue.Enqueue(new EnqueuableStatus(() =>
                 {
-                    PFile = new ParamFile(ofd.FileName);
+                    PFile = new ParamFile();
+                    PFile.Open(ofd.FileName);
+                    ParamViewModel = new VM_ParamRoot(PFile.Root);
                     IsOpenEnabled = true;
                     IsSaveEnabled = true;
                 }, "Loading param file"));
