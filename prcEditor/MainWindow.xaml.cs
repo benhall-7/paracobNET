@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -17,10 +18,9 @@ namespace prcEditor
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        ParamFile PFile { get; set; }
+        private ParamFile PFile { get; set; }
 
-        Queue<EnqueuableStatus> WorkerQueue { get; set; }
-        readonly object WorkerQueueLock = new object();
+        private WorkQueue WorkerQueue { get; set; }
 
         private bool KeyCtrl { get; set; }
         private bool KeyShift { get; set; }
@@ -57,13 +57,36 @@ namespace prcEditor
             }
         }
         
-        private string statusMessage = "Idle";
         public string StatusMessage
         {
-            get { return statusMessage; }
+            get
+            {
+                if (!string.IsNullOrEmpty(WorkerThreadStatus))
+                    return WorkerThreadStatus;
+                if (!string.IsNullOrEmpty(TimedMessage))
+                    return TimedMessage;
+                return "Idle";
+            }
+        }
+
+        private string workerThreadStatus;
+        public string WorkerThreadStatus
+        {
+            get => workerThreadStatus;
             set
             {
-                statusMessage = value;
+                workerThreadStatus = value;
+                NotifyPropertyChanged(nameof(StatusMessage));
+            }
+        }
+
+        private string timedMessage;
+        public string TimedMessage
+        {
+            get => timedMessage;
+            set
+            {
+                timedMessage = value;
                 NotifyPropertyChanged(nameof(StatusMessage));
             }
         }
@@ -152,8 +175,7 @@ namespace prcEditor
         {
             InitializeComponent();
 
-            Thread.CurrentThread.Name = "Main";
-            WorkerQueue = new Queue<EnqueuableStatus>();
+            WorkerQueue = new WorkQueue();
 
             StatusTB.DataContext = this;
             OpenFileButton.DataContext = this;
@@ -169,32 +191,14 @@ namespace prcEditor
             KeyCtrl = false;
         }
 
-        private void StartWorkerThread()
-        {
-            var WorkerThread = new Thread(() =>
-            {
-                lock (WorkerQueueLock) {
-                    EnqueuableStatus status;
-                    while (WorkerQueue.Count > 0)
-                    {
-                        status = WorkerQueue.Dequeue();
-
-                        StatusMessage = status.Message;
-                        status.Action.Invoke();
-                    }
-
-                    StatusMessage = "Idle";
-                }
-            });
-            WorkerThread.Name = "Worker";
-            WorkerThread.IsBackground = true;
-            WorkerThread.SetApartmentState(ApartmentState.STA);
-            WorkerThread.Start();
-        }
-
         private void NotifyPropertyChanged(string propName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+        }
+
+        private void SetTimedMessage(string message, int milliseconds)
+        {
+            
         }
 
         #region EVENT_HANDLERS
@@ -219,7 +223,6 @@ namespace prcEditor
                     IsLabelEditEnabled = true;
                 }
             }, "Loading label dictionaries"));
-            StartWorkerThread();
         }
 
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
@@ -243,7 +246,6 @@ namespace prcEditor
                     IsOpenEnabled = true;
                     IsSaveEnabled = true;
                 }, "Loading param file"));
-                StartWorkerThread();
             }
         }
 
@@ -264,7 +266,6 @@ namespace prcEditor
                     IsOpenEnabled = true;
                     IsSaveEnabled = true;
                 }, "Saving param file"));
-                StartWorkerThread();
             }
         }
 

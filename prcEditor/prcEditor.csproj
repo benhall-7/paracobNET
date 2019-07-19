@@ -57,6 +57,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="EnqueuableStatus.cs" />
+    <Compile Include="WorkQueue.cs" />
     <Page Include="LabelEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
