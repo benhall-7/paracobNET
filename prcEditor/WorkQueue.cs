@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Threading;
 
 namespace prcEditor
@@ -48,7 +44,8 @@ namespace prcEditor
                         return;
                     }
                 }
-                Status = next.Message;
+                if (next.NewMessage)
+                    Status = next.Message;
                 next.Action.Invoke();
             }
         }
