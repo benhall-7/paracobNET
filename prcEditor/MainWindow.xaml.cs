@@ -174,6 +174,7 @@ namespace prcEditor
             InitializeComponent();
 
             WorkerQueue = new WorkQueue();
+            WorkerQueue.RaiseMessageChangeEvent += WorkerStatusChangeEvent;
 
             StatusTB.DataContext = this;
             OpenFileButton.DataContext = this;
@@ -187,6 +188,11 @@ namespace prcEditor
             ParamList_DataGrid.DataContext = this;
 
             KeyCtrl = false;
+        }
+
+        private void WorkerStatusChangeEvent(object sender, MessageChangeEventArgs e)
+        {
+            WorkerThreadStatus = e.Message;
         }
 
         private void NotifyPropertyChanged(string propName)

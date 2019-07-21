@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace prcEditor
@@ -17,10 +18,13 @@ namespace prcEditor
             set
             {
                 status = value;
+                RaiseMessageChangeEvent?.Invoke(this, new MessageChangeEventArgs(value));
             }
         }
 
         public int Count => queue.Count;
+
+        public event EventHandler<MessageChangeEventArgs> RaiseMessageChangeEvent;
 
         public WorkQueue()
         {
