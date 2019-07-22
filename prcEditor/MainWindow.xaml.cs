@@ -408,9 +408,28 @@ namespace prcEditor
                                 }
                                 catch (ArgumentException)
                                 {
-                                    Timer.SetMessage("Paste operation failed (key " +
-                                        $"'{Hash40Util.FormatToString(data.Hash40, HashToStringLabels)}' " +
-                                        $"already exists)", 3000);
+                                    LabelEditor le = new LabelEditor(true);
+                                    bool? result = le.ShowDialog();
+                                    if (result == true)
+                                    {
+                                        try
+                                        {
+                                            str.Add(data.Param, Hash40Util.LabelToHash40(le.Label, StringToHashLabels));
+                                            str.UpdateChildrenIndeces();
+                                        }
+                                        catch
+                                        {
+                                            Timer.SetMessage("Paste operation failed (key " +
+                                                $"'{le.Label}' " +
+                                                $"already exists)", 2000);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Timer.SetMessage("Paste operation failed (key " +
+                                            $"'{Hash40Util.FormatToString(data.Hash40, HashToStringLabels)}' " +
+                                            $"already exists)", 3000);
+                                    }
                                 }
                             }
                             else if (tvi.Header is VM_ParamList list)
@@ -466,9 +485,28 @@ namespace prcEditor
                                 }
                                 catch (ArgumentException)
                                 {
-                                    Timer.SetMessage("Paste operation failed (key " +
-                                        $"'{Hash40Util.FormatToString(data.Hash40, HashToStringLabels)}' " +
-                                        $"already exists)", 3000);
+                                    LabelEditor le = new LabelEditor(true);
+                                    bool? result = le.ShowDialog();
+                                    if (result == true)
+                                    {
+                                        try
+                                        {
+                                            structChild.Parent.Add(data.Param, Hash40Util.LabelToHash40(le.Label, StringToHashLabels));
+                                            structChild.Parent.UpdateChildrenIndeces();
+                                        }
+                                        catch
+                                        {
+                                            Timer.SetMessage("Paste operation failed (key " +
+                                                $"'{le.Label}' " +
+                                                $"already exists)", 2000);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Timer.SetMessage("Paste operation failed (key " +
+                                            $"'{Hash40Util.FormatToString(data.Hash40, HashToStringLabels)}' " +
+                                            $"already exists)", 3000);
+                                    }
                                 }
                             }
                             else if (tvi.Header is IListChild listChild)
