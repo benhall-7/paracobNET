@@ -421,7 +421,7 @@ namespace prcEditor
                                         {
                                             Timer.SetMessage("Paste operation failed (key " +
                                                 $"'{le.Label}' " +
-                                                $"already exists)", 2000);
+                                                $"already exists)", 3000);
                                         }
                                     }
                                     else
@@ -498,7 +498,7 @@ namespace prcEditor
                                         {
                                             Timer.SetMessage("Paste operation failed (key " +
                                                 $"'{le.Label}' " +
-                                                $"already exists)", 2000);
+                                                $"already exists)", 3000);
                                         }
                                     }
                                     else
