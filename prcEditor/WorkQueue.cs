@@ -18,13 +18,13 @@ namespace prcEditor
             set
             {
                 status = value;
-                RaiseMessageChangeEvent?.Invoke(this, new MessageChangeEventArgs(value));
+                RaiseMessageChangeEvent?.Invoke(this, new StatusChangeEventArgs(value));
             }
         }
 
         public int Count => queue.Count;
 
-        public event EventHandler<MessageChangeEventArgs> RaiseMessageChangeEvent;
+        public event EventHandler<StatusChangeEventArgs> RaiseMessageChangeEvent;
 
         public WorkQueue()
         {

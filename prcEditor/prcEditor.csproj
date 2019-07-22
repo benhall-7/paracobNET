@@ -57,7 +57,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="EnqueuableStatus.cs" />
-    <Compile Include="MessageChangeEventArgs.cs" />
+    <Compile Include="StatusChangeEventArgs.cs" />
+    <Compile Include="TimedMessage.cs" />
+    <Compile Include="TimedMsgChangedEventArgs.cs" />
     <Compile Include="WorkQueue.cs" />
     <Page Include="LabelEditor.xaml">
       <SubType>Designer</SubType>

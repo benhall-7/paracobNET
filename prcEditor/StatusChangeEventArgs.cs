@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace prcEditor
 {
-    public class MessageChangeEventArgs : EventArgs
+    public class StatusChangeEventArgs : EventArgs
     {
         public string Message { get; }
 
-        public MessageChangeEventArgs(string message)
+        public StatusChangeEventArgs(string message)
         {
             Message = message;
         }

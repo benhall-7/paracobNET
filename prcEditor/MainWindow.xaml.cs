@@ -20,6 +20,8 @@ namespace prcEditor
 
         private WorkQueue WorkerQueue { get; set; }
 
+        private TimedMessage Timer { get; set; }
+
         private bool KeyCtrl { get; set; }
         private bool KeyShift { get; set; }
 
@@ -176,6 +178,9 @@ namespace prcEditor
             WorkerQueue = new WorkQueue();
             WorkerQueue.RaiseMessageChangeEvent += WorkerStatusChangeEvent;
 
+            Timer = new TimedMessage();
+            Timer.RaiseMessageChangeEvent += TimerMessageChangeEvent;
+
             StatusTB.DataContext = this;
             OpenFileButton.DataContext = this;
             SaveFileButton.DataContext = this;
@@ -190,19 +195,19 @@ namespace prcEditor
             KeyCtrl = false;
         }
 
-        private void WorkerStatusChangeEvent(object sender, MessageChangeEventArgs e)
-        {
-            WorkerThreadStatus = e.Message;
-        }
-
         private void NotifyPropertyChanged(string propName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }
 
-        private void SetTimedMessage(string message, int milliseconds)
+        private void WorkerStatusChangeEvent(object sender, StatusChangeEventArgs e)
         {
-            
+            WorkerThreadStatus = e.Message;
+        }
+
+        private void TimerMessageChangeEvent(object sender, TimedMsgChangedEventArgs e)
+        {
+            TimedMessage = e.Message;
         }
 
         #region EVENT_HANDLERS
@@ -396,12 +401,22 @@ namespace prcEditor
 
                             if (tvi.Header is VM_ParamStruct str)
                             {
-                                str.Add(data.Param, data.Hash40);
-                                str.UpdateChildrenIndeces();
+                                try
+                                {
+                                    str.Add(data.Param, data.Hash40);
+                                    str.UpdateChildrenIndeces();
+                                }
+                                catch (ArgumentException)
+                                {
+                                    Timer.SetMessage("Paste operation failed (key " +
+                                        $"'{Hash40Util.FormatToString(data.Hash40, HashToStringLabels)}' " +
+                                        $"already exists)", 3000);
+                                }
                             }
                             else if (tvi.Header is VM_ParamList list)
                             {
                                 list.Add(data.Param);
+                                list.UpdateChildrenIndeces();
                             }
                         }
                         else if (dataObject.GetDataPresent(typeof(SerializableParam)))
@@ -413,14 +428,22 @@ namespace prcEditor
                                 LabelEditor le = new LabelEditor(true);
                                 if (le.ShowDialog() == true)
                                 {
-                                    str.Add(data.Param, StringToHashLabels[le.Label]);
-                                    str.UpdateChildrenIndeces();
-                                    str.UpdateHashes();
+                                    try
+                                    {
+                                        str.Add(data.Param, StringToHashLabels[le.Label]);
+                                        str.UpdateChildrenIndeces();
+                                        str.UpdateHashes();
+                                    }
+                                    catch (ArgumentException)
+                                    {
+                                        Timer.SetMessage($"Paste operation failed (key '{le.Label}' already exists)", 3000);
+                                    }
                                 }
                             }
                             else if (tvi.Header is VM_ParamList list)
                             {
                                 list.Add(data.Param);
+                                list.UpdateChildrenIndeces();
                             }
                         }
                     }
@@ -436,11 +459,22 @@ namespace prcEditor
 
                             if (tvi.Header is IStructChild structChild)
                             {
-                                structChild.Parent.Add(data.Param, data.Hash40);
+                                try
+                                {
+                                    structChild.Parent.Add(data.Param, data.Hash40);
+                                    structChild.Parent.UpdateChildrenIndeces();
+                                }
+                                catch (ArgumentException)
+                                {
+                                    Timer.SetMessage("Paste operation failed (key " +
+                                        $"'{Hash40Util.FormatToString(data.Hash40, HashToStringLabels)}' " +
+                                        $"already exists)", 3000);
+                                }
                             }
                             else if (tvi.Header is IListChild listChild)
                             {
                                 listChild.Parent.Add(data.Param);
+                                listChild.Parent.UpdateChildrenIndeces();
                             }
                         }
                         else if (dataObject.GetDataPresent(typeof(SerializableParam)))
@@ -452,14 +486,22 @@ namespace prcEditor
                                 LabelEditor le = new LabelEditor(true);
                                 if (le.ShowDialog() == true)
                                 {
-                                    structChild.Parent.Add(data.Param, StringToHashLabels[le.Label]);
-                                    structChild.Parent.UpdateChildrenIndeces();
-                                    structChild.Parent.UpdateHashes();
+                                    try
+                                    {
+                                        structChild.Parent.Add(data.Param, StringToHashLabels[le.Label]);
+                                        structChild.Parent.UpdateChildrenIndeces();
+                                        structChild.Parent.UpdateHashes();
+                                    }
+                                    catch (ArgumentException)
+                                    {
+                                        Timer.SetMessage($"Paste operation failed (key '{le.Label}' already exists)", 3000);
+                                    }
                                 }
                             }
                             else if (tvi.Header is IListChild listChild)
                             {
                                 listChild.Parent.Add(data.Param);
+                                listChild.Parent.UpdateChildrenIndeces();
                             }
                         }
                     }
