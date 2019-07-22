@@ -19,10 +19,11 @@ namespace prcEditor
                 RaiseMessageChangeEvent?.Invoke(this, new TimedMsgChangedEventArgs(value));
             }
         }
-        private readonly object messageLock = new object();
+        private int OpenThreadCount = 0;
+        private readonly object Locker = new object();
 
-        private Thread timerThread { get; set; }
-        private int sleepTime { get; set; }
+        private Thread TimerThread { get; set; }
+        private int SleepTime { get; set; }
 
         public event EventHandler<TimedMsgChangedEventArgs> RaiseMessageChangeEvent;
 
@@ -30,26 +31,28 @@ namespace prcEditor
 
         private void TimerMain()
         {
-            Thread.Sleep(sleepTime);
-            lock (messageLock)
+            Thread.Sleep(SleepTime);
+            lock (Locker)
             {
-                Message = null;
+                OpenThreadCount--;
+                if (OpenThreadCount == 0)
+                {
+                    Message = null;
+                }
             }
         }
 
         public void SetMessage(string message, int milliseconds)
         {
-            sleepTime = milliseconds;
-            lock (messageLock)
+            SleepTime = milliseconds;
+            lock (Locker)
             {
                 Message = message;
+                OpenThreadCount++;
 
-                //TODO: thread isn't guaranteed to be sleeping
-                if (timerThread?.IsAlive == true)
-                    timerThread.Interrupt();
-                timerThread = new Thread(TimerMain);
-                timerThread.IsBackground = true;
-                timerThread.Start();
+                TimerThread = new Thread(TimerMain);
+                TimerThread.IsBackground = true;
+                TimerThread.Start();
             }
         }
     }
