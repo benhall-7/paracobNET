@@ -62,6 +62,7 @@ namespace prcEditor
                 if (workerThread == null || !workerThread.IsAlive)
                 {
                     workerThread = new Thread(WorkerMain);
+                    workerThread.IsBackground = true;
                     workerThread.Start();
                 }
             }
