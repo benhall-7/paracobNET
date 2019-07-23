@@ -74,6 +74,7 @@ namespace ParamXML
                     file = new ParamFile();
                     file.RaiseDuplicateKeyEvent += DuplicateKeyEvent;
                     file.Open(input);
+
                     Console.WriteLine("Disassembling...");
                     xml = new XmlDocument();
                     xml.AppendChild(xml.CreateXmlDeclaration("1.0", "UTF-8", null));
@@ -81,6 +82,7 @@ namespace ParamXML
                     XmlWriterSettings settings = new XmlWriterSettings() { Indent = true };
                     XmlWriter writer = XmlWriter.Create(output, settings);
                     xml.Save(writer);
+
                     stopwatch.Stop();
                     Console.WriteLine("Finished in {0} seconds", stopwatch.Elapsed.TotalSeconds);
                 }
@@ -97,8 +99,10 @@ namespace ParamXML
                     xml = new XmlDocument();
                     xml.Load(input);
                     file = new ParamFile(Node2ParamStruct(xml.DocumentElement));
+
                     Console.WriteLine("Assembling...");
                     file.Save(output);
+
                     stopwatch.Stop();
                     Console.WriteLine("Finished in {0} seconds", stopwatch.Elapsed.TotalSeconds);
                 }

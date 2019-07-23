@@ -17,6 +17,7 @@ namespace prcEditor
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
         private ParamFile PFile { get; set; }
+        private bool HasDuplicateKey { get; set; }
 
         private WorkQueue WorkerQueue { get; set; }
 
@@ -250,12 +251,23 @@ namespace prcEditor
                 WorkerQueue.Enqueue(new EnqueuableStatus(() =>
                 {
                     PFile = new ParamFile();
+                    PFile.RaiseDuplicateKeyEvent += PFile_RaiseDuplicateKeyEvent;
                     PFile.Open(ofd.FileName);
                     ParamViewModel = new VM_ParamRoot(PFile.Root);
                     IsOpenEnabled = true;
                     IsSaveEnabled = true;
+                    if (HasDuplicateKey)
+                    {
+                        Timer.SetMessage("Warning: skipped param(s) in file with duplicate key", 2000);
+                        HasDuplicateKey = false;
+                    }
                 }, "Loading param file"));
             }
+        }
+
+        private void PFile_RaiseDuplicateKeyEvent(object sender, DuplicateKeyEventArgs e)
+        {
+            HasDuplicateKey = true;
         }
 
         private void SaveFileButton_Click(object sender, RoutedEventArgs e)
