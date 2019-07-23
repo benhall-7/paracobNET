@@ -72,6 +72,7 @@ namespace ParamXML
                     Console.WriteLine("Initializing...");
                     stopwatch.Start();
                     file = new ParamFile();
+                    file.RaiseDuplicateKeyEvent += DuplicateKeyEvent;
                     file.Open(input);
                     Console.WriteLine("Disassembling...");
                     xml = new XmlDocument();
@@ -110,6 +111,11 @@ namespace ParamXML
                 else
                     Console.WriteLine(e.InnerException.StackTrace);
             }
+        }
+
+        static void DuplicateKeyEvent(object sender, DuplicateKeyEventArgs e)
+        {
+            Console.WriteLine($"[Warn: duplicate key '{Hash40Util.FormatToString(e.Hash, hashToStringLabels)}' encountered]");
         }
 
         static XmlNode Param2Node(IParam param)

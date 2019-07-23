@@ -1,9 +1,13 @@
-﻿namespace paracobNET
+﻿using System;
+
+namespace paracobNET
 {
     public class ParamFile
     {
         public const string Magic = "paracobn";
         public ParamStruct Root { get; set; }
+
+        public event EventHandler<DuplicateKeyEventArgs> RaiseDuplicateKeyEvent;
 
         public ParamFile()
         {
@@ -17,6 +21,7 @@
         public void Open(string filepath)
         {
             Disassembler disassembler = new Disassembler(filepath);
+            disassembler.RaiseDuplicateKeyEvent = RaiseDuplicateKeyEvent;
             Root = disassembler.Start();
         }
 

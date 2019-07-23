@@ -18,6 +18,8 @@ namespace paracobNET
         int RefStart { get { return 0x10 + HashTableSize; } }
         int ParamStart { get { return 0x10 + HashTableSize + RefTableSize; } }
 
+        public EventHandler<DuplicateKeyEventArgs> RaiseDuplicateKeyEvent;
+
         public Disassembler(string filepath)
         {
             Filepath = filepath;
@@ -87,7 +89,7 @@ namespace paracobNET
                                 try { hashOffsets.Add(hashIndex, paramOffset); }
                                 catch
                                 {
-                                    //TODO: raise an event to emit a warning
+                                    RaiseDuplicateKeyEvent?.Invoke(null, new DuplicateKeyEventArgs(HashTable[hashIndex]));
                                 }
                             }
                             RefEntries.Add(structRefOffset, hashOffsets);
