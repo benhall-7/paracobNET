@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace paracobNET
 {
     [Serializable]
-    public class ParamStruct : IParam
+    public class ParamStruct : IParam, IQueriable
     {
         public ParamType TypeKey { get; } = ParamType.@struct;
         public Hash40Dictionary<IParam> Nodes { get; set; }
@@ -27,6 +28,16 @@ namespace paracobNET
             foreach (var node in Nodes)
                 clone.Nodes.Add(node.Key, node.Value.Clone());
             return clone;
+        }
+
+        public QueryResult Query(string path)
+        {
+            throw new NotImplementedException();
+        }
+
+        public QueryResult Query(string path, IDictionary<string, ulong> labels)
+        {
+            throw new NotImplementedException();
         }
     }
 }
