@@ -14,7 +14,7 @@ namespace prcScript
             "  -h = print help text\n" +
             "       (alias: -help)\n" +
             "  -s = sandbox lua environment (prevents running unsafe code)\n" +
-            "       (alias: -safe | -sandbox\n" +
+            "       (alias: -safe | -sandbox)\n" +
             "  -l = load label file [path]";
 
         static List<string> LuaFiles { get; set; }
