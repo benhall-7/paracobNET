@@ -23,7 +23,7 @@ namespace prcScript
         /// </summary>
         /// <param name="path">Relative or absolute path of file to open</param>
         /// <returns>LuaParam object corresponding to param file's root struct</returns>
-        public IParam open(string path)
+        public LuaParam open(string path)
         {
             last_dir = path;
 
@@ -38,7 +38,7 @@ namespace prcScript
         }
         public void save(LuaParam param, string path)
         {
-            var conversion = (ParamStruct)(IParam)param;
+            var conversion = (ParamStruct)param.Inner;
             ParamFile pfile = new ParamFile(conversion);
             pfile.Save(fix_path(path));
         }

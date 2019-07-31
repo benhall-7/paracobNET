@@ -19,12 +19,11 @@ namespace prcScript
 
         static void Main(string[] args)
         {
+            //args = new string[] { "mods.lua", "-s", "-l", "ParamLabels.csv" };
             LuaFiles = new List<string>();
             HashToStringLabels = new OrderedDictionary<ulong, string>();
             StringToHashLabels = new OrderedDictionary<string, ulong>();
             ParamGlobal = new LuaParamGlobal();
-
-            LuaFiles.Add("mods.lua");
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -59,6 +58,10 @@ namespace prcScript
                     L.State.Encoding = Encoding.UTF8;
                     //set globals
                     L["Param"] = ParamGlobal;
+                    //add some timing functions in case the lua environment is sandboxed
+                    L.DoString("time = os.time\n" +
+                        "clock = os.clock\n" +
+                        "date = os.date");
 
                     if (Sandbox)
                     {
