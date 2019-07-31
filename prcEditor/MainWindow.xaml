@@ -177,7 +177,7 @@
                   ItemsSource="{Binding Struct_DataGrid_Source}"
                   Visibility="{Binding Struct_DataGrid_Visible}">
             <DataGrid.Columns>
-                <DataGridTemplateColumn Header="Key">
+                <DataGridTemplateColumn Header="Key" ClipboardContentBinding="{Binding Key}">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Key}" Margin="2,0,2,0"/>
@@ -203,7 +203,8 @@
                                         SelectedItemBinding="{Binding Type}"/>
                 <DataGridTemplateColumn Header="Value" Width="*"
                                         CellTemplateSelector="{StaticResource CellValueTemplateSel}"
-                                        CellEditingTemplateSelector="{StaticResource CellValueEditTemplateSel}"/>
+                                        CellEditingTemplateSelector="{StaticResource CellValueEditTemplateSel}"
+                                        ClipboardContentBinding="{Binding Value}"/>
             </DataGrid.Columns>
             <DataGrid.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="Gray"/>
@@ -227,7 +228,8 @@
                                         SelectedItemBinding="{Binding Type}"/>
                 <DataGridTemplateColumn Header="Value" Width="*"
                                         CellTemplateSelector="{StaticResource CellValueTemplateSel}"
-                                        CellEditingTemplateSelector="{StaticResource CellValueEditTemplateSel}"/>
+                                        CellEditingTemplateSelector="{StaticResource CellValueEditTemplateSel}"
+                                        ClipboardContentBinding="{Binding Value}"/>
             </DataGrid.Columns>
             <DataGrid.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="Gray"/>
