@@ -35,7 +35,7 @@ namespace prcScript
             if (path == null)
                 path = last_dir;
             ParamFile pfile = new ParamFile((ParamStruct)param);
-            pfile.Save(path);
+            pfile.Save(fix_path(path));
         }
 
         private string fix_path(string rel_path)
