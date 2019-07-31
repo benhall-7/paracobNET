@@ -8,6 +8,13 @@ namespace prcScript
 {
     public class Program
     {
+        static string HelpText = "prcScript: edit params through lua\n" +
+            "required: [script file] (allows multiple files)\n" +
+            "optional: \n" +
+            "  -h = print help text\n" +
+            "  -s = sandbox lua environment (prevents running unsafe code)\n" +
+            "  -l = load label file [path]";
+
         static List<string> LuaFiles { get; set; }
         static bool Sandbox { get; set; } = false;
 
@@ -29,6 +36,9 @@ namespace prcScript
             {
                 switch (args[i])
                 {
+                    case "-h":
+                        Console.WriteLine(HelpText);
+                        break;
                     case "-l":
                         HashToStringLabels = LabelIO.GetHashStringDict(args[++i]);
                         StringToHashLabels = LabelIO.GetStringHashDict(args[i]);
@@ -48,7 +58,10 @@ namespace prcScript
             }
 
             if (LuaFiles.Count == 0)
-                throw new Exception("No files specified. See -h for help");
+            {
+                Console.WriteLine("No input files specified. See -h for help");
+                return;
+            }
 
             foreach (var file in LuaFiles)
             {
