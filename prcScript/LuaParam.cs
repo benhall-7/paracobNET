@@ -1,48 +1,68 @@
 ﻿using paracobNET;
-using System.IO;
+using NLua;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace prcScript
 {
-    public class LuaParam
+    public class LuaParam : IParam
     {
-        //NLua doesn't seem to handle static properties
-        //so use the "root" property in lua files
-        public static string Root = "";
-        public string root
+        IParam Inner { get; set; }
+
+        public ParamType TypeKey => Inner.TypeKey;
+
+        public LuaParam(IParam inner)
         {
-            get => Root;
-            set => Root = value;
+            Inner = inner;
         }
 
-        public string last_dir { get; set; } = "";
-
-        /// <summary>
-        /// Opens a param file given by the path and static Root field
-        /// </summary>
-        /// <param name="path">Relative or absolute path of file to open</param>
-        /// <returns>LuaParam object corresponding to param file's root struct</returns>
-        public IParam open(string path)
+        public LuaParam get(object indexer)
         {
-            last_dir = path;
-
-            ParamFile pfile = new ParamFile();
-            pfile.Open(fix_path(path));
-            return pfile.Root;
+            switch (Inner.TypeKey)
+            {
+                case ParamType.@struct:
+                    {
+                        var s = Inner as ParamStruct;
+                        if (indexer is ulong hash)
+                            return new LuaParam(s.Nodes[hash]);
+                        else if (indexer is string label)
+                            return new LuaParam(s.Nodes[label]);
+                        else
+                            return new LuaParam(s.Nodes[(int)indexer]);
+                    }
+                case ParamType.list:
+                    {
+                        var l = Inner as ParamList;
+                        return new LuaParam(l.Nodes[(int)indexer]);
+                    }
+            }
+            return null;
         }
 
-        public void save(IParam param, string path)
+        public LuaParam get(object indexer, object labels)
         {
-            if (path == null)
-                path = last_dir;
-            ParamFile pfile = new ParamFile((ParamStruct)param);
-            pfile.Save(fix_path(path));
+            switch (Inner.TypeKey)
+            {
+                case ParamType.@struct:
+                    break;
+                case ParamType.list:
+                    {
+                        var l = Inner as ParamList;
+                        return new LuaParam(l.Nodes[(int)indexer]);
+                    }
+            }
+            return null;
         }
 
-        private string fix_path(string rel_path)
+        public void save(string path)
         {
-            string fix1 = root.Replace('/', '\\');
-            string fix2 = rel_path.Replace('/', '\\');
-            return Path.Combine(fix1, fix2);
+
+        }
+
+        public IParam Clone()
+        {
+            return Inner.Clone();
         }
     }
 }

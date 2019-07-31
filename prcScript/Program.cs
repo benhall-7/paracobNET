@@ -14,11 +14,12 @@ namespace prcScript
         static OrderedDictionary<ulong, string> HashToStringLabels { get; set; }
 
         static Lua L { get; set; }
-        static LuaParam ParamGlobal { get; set; }
+        static LuaParamGlobal ParamGlobal { get; set; }
 
         static void Main(string[] args)
         {
             LuaFiles = new List<string>();
+            LuaFiles.Add("mods.lua");
             HashToStringLabels = new OrderedDictionary<ulong, string>();
 
             for (int i = 0; i < args.Length; i++)
@@ -46,7 +47,7 @@ namespace prcScript
                     L = new Lua();
                     L.State.Encoding = Encoding.UTF8;
                     //set globals
-                    L["Param"] = new LuaParam();
+                    L["Param"] = new LuaParamGlobal();
 
                     if (Sandbox)
                     {
