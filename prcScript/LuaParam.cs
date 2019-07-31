@@ -101,9 +101,9 @@ namespace prcScript
 
         }
 
-        public IParam Clone()
+        public LuaParam copy()
         {
-            return Inner.Clone();
+            return new LuaParam(Inner.Clone());
         }
     }
 }
