@@ -1,5 +1,6 @@
 ﻿using NLua;
 using paracobNET;
+using System;
 using System.IO;
 
 namespace prcScript
@@ -31,9 +32,15 @@ namespace prcScript
             return new LuaParam(pfile.Root);
         }
 
-        private LuaTable totable(IParam param)
+        public void save(LuaParam param)
         {
-
+            save(param, last_dir);
+        }
+        public void save(LuaParam param, string path)
+        {
+            var conversion = (ParamStruct)(IParam)param;
+            ParamFile pfile = new ParamFile(conversion);
+            pfile.Save(fix_path(path));
         }
 
         private string fix_path(string rel_path)

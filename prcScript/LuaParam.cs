@@ -24,10 +24,16 @@ namespace prcScript
                 case ParamType.@struct:
                     {
                         var s = Inner as ParamStruct;
-                        if (indexer is ulong hash)
-                            return new LuaParam(s.Nodes[hash]);
+                        if (indexer is long hash)
+                            return new LuaParam(s.Nodes[(ulong)hash]);
                         else if (indexer is string label)
-                            return new LuaParam(s.Nodes[label]);
+                        {
+                            try { return new LuaParam(s.Nodes[label, Program.StringToHashLabels]); }
+                            catch (InvalidLabelException)
+                            {
+                                return new LuaParam(s.Nodes[label]);
+                            }
+                        }
                         else
                             return new LuaParam(s.Nodes[(int)indexer]);
                     }
@@ -38,26 +44,6 @@ namespace prcScript
                     }
             }
             return null;
-        }
-
-        public LuaParam get(object indexer, object labels)
-        {
-            switch (Inner.TypeKey)
-            {
-                case ParamType.@struct:
-                    break;
-                case ParamType.list:
-                    {
-                        var l = Inner as ParamList;
-                        return new LuaParam(l.Nodes[(int)indexer]);
-                    }
-            }
-            return null;
-        }
-
-        public void save(string path)
-        {
-
         }
 
         public IParam Clone()

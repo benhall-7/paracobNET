@@ -6,12 +6,13 @@ using System.Text;
 
 namespace prcScript
 {
-    class Program
+    public class Program
     {
         static List<string> LuaFiles { get; set; }
         static bool Sandbox { get; set; } = false;
 
-        static OrderedDictionary<ulong, string> HashToStringLabels { get; set; }
+        internal static OrderedDictionary<ulong, string> HashToStringLabels { get; set; }
+        internal static OrderedDictionary<string, ulong> StringToHashLabels { get; set; }
 
         static Lua L { get; set; }
         static LuaParamGlobal ParamGlobal { get; set; }
@@ -19,26 +20,36 @@ namespace prcScript
         static void Main(string[] args)
         {
             LuaFiles = new List<string>();
-            LuaFiles.Add("mods.lua");
             HashToStringLabels = new OrderedDictionary<ulong, string>();
+            StringToHashLabels = new OrderedDictionary<string, ulong>();
+            ParamGlobal = new LuaParamGlobal();
+
+            LuaFiles.Add("mods.lua");
 
             for (int i = 0; i < args.Length; i++)
             {
                 switch (args[i])
                 {
+                    case "-l":
+                        HashToStringLabels = LabelIO.GetHashStringDict(args[++i]);
+                        StringToHashLabels = LabelIO.GetStringHashDict(args[i]);
+                        break;
                     case "-s":
                     case "-safe":
                     case "-sandbox":
                         Sandbox = true;
                         break;
                     default:
-                        LuaFiles.Add(args[i]);
+                        if (args[i].StartsWith("-"))
+                            throw new Exception($"unknown command {args[i]}");
+                        else
+                            LuaFiles.Add(args[i]);
                         break;
                 }
             }
 
             if (LuaFiles.Count == 0)
-                throw new ArgumentException("No files specified. See -h for help");
+                throw new Exception("No files specified. See -h for help");
 
             foreach (var file in LuaFiles)
             {
@@ -47,7 +58,7 @@ namespace prcScript
                     L = new Lua();
                     L.State.Encoding = Encoding.UTF8;
                     //set globals
-                    L["Param"] = new LuaParamGlobal();
+                    L["Param"] = ParamGlobal;
 
                     if (Sandbox)
                     {
