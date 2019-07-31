@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace paracobNET
 {
     [Serializable]
-    public class ParamList : IParam, IQueriable
+    public class ParamList : IParam
     {
         public ParamType TypeKey { get; } = ParamType.list;
         
@@ -29,16 +29,6 @@ namespace paracobNET
             foreach (var node in Nodes)
                 clone.Nodes.Add(node.Clone());
             return clone;
-        }
-
-        public QueryResult Query(string path)
-        {
-            throw new NotImplementedException();
-        }
-
-        public QueryResult Query(string path, IDictionary<string, ulong> labels)
-        {
-            throw new NotImplementedException();
         }
     }
 }
