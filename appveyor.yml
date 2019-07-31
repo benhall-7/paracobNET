@@ -18,6 +18,8 @@ after_build:
     mkdir %APPVEYOR_BUILD_FOLDER%\build\ParamXML
 
     mkdir %APPVEYOR_BUILD_FOLDER%\build\prcEditor
+
+    mkdir %APPVEYOR_BUILD_FOLDER%\build\prcScript
     
     xcopy %APPVEYOR_BUILD_FOLDER%\ParamXML\bin\%CONFIGURATION%\netcoreapp2.1 %APPVEYOR_BUILD_FOLDER%\build\ParamXML
     
@@ -30,6 +32,8 @@ after_build:
     xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\prcEditor.exe.config %APPVEYOR_BUILD_FOLDER%\build\prcEditor
     
     xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\prcEditor.pdb %APPVEYOR_BUILD_FOLDER%\build\prcEditor
+    
+    xcopy %APPVEYOR_BUILD_FOLDER%\prcScript\bin\%CONFIGURATION%\netcoreapp2.1 %APPVEYOR_BUILD_FOLDER%\build\prcScript
     
     7z a paracobNET.zip .\build\*
     
