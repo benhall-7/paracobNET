@@ -23,16 +23,12 @@ namespace prcScript
         internal static OrderedDictionary<ulong, string> HashToStringLabels { get; set; }
         internal static OrderedDictionary<string, ulong> StringToHashLabels { get; set; }
 
-        static Lua L { get; set; }
-        static LuaParamGlobal ParamGlobal { get; set; }
-
         static void Main(string[] args)
         {
             //args = new string[] { "mods.lua", "-s", "-l", "ParamLabels.csv" };
             LuaFiles = new List<string>();
             HashToStringLabels = new OrderedDictionary<ulong, string>();
             StringToHashLabels = new OrderedDictionary<string, ulong>();
-            ParamGlobal = new LuaParamGlobal();
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -68,12 +64,11 @@ namespace prcScript
 
             foreach (var file in LuaFiles)
             {
-                using (L = new Lua())
+                using (var L = new Lua())
                 {
-                    L = new Lua();
                     L.State.Encoding = Encoding.UTF8;
                     //set globals
-                    L["Param"] = ParamGlobal;
+                    L["Param"] = new LuaParamGlobal();
                     L["sandbox"] = Sandbox;
 
                     L.DoString(Properties.Resources.sandbox);
