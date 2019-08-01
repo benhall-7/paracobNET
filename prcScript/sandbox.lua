@@ -1,4 +1,4 @@
-﻿time = os.time
+time = os.time
 clock = os.clock
 date = os.date
 
