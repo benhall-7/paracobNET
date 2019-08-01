@@ -1,8 +1,4 @@
 ﻿using paracobNET;
-using NLua;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace prcScript
 {

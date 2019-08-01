@@ -1,25 +1,29 @@
-﻿using NLua;
-using paracobNET;
-using System;
+﻿using paracobNET;
 using System.IO;
 
 namespace prcScript
 {
     public class LuaParamGlobal
     {
-        //NLua doesn't seem to handle static properties
-        //so use the "root" property in lua files
-        public static string Root = "";
-        public string root
+        //only public, non-static properties exposed to lua context
+        internal static string OpenDir { get; set; } = "";
+        public string open_dir
         {
-            get => Root;
-            set => Root = value;
+            get => OpenDir;
+            set => OpenDir = value;
         }
 
-        public string last_dir { get; set; } = "";
+        internal static string SaveDir { get; set; } = "";
+        public string save_dir
+        {
+            get => SaveDir;
+            set => SaveDir = value;
+        }
+
+        private string last_dir { get; set; } = "";
 
         /// <summary>
-        /// Opens a param file given by the path and static Root field
+        /// Opens a param file combining path and the static property 'open_dir'
         /// </summary>
         /// <param name="path">Relative or absolute path of file to open</param>
         /// <returns>LuaParam object corresponding to param file's root struct</returns>
@@ -28,7 +32,10 @@ namespace prcScript
             last_dir = path;
 
             ParamFile pfile = new ParamFile();
-            pfile.Open(fix_path(path));
+            string fix1 = OpenDir.Replace('/', '\\');
+            string fix2 = path.Replace('/', '\\');
+            string real = Path.Combine(fix1, fix2);
+            pfile.Open(real);
             return new LuaParam(pfile.Root);
         }
 
@@ -40,14 +47,10 @@ namespace prcScript
         {
             var conversion = (ParamStruct)param.Inner;
             ParamFile pfile = new ParamFile(conversion);
-            pfile.Save(fix_path(path));
-        }
-
-        private string fix_path(string rel_path)
-        {
-            string fix1 = root.Replace('/', '\\');
-            string fix2 = rel_path.Replace('/', '\\');
-            return Path.Combine(fix1, fix2);
+            string fix1 = SaveDir.Replace('/', '\\');
+            string fix2 = path.Replace('/', '\\');
+            string real = Path.Combine(fix1, fix2);
+            pfile.Save(real);
         }
     }
 }

@@ -8,17 +8,9 @@ namespace prcScript
 {
     public class Program
     {
-        static string HelpText = "prcScript: edit params through lua\n" +
-            "required: [script file] (allows multiple files)\n" +
-            "optional: \n" +
-            "  -h = print help text\n" +
-            "       (alias: -help)\n" +
-            "  -s = sandbox lua environment (prevents running unsafe code)\n" +
-            "       (alias: -safe | -sandbox)\n" +
-            "  -l = load label file [path]";
-
         static List<string> LuaFiles { get; set; }
         static bool Sandbox { get; set; } = false;
+        static bool PrintedHelp { get; set; } = false;
 
         internal static OrderedDictionary<ulong, string> HashToStringLabels { get; set; }
         internal static OrderedDictionary<string, ulong> StringToHashLabels { get; set; }
@@ -36,7 +28,13 @@ namespace prcScript
                 {
                     case "-h":
                     case "-help":
-                        Console.WriteLine(HelpText);
+                        Console.WriteLine(Properties.Resources.Help);
+                        PrintedHelp = true;
+                        break;
+                    case "-a":
+                    case "-api":
+                        Console.WriteLine(Properties.Resources.LuaAPI);
+                        PrintedHelp = true;
                         break;
                     case "-l":
                         HashToStringLabels = LabelIO.GetHashStringDict(args[++i]);
@@ -58,7 +56,8 @@ namespace prcScript
 
             if (LuaFiles.Count == 0)
             {
-                Console.WriteLine("No input files specified. See -h for help");
+                if (!PrintedHelp)
+                    Console.WriteLine("No input files specified. See -h for help");
                 return;
             }
 
@@ -71,7 +70,7 @@ namespace prcScript
                     L["Param"] = new LuaParamGlobal();
                     L["sandbox"] = Sandbox;
 
-                    L.DoString(Properties.Resources.sandbox);
+                    L.DoString(Properties.Resources.Sandbox);
 
                     L.DoFile(file);
                 }

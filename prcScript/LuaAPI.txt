@@ -1,0 +1,41 @@
+﻿Lua version: 5.3
+
+[Globals] 
+sandbox : boolean
+   <returns true if prcScript is run with the -s flag>
+Param : userdata
+|   <contains methods and properties to interact with params>
++-> open_dir : string
+|       <gets or sets the directory root for opening params>
++-> save_dir : string
+|       <gets or sets the directory root for saving params>
++-> open : function(string)
+|       <returns a param object using the given relative path>
++-> save : function(param)
+|       <saves a param object, assumes the last relative open path>
++-> save : function(param, string)
+        <saves a param object using the given relative path
+time : function()
+    <from os.time>
+clock : function()
+    <from os.clock>
+date : function()
+    <from os.date>
+
+[Other]
+param : userdata
+|   <returned from Param:open, expected in Param:save>
++-> type : string
+|       <gets the ParamType name of the associated IParam object>
++-> value : any
+|       <gets or sets the value of the param>
+|       <does nothing if the param type is not a value>
++-> children : table
+|       <gets a copy of the child params as a table>
+|       <does nothing if the param type is a value>
++-> get_child : function(any)
+|       <returns a child param using the provided index>
+|       <does nothing if the param type is a value>
+|       <index can be a hash, string, or integer>
++-> copy : function
+        <returns a full copy of the current param>

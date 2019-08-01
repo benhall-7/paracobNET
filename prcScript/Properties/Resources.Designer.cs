@@ -61,11 +61,45 @@ namespace prcScript.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to prcScript: edit params through lua
+        ///required: [script file] (allows multiple files)
+        ///optional:
+        ///  -h = print help text
+        ///       (alias: -help)
+        ///  -a = print lua api
+        ///       (alias: -api)
+        ///  -l = load label file [path]
+        ///  -s = sandbox lua environment (prevents running unsafe code)
+        ///       (alias: -safe | -sandbox).
+        /// </summary>
+        internal static string Help {
+            get {
+                return ResourceManager.GetString("Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Lua version: 5.3
+        ///
+        ///Globals:
+        ///Param   : userdata
+        ///  contains methods and properties for interacting with param files 
+        ///sandbox : boolean
+        ///  returns true if prcScript is run with the -s flag
+        ///.
+        /// </summary>
+        internal static string LuaAPI {
+            get {
+                return ResourceManager.GetString("LuaAPI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] sandbox {
+        internal static byte[] Sandbox {
             get {
-                object obj = ResourceManager.GetObject("sandbox", resourceCulture);
+                object obj = ResourceManager.GetObject("Sandbox", resourceCulture);
                 return ((byte[])(obj));
             }
         }
