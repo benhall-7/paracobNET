@@ -74,24 +74,9 @@ namespace prcScript
                     L.State.Encoding = Encoding.UTF8;
                     //set globals
                     L["Param"] = ParamGlobal;
-                    //add some timing functions in case the lua environment is sandboxed
-                    L.DoString("time = os.time\n" +
-                        "clock = os.clock\n" +
-                        "date = os.date");
+                    L["sandbox"] = Sandbox;
 
-                    if (Sandbox)
-                    {
-                        L.DoString("debug = nil\n" +
-                            "io = nil\n" +
-                            "luanet = nil\n" +
-                            "os = nil\n" +
-                            "package = nil\n" +
-                            "collectgarbage = nil\n" +
-                            "dofile = nil\n" +
-                            "load = nil\n" +
-                            "loadfile = nil\n" +
-                            "require = nil");
-                    }
+                    L.DoString(Properties.Resources.sandbox);
 
                     L.DoFile(file);
                 }
