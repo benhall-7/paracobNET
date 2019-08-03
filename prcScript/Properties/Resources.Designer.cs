@@ -81,12 +81,19 @@ namespace prcScript.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Lua version: 5.3
         ///
-        ///Globals:
-        ///Param   : userdata
-        ///  contains methods and properties for interacting with param files 
+        ///[Globals] 
         ///sandbox : boolean
-        ///  returns true if prcScript is run with the -s flag
-        ///.
+        ///   &lt;returns true if prcScript is run with the -s flag&gt;
+        ///Param : userdata
+        ///|   &lt;contains methods and properties to interact with params&gt;
+        ///+-&gt; open_dir : string
+        ///|       &lt;gets or sets the directory root for opening params&gt;
+        ///+-&gt; save_dir : string
+        ///|       &lt;gets or sets the directory root for saving params&gt;
+        ///+-&gt; open : function(string)
+        ///|       &lt;returns a param object using the given relative path&gt;
+        ///+-&gt; save : function(param)
+        ///|       &lt;saves a param object, ass [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string LuaAPI {
             get {
@@ -95,12 +102,35 @@ namespace prcScript.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
+        ///   Looks up a localized string similar to return {}.
         /// </summary>
-        internal static byte[] Sandbox {
+        internal static string LuaNewTable {
             get {
-                object obj = ResourceManager.GetObject("Sandbox", resourceCulture);
-                return ((byte[])(obj));
+                return ResourceManager.GetString("LuaNewTable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to time = os.time
+        ///clock = os.clock
+        ///date = os.date
+        ///
+        ///if sandbox then
+        ///    collectgarbage = nil
+        ///    debug = nil
+        ///    dofile = nil
+        ///    io = nil
+        ///    luanet = nil
+        ///    load = nil
+        ///    loadfile = nil
+        ///    os = nil
+        ///    package = nil
+        ///    require = nil
+        ///end.
+        /// </summary>
+        internal static string Sandbox {
+            get {
+                return ResourceManager.GetString("Sandbox", resourceCulture);
             }
         }
     }

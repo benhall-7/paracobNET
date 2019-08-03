@@ -15,6 +15,8 @@ namespace prcScript
         internal static OrderedDictionary<ulong, string> HashToStringLabels { get; set; }
         internal static OrderedDictionary<string, ulong> StringToHashLabels { get; set; }
 
+        internal static Lua L { get; set; }
+
         static void Main(string[] args)
         {
             //args = new string[] { "mods.lua", "-s", "-l", "ParamLabels.csv" };
@@ -63,7 +65,7 @@ namespace prcScript
 
             foreach (var file in LuaFiles)
             {
-                using (var L = new Lua())
+                using (L = new Lua())
                 {
                     L.State.Encoding = Encoding.UTF8;
                     //set globals

@@ -1,4 +1,5 @@
-﻿using paracobNET;
+﻿using NLua;
+using paracobNET;
 using System.IO;
 
 namespace prcScript
@@ -51,6 +52,11 @@ namespace prcScript
             string fix2 = path.Replace('/', '\\');
             string real = Path.Combine(fix1, fix2);
             pfile.Save(real);
+        }
+
+        public LuaParam table2param(LuaTable table)
+        {
+
         }
     }
 }

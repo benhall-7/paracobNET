@@ -1,4 +1,5 @@
-﻿using paracobNET;
+﻿using NLua;
+using paracobNET;
 
 namespace prcScript
 {
@@ -24,41 +25,7 @@ namespace prcScript
             }
         }
 
-        /// <summary>
-        /// Child params as an array. First and last elements are null to work as lua tables
-        /// </summary>
-        public LuaParam[] children
-        {
-            get
-            {
-                switch (Inner.TypeKey)
-                {
-                    case ParamType.@struct:
-                        {
-                            var s = Inner as ParamStruct;
-                            var prms = new LuaParam[s.Nodes.Count + 2];
-                            for (int i = 0; i < s.Nodes.Count; i++)
-                            {
-                                prms[i + 1] = new LuaParam(s.Nodes[i]);
-                            }
-                            return prms;
-                        }
-                    case ParamType.list:
-                        {
-                            var l = Inner as ParamList;
-                            var prms = new LuaParam[l.Nodes.Count + 2];
-                            for (int i = 0; i < l.Nodes.Count; i++)
-                            {
-                                prms[i + 1] = new LuaParam(l.Nodes[i]);
-                            }
-                            return prms;
-                        }
-                }
-                return null;
-            }
-        }
-
-        public LuaParam(IParam inner)
+        internal LuaParam(IParam inner)
         {
             Inner = inner;
         }
@@ -92,14 +59,48 @@ namespace prcScript
             return null;
         }
 
-        public void set_child(object indexer, LuaParam child)
+        public LuaTable totable()
         {
-
+            var t = newtable();
+            t["type"] = type;
+            switch (Inner.TypeKey)
+            {
+                case ParamType.@struct:
+                    {
+                        var s = Inner as ParamStruct;
+                        int lua_i = 1;
+                        foreach (var n in s.Nodes)
+                        {
+                            var t2 = newtable();
+                            t2["hash"] = n.Key;
+                            t2["param"] = new LuaParam(n.Value);
+                            t[lua_i++] = t2;
+                        }
+                    }
+                    break;
+                case ParamType.list:
+                    {
+                        var l = Inner as ParamList;
+                        int lua_i = 1;
+                        foreach (var n in l.Nodes)
+                            t[lua_i++] = new LuaParam(n);
+                    }
+                    break;
+                default:
+                    t["value"] = value;
+                    break;
+            }
+            return t;
         }
 
         public LuaParam copy()
         {
             return new LuaParam(Inner.Clone());
+        }
+
+        private LuaTable newtable()
+        {
+            return Program.L.DoString(Properties.Resources.LuaNewTable)[0] as LuaTable;
         }
     }
 }
