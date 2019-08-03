@@ -40,7 +40,6 @@ namespace paracobNET
 
         public void Start()
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(Filepath));
             using (FileStream = File.Create(Filepath))
             using (WriterHeader = new BinaryWriter(new MemoryStream()))
             using (WriterHash = new BinaryWriter(new MemoryStream()))

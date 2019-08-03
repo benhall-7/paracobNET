@@ -283,6 +283,7 @@ namespace prcEditor
 
                 WorkerQueue.Enqueue(new EnqueuableStatus(() =>
                 {
+                    Directory.CreateDirectory(Path.GetDirectoryName(sfd.FileName));
                     PFile.Save(sfd.FileName);
                     IsOpenEnabled = true;
                     IsSaveEnabled = true;

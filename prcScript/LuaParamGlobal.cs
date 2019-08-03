@@ -52,6 +52,7 @@ namespace prcScript
             string fix1 = SaveDir.Replace('/', '\\');
             string fix2 = path.Replace('/', '\\');
             string real = Path.Combine(fix1, fix2);
+            Directory.CreateDirectory(Path.GetDirectoryName(real));
             pfile.Save(real);
         }
 

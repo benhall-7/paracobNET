@@ -102,6 +102,7 @@ namespace ParamXML
                     file = new ParamFile(Node2ParamStruct(xml.DocumentElement));
 
                     Console.WriteLine("Assembling...");
+                    Directory.CreateDirectory(Path.GetDirectoryName(output));
                     file.Save(output);
 
                     stopwatch.Stop();
