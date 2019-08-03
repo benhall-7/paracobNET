@@ -1,5 +1,6 @@
 ﻿using NLua;
 using paracobNET;
+using System;
 using System.IO;
 
 namespace prcScript
@@ -54,9 +55,37 @@ namespace prcScript
             pfile.Save(real);
         }
 
-        public LuaParam table2param(LuaTable table)
+        public static LuaParam table2param(LuaTable table)
         {
-
+            string type = (string)table["type"];
+            ParamType ptype = (ParamType)Enum.Parse(typeof(ParamType), type);
+            switch (ptype)
+            {
+                case ParamType.@struct:
+                    {
+                        var s = new ParamStruct();
+                        int lua_i = 1;
+                        while (table[lua_i++] is LuaTable t)
+                        {
+                            var key = (ulong)t["hash"];
+                            var value = ((LuaParam)t["param"]).Inner;
+                            s.Nodes.Add(key, value);
+                        }
+                        return new LuaParam(s);
+                    }
+                case ParamType.list:
+                    {
+                        var l = new ParamList();
+                        int lua_i = 1;
+                        while (table[lua_i++] is LuaParam p)
+                            l.Nodes.Add(p.Inner);
+                        return new LuaParam(l);
+                    }
+                default:
+                    var v = new ParamValue(ptype);
+                    v.SetValue(table["value"].ToString(), Program.StringToHashLabels);
+                    return new LuaParam(v);
+            }
         }
     }
 }
