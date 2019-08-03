@@ -81,6 +81,7 @@ namespace ParamXML
                     xml.AppendChild(ParamStruct2Node(file.Root));
                     XmlWriterSettings settings = new XmlWriterSettings() { Indent = true };
                     XmlWriter writer = XmlWriter.Create(output, settings);
+                    Directory.CreateDirectory(Path.GetDirectoryName(output));
                     xml.Save(writer);
 
                     stopwatch.Stop();
