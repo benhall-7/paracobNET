@@ -4,7 +4,6 @@ configuration: Release
 #platform: Any CPU
 environment:
   TIMESTAMP: n/a
-cache: #'%USERPROFILE%\.nuget\packages'
 before_build:
 - cmd: >-
     set TIMESTAMP=%date% %time%
