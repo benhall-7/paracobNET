@@ -1,9 +1,10 @@
-version: 1.0.{build}
+version: {build}
 image: Visual Studio 2019
 configuration: Release
 platform: Any CPU
 environment:
   TIMESTAMP: n/a
+cache: '%USERPROFILE%\.nuget\packages'
 before_build:
 - cmd: >-
     set TIMESTAMP=%date% %time%
