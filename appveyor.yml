@@ -11,7 +11,7 @@ before_build:
 
     dotnet restore
 build:
-- verbosity: minimal
+  verbosity: minimal
   publish_core_console: true
 after_build:
 - cmd: >-
