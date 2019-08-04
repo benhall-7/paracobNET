@@ -1,45 +1,32 @@
 version: '{build}'
 image: Visual Studio 2019
 configuration: Release
-platform: 'Any CPU'
+#platform: Any CPU
 environment:
   TIMESTAMP: n/a
 cache: #'%USERPROFILE%\.nuget\packages'
 before_build:
 - cmd: >-
     set TIMESTAMP=%date% %time%
-    
-    dotnet restore
-    
-    dotnet publish -o build ParamXML
-    
-    dotnet publish -o build prcScript
-    
-    cd %APPVEYOR_BUILD_FOLDER%
+     dotnet restore
+     dotnet publish -o build ParamXML
+     dotnet publish -o build prcScript
+     cd %APPVEYOR_BUILD_FOLDER%
 build:
   verbosity: minimal
   project: prcEditor
 after_build:
 - cmd: >-
     mkdir %APPVEYOR_BUILD_FOLDER%\build\ParamXML,%APPVEYOR_BUILD_FOLDER%\build\prcEditor,%APPVEYOR_BUILD_FOLDER%\build\prcScript
-    
-    xcopy %APPVEYOR_BUILD_FOLDER%\ParamXML\build %APPVEYOR_BUILD_FOLDER%\build\ParamXML
-    
-    xcopy %APPVEYOR_BUILD_FOLDER%\prcScript\build %APPVEYOR_BUILD_FOLDER%\build\prcScript
-    
-    xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\paracobNET.dll %APPVEYOR_BUILD_FOLDER%\build\prcEditor
-    
-    xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\paracobNET.pdb %APPVEYOR_BUILD_FOLDER%\build\prcEditor
-    
-    xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\prcEditor.exe %APPVEYOR_BUILD_FOLDER%\build\prcEditor
-    
-    xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\prcEditor.exe.config %APPVEYOR_BUILD_FOLDER%\build\prcEditor
-    
-    xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\prcEditor.pdb %APPVEYOR_BUILD_FOLDER%\build\prcEditor
-    
-    7z a paracobNET.zip .\build\*
-    
-    appveyor PushArtifact paracobNET.zip
+     xcopy %APPVEYOR_BUILD_FOLDER%\ParamXML\build %APPVEYOR_BUILD_FOLDER%\build\ParamXML
+     xcopy %APPVEYOR_BUILD_FOLDER%\prcScript\build %APPVEYOR_BUILD_FOLDER%\build\prcScript
+     xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\paracobNET.dll %APPVEYOR_BUILD_FOLDER%\build\prcEditor
+     xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\paracobNET.pdb %APPVEYOR_BUILD_FOLDER%\build\prcEditor
+     xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\prcEditor.exe %APPVEYOR_BUILD_FOLDER%\build\prcEditor
+     xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\prcEditor.exe.config %APPVEYOR_BUILD_FOLDER%\build\prcEditor
+     xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\prcEditor.pdb %APPVEYOR_BUILD_FOLDER%\build\prcEditor
+     7z a paracobNET.zip .\build\*
+     appveyor PushArtifact paracobNET.zip
 deploy:
 - provider: GitHub
   tag: v2.∞
