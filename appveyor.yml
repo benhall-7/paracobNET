@@ -10,7 +10,6 @@ before_build:
      dotnet restore
      dotnet publish -o build ParamXML
      dotnet publish -o build prcScript
-     cd %APPVEYOR_BUILD_FOLDER%
 build:
   verbosity: minimal
   project: prcEditor
