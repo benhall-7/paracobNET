@@ -13,4 +13,5 @@ if sandbox then
     os = nil
     package = nil
     require = nil
+    print("applied sandbox")
 end
