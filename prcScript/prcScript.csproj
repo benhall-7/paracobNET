@@ -6,6 +6,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Help.txt" />
+    <None Remove="LuaAPI.txt" />
+    <None Remove="sandbox.lua" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Help.txt" />
+    <EmbeddedResource Include="LuaAPI.txt" />
+    <EmbeddedResource Include="sandbox.lua" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\paracobNET\paracobNET.csproj" />
   </ItemGroup>
 
