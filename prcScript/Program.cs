@@ -23,6 +23,7 @@ namespace prcScript
             LuaFiles = new List<string>();
             HashToStringLabels = new OrderedDictionary<ulong, string>();
             StringToHashLabels = new OrderedDictionary<string, ulong>();
+            Resources.SetUp();
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -30,12 +31,12 @@ namespace prcScript
                 {
                     case "-h":
                     case "-help":
-                        Console.WriteLine(Properties.Resources.Help);
+                        Console.WriteLine(Resources.Help);
                         PrintedHelp = true;
                         break;
                     case "-a":
                     case "-api":
-                        Console.WriteLine(Properties.Resources.LuaAPI);
+                        Console.WriteLine(Resources.LuaAPI);
                         PrintedHelp = true;
                         break;
                     case "-l":
@@ -72,7 +73,7 @@ namespace prcScript
                     L["Param"] = new LuaParamGlobal();
                     L["sandbox"] = Sandbox;
 
-                    L.DoString(Properties.Resources.Sandbox);
+                    L.DoString(Resources.LuaSandbox);
 
                     L.DoFile(file);
                 }

@@ -6,26 +6,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Help.txt" />
+    <None Remove="LuaAPI.txt" />
+    <None Remove="sandbox.lua" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Help.txt" />
+    <EmbeddedResource Include="LuaAPI.txt" />
+    <EmbeddedResource Include="sandbox.lua" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\paracobNET\paracobNET.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="NLua" Version="1.4.20" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

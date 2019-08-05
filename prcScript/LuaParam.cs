@@ -100,7 +100,7 @@ namespace prcScript
 
         private LuaTable newtable()
         {
-            return Program.L.DoString(Properties.Resources.LuaNewTable)[0] as LuaTable;
+            return Program.L.DoString(Resources.LuaNewTable)[0] as LuaTable;
         }
     }
 }
