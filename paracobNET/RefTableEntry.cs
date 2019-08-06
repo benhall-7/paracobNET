@@ -7,17 +7,17 @@ namespace paracobNET
     internal class RefTableEntry
     {
         public int RefTableOffset { get; set; }
-        public Dictionary<int, int> HashOffsets { get; set; }
+        public List<KeyValuePair<int, int>> HashOffsets { get; set; }
         public ParamStruct CorrespondingStruct { get; set; }
 
         public RefTableEntry(ParamStruct correspondingStruct)
         {
             CorrespondingStruct = correspondingStruct;
-            HashOffsets = new Dictionary<int, int>();
+            HashOffsets = new List<KeyValuePair<int, int>>();
         }
         public RefTableEntry()
         {
-            HashOffsets = new Dictionary<int, int>();
+            HashOffsets = new List<KeyValuePair<int, int>>();
         }
 
         public override bool Equals(object other)

@@ -48,7 +48,7 @@ namespace prcScript
                             }
                         }
                         else
-                            return new LuaParam(s.Nodes[(int)indexer]);
+                            return new LuaParam(s.Nodes[(int)indexer].Value);
                     }
                 case ParamType.list:
                     {

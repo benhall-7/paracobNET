@@ -91,7 +91,7 @@ namespace paracobNET
                         {
                             int hashIndex = AsmHashTable.IndexOf(node.Key);
                             int relOffset = (int)(WriterParam.BaseStream.Position - start);
-                            entry.HashOffsets.Add(hashIndex, relOffset);
+                            entry.HashOffsets.Add(new KeyValuePair<int, int>(hashIndex, relOffset));
 
                             Write(node.Value);
                         }

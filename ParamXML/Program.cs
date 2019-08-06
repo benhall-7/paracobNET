@@ -81,7 +81,9 @@ namespace ParamXML
                     xml.AppendChild(ParamStruct2Node(file.Root));
                     XmlWriterSettings settings = new XmlWriterSettings() { Indent = true };
                     XmlWriter writer = XmlWriter.Create(output, settings);
-                    Directory.CreateDirectory(Path.GetDirectoryName(output));
+                    var dirname = Path.GetDirectoryName(output);
+                    if (!string.IsNullOrEmpty(dirname))
+                        Directory.CreateDirectory(dirname);
                     xml.Save(writer);
 
                     stopwatch.Stop();
@@ -102,7 +104,9 @@ namespace ParamXML
                     file = new ParamFile(Node2ParamStruct(xml.DocumentElement));
 
                     Console.WriteLine("Assembling...");
-                    Directory.CreateDirectory(Path.GetDirectoryName(output));
+                    var dirname = Path.GetDirectoryName(output);
+                    if (!string.IsNullOrEmpty(dirname))
+                        Directory.CreateDirectory(dirname);
                     file.Save(output);
 
                     stopwatch.Stop();
@@ -209,7 +213,7 @@ namespace ParamXML
 
         static ParamStruct Node2ParamStruct(XmlNode node)
         {
-            Hash40Dictionary<IParam> childParams = new Hash40Dictionary<IParam>();
+            Hash40Pairs<IParam> childParams = new Hash40Pairs<IParam>();
             foreach (XmlNode child in node.ChildNodes)
                 childParams.Add(child.Attributes["hash"].Value, stringToHashLabels, Node2Param(child));
             return new ParamStruct(childParams);

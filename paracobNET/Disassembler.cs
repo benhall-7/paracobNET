@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace paracobNET
 {
@@ -10,7 +11,7 @@ namespace paracobNET
 
         BinaryReader Reader { get; set; }
         ulong[] HashTable { get; set; }
-        Dictionary<int, SortedDictionary<int, int>> RefEntries { get; set; }
+        Dictionary<int, IOrderedEnumerable<KeyValuePair<int, int>>> RefEntries { get; set; }
 
         int HashTableSize { get; set; }
         int RefTableSize { get; set; }
@@ -23,7 +24,7 @@ namespace paracobNET
         public Disassembler(string filepath)
         {
             Filepath = filepath;
-            RefEntries = new Dictionary<int, SortedDictionary<int, int>>();
+            RefEntries = new Dictionary<int, IOrderedEnumerable<KeyValuePair<int, int>>>();
         }
 
         public ParamStruct Start()
@@ -75,23 +76,20 @@ namespace paracobNET
 
                         var str = new ParamStruct(size);
 
-                        SortedDictionary<int, int> hashOffsets;
+                        IOrderedEnumerable<KeyValuePair<int, int>> hashOffsets;
                         if (RefEntries.TryGetValue(structRefOffset, out var refEntry))
                             hashOffsets = refEntry;
                         else
                         {
-                            hashOffsets = new SortedDictionary<int, int>();
                             Reader.BaseStream.Position = structRefOffset + RefStart;
+                            var tempHashOffsets = new List<KeyValuePair<int, int>>(size);
                             for (int i = 0; i < size; i++)
                             {
                                 int hashIndex = Reader.ReadInt32();
                                 int paramOffset = Reader.ReadInt32();
-                                try { hashOffsets.Add(hashIndex, paramOffset); }
-                                catch
-                                {
-                                    RaiseDuplicateKeyEvent?.Invoke(null, new DuplicateKeyEventArgs(HashTable[hashIndex]));
-                                }
+                                tempHashOffsets.Add(new KeyValuePair<int, int>(hashIndex, paramOffset));
                             }
+                            hashOffsets = tempHashOffsets.OrderBy(a => a.Key);
                             RefEntries.Add(structRefOffset, hashOffsets);
                         }
 

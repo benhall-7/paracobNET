@@ -7,17 +7,17 @@ namespace paracobNET
     public class ParamStruct : IParam
     {
         public ParamType TypeKey { get; } = ParamType.@struct;
-        public Hash40Dictionary<IParam> Nodes { get; set; }
+        public Hash40Pairs<IParam> Nodes { get; set; }
 
         public ParamStruct()
         {
-            Nodes = new Hash40Dictionary<IParam>();
+            Nodes = new Hash40Pairs<IParam>();
         }
         public ParamStruct(int capacity)
         {
-            Nodes = new Hash40Dictionary<IParam>(capacity);
+            Nodes = new Hash40Pairs<IParam>(capacity);
         }
-        public ParamStruct(Hash40Dictionary<IParam> nodes)
+        public ParamStruct(Hash40Pairs<IParam> nodes)
         {
             Nodes = nodes;
         }
