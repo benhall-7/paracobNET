@@ -13,10 +13,6 @@ namespace paracobNET
         {
             return (byte)(hash40 >> 32);
         }
-        public static ulong StringToHash40(string word)
-        {
-            return (ulong)word.Length << 32 | Util.CRC32(word);
-        }
         public static string FormatToString(ulong hash40)
         {
             return "0x" + hash40.ToString("x10");
@@ -26,6 +22,10 @@ namespace paracobNET
             if (labels.TryGetValue(hash40, out string val))
                 return val;
             else return FormatToString(hash40);
+        }
+        public static ulong StringToHash40(string word)
+        {
+            return (ulong)word.Length << 32 | Util.CRC32(word);
         }
         public static ulong LabelToHash40(string hash40, IDictionary<string, ulong> labels)
         {

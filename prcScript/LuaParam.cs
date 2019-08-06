@@ -30,36 +30,43 @@ namespace prcScript
             Inner = inner;
         }
 
-        public LuaParam get_child(object indexer)
+        public LuaParam by_hash(ulong hash)
         {
-            switch (Inner.TypeKey)
+            if (Inner is ParamStruct s)
+                return new LuaParam(s.Nodes[hash]);
+            return null;
+        }
+
+        public LuaParam by_label(string label)
+        {
+            if (Inner is ParamStruct s)
             {
-                case ParamType.@struct:
-                    {
-                        var s = Inner as ParamStruct;
-                        if (indexer is long hash)
-                            return new LuaParam(s.Nodes[(ulong)hash]);
-                        else if (indexer is string label)
-                        {
-                            try { return new LuaParam(s.Nodes[label, Program.StringToHashLabels]); }
-                            catch (InvalidLabelException)
-                            {
-                                return new LuaParam(s.Nodes[label]);
-                            }
-                        }
-                        else
-                            return new LuaParam(s.Nodes[(int)indexer].Value);
-                    }
-                case ParamType.list:
-                    {
-                        var l = Inner as ParamList;
-                        return new LuaParam(l.Nodes[(int)indexer]);
-                    }
+                IParam child;
+                try { child = s.Nodes[label, Program.StringToHashLabels]; }
+                catch (InvalidLabelException)
+                {
+                    //if the string as hash40 isn't present it will throw an exception
+                    //stating that the string is not found, which is good behavior!
+                    child = s.Nodes[label];
+                }
+                return new LuaParam(child);
             }
             return null;
         }
 
-        public LuaTable totable()
+        public LuaParam by_index(int index)
+        {
+            switch (Inner.TypeKey)
+            {
+                case ParamType.@struct:
+                    return new LuaParam((Inner as ParamStruct).Nodes[index].Value);
+                case ParamType.list:
+                    return new LuaParam((Inner as ParamList).Nodes[index]);
+            }
+            return null;
+        }
+
+        public LuaTable to_table()
         {
             var t = newtable();
             t["type"] = type;
@@ -93,7 +100,7 @@ namespace prcScript
             return t;
         }
 
-        public LuaParam copy()
+        public LuaParam clone()
         {
             return new LuaParam(Inner.Clone());
         }
