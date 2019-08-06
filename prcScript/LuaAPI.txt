@@ -14,7 +14,7 @@ Param : userdata
 +-> save : function(param)
 |       <saves a param object, assumes the last relative open path>
 +-> save : function(param, string)
-|       <saves a param object using the given relative path
+|       <saves a param object using the given relative path>
 +-> table2param : function(table)
         <converts a lua table to param userdata>
 		<you can convert params to tables through param methods>
@@ -39,11 +39,10 @@ param : userdata
 |       <returns a struct's child param using string label>
 +-> by_index : function(number)
 |       <returns a struct's or list's child using index>
-+-> to_table : table
++-> to_table : function
 |       <converts a param to table format>
 |       <values  -> contains "type" and "value" keys>
 |       <lists   -> contains "type" and indexed params>
 |       <structs -> contains "type" and indexed {hash, param} tables>
-|       <does nothing if the param type is a value>
 +-> clone : function
         <returns a deep copy of the current param>
