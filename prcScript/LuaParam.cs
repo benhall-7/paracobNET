@@ -21,6 +21,8 @@ namespace prcScript
             {
                 if (Inner.TypeKey == ParamType.@struct || Inner.TypeKey == ParamType.list)
                     return;
+                //To do: value.ToString() doesn't handle the case where the param is a hash40
+                //and the value is a ulong, because ulong formatting doesn't use 0x by default
                 (Inner as ParamValue).SetValue(value.ToString(), Program.StringToHashLabels);
             }
         }
@@ -42,6 +44,7 @@ namespace prcScript
             if (Inner is ParamStruct s)
             {
                 IParam child;
+                //if the label isn't in the dictionary, catch it and convert directly to hash40 instead
                 try { child = s.Nodes[label, Program.StringToHashLabels]; }
                 catch (InvalidLabelException)
                 {

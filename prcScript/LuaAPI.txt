@@ -14,7 +14,10 @@ Param : userdata
 +-> save : function(param)
 |       <saves a param object, assumes the last relative open path>
 +-> save : function(param, string)
-        <saves a param object using the given relative path
+|       <saves a param object using the given relative path
++-> table2param : function(table)
+        <converts a lua table to param userdata>
+		<you can convert params to tables through param methods>
 time : function()
     <from os.time>
 clock : function()
@@ -30,12 +33,17 @@ param : userdata
 +-> value : any
 |       <gets or sets the value of the param>
 |       <does nothing if the param type is not a value>
-+-> children : table
-|       <gets a copy of the child params as a table>
++-> by_hash : function(ulong)
+|       <returns a struct's child param using provided hash>
++-> by_label : function(string)
+|       <returns a struct's child param using string label>
++-> by_index : function(number)
+|       <returns a struct's or list's child using index>
++-> to_table : table
+|       <converts a param to table format>
+|       <values  -> contains "type" and "value" keys>
+|       <lists   -> contains "type" and indexed params>
+|       <structs -> contains "type" and indexed {hash, param} tables>
 |       <does nothing if the param type is a value>
-+-> get_child : function(any)
-|       <returns a child param using the provided index>
-|       <does nothing if the param type is a value>
-|       <index can be a hash, string, or integer>
-+-> copy : function
-        <returns a full copy of the current param>
++-> clone : function
+        <returns a deep copy of the current param>
