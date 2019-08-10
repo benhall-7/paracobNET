@@ -19,8 +19,6 @@ namespace paracobNET
         int RefStart { get { return 0x10 + HashTableSize; } }
         int ParamStart { get { return 0x10 + HashTableSize + RefTableSize; } }
 
-        public EventHandler<DuplicateKeyEventArgs> RaiseDuplicateKeyEvent;
-
         public Disassembler(string filepath)
         {
             Filepath = filepath;
@@ -161,7 +159,13 @@ namespace paracobNET
                                 v = HashTable[Reader.ReadUInt32()];
                                 break;
                             case ParamType.@string:
-                                v = Util.ReadStringAt(Reader, RefStart + Reader.ReadInt32());
+                                long returnTo = Reader.BaseStream.Position;
+                                Reader.BaseStream.Seek(RefStart + Reader.ReadInt32(), SeekOrigin.Begin);
+                                string s = ""; char c;
+                                while ((c = Reader.ReadChar()) != 0)
+                                    s += c;
+                                Reader.BaseStream.Seek(returnTo, SeekOrigin.Begin);
+                                v = s;
                                 break;
                         }
 

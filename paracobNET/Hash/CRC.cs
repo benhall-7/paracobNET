@@ -1,20 +1,7 @@
-﻿using System;
-using System.IO;
-
-namespace paracobNET
+﻿namespace paracobNET
 {
-    internal static class Util
+    internal static class CRC
     {
-        internal static string ReadStringAt(BinaryReader reader, int position)
-        {
-            long returnTo = reader.BaseStream.Position;
-            reader.BaseStream.Seek(position, SeekOrigin.Begin);
-            string s = ""; char c;
-            while ((c = reader.ReadChar()) != 0)
-                s += c;
-            reader.BaseStream.Seek(returnTo, SeekOrigin.Begin);
-            return s;
-        }
         internal static uint CRC32(string word)
         {
             uint hash = 0xffffffff;

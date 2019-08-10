@@ -7,8 +7,6 @@ namespace paracobNET
         public const string Magic = "paracobn";
         public ParamStruct Root { get; set; }
 
-        public event EventHandler<DuplicateKeyEventArgs> RaiseDuplicateKeyEvent;
-
         public ParamFile()
         {
             Root = new ParamStruct();
@@ -21,7 +19,6 @@ namespace paracobNET
         public void Open(string filepath)
         {
             Disassembler disassembler = new Disassembler(filepath);
-            disassembler.RaiseDuplicateKeyEvent = RaiseDuplicateKeyEvent;
             Root = disassembler.Start();
         }
 

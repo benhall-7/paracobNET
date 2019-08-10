@@ -56,16 +56,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="EnqueuableStatus.cs" />
-    <Compile Include="StatusChangeEventArgs.cs" />
-    <Compile Include="TimedMessage.cs" />
-    <Compile Include="TimedMsgChangedEventArgs.cs" />
-    <Compile Include="WorkQueue.cs" />
-    <Page Include="LabelEditor.xaml">
+    <Compile Include="System\EnqueuableStatus.cs" />
+    <Compile Include="System\StatusChangeEventArgs.cs" />
+    <Compile Include="System\TimedMessage.cs" />
+    <Compile Include="System\TimedMsgChangedEventArgs.cs" />
+    <Compile Include="System\WorkQueue.cs" />
+    <Page Include="Windows\LabelEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainWindow.xaml">
+    <Page Include="Windows\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -73,14 +73,14 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="LabelEditor.xaml.cs">
+    <Compile Include="Windows\LabelEditor.xaml.cs">
       <DependentUpon>LabelEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ValueEditTemplateSelector.cs" />
-    <Compile Include="ValueTemplateSelector.cs" />
-    <Compile Include="Util.cs" />
-    <Compile Include="ParamViewModel.cs" />
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="Template\ValueEditTemplateSelector.cs" />
+    <Compile Include="Template\ValueTemplateSelector.cs" />
+    <Compile Include="ViewModel\Util.cs" />
+    <Compile Include="ViewModel\ParamViewModel.cs" />
+    <Compile Include="Windows\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
