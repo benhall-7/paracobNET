@@ -36,7 +36,7 @@ namespace paracobNET
                     //TODO: use events instead of exceptions to allow
                     //user app to determine what to do in weird cases
                     //(e.g. user manually replaces "paracobn" header)
-                    throw new InvalidDataException("File contains an invalid header");
+                    throw new InvalidHeaderException("File contains an invalid header. Ensure that the file is a valid param file and that it is not compressed.");
                 }
 
                 HashTableSize = Reader.ReadInt32();

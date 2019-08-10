@@ -250,8 +250,15 @@ namespace prcEditor
                 WorkerQueue.Enqueue(new EnqueuableStatus(() =>
                 {
                     PFile = new ParamFile();
-                    PFile.Open(ofd.FileName);
-                    ParamViewModel = new VM_ParamRoot(PFile.Root);
+                    try
+                    {
+                        PFile.Open(ofd.FileName);
+                        ParamViewModel = new VM_ParamRoot(PFile.Root);
+                    }
+                    catch (InvalidHeaderException ex)
+                    {
+                        Timer.SetMessage(ex.Message, 5000);
+                    }
                     IsOpenEnabled = true;
                     IsSaveEnabled = true;
                 }, "Loading param file"));
