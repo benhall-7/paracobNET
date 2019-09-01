@@ -63,6 +63,43 @@ namespace paracobNET
             }
         }
 
+        public void SetValue(object value)
+        {
+            switch (TypeKey)
+            {
+                case ParamType.@bool:
+                    Value = Convert.ToBoolean(value);
+                    break;
+                case ParamType.@sbyte:
+                    Value = Convert.ToSByte(value);
+                    break;
+                case ParamType.@byte:
+                    Value = Convert.ToByte(value);
+                    break;
+                case ParamType.@short:
+                    Value = Convert.ToInt16(value);
+                    break;
+                case ParamType.@ushort:
+                    Value = Convert.ToUInt16(value);
+                    break;
+                case ParamType.@int:
+                    Value = Convert.ToInt32(value);
+                    break;
+                case ParamType.@uint:
+                    Value = Convert.ToUInt32(value);
+                    break;
+                case ParamType.@float:
+                    Value = Convert.ToSingle(value);
+                    break;
+                case ParamType.hash40:
+                    Value = Convert.ToUInt64(value);
+                    break;
+                case ParamType.@string:
+                    Value = Convert.ToString(value);
+                    break;
+            }
+        }
+
         public void ChangeType(ParamType to)
         {
             ParamType from = TypeKey;

@@ -19,7 +19,6 @@ namespace prcScript
 
         static void Main(string[] args)
         {
-            //args = new string[] { "mods.lua", "-s", "-l", "ParamLabels.csv" };
             LuaFiles = new List<string>();
             HashToStringLabels = new OrderedDictionary<ulong, string>();
             StringToHashLabels = new OrderedDictionary<string, ulong>();
@@ -70,8 +69,9 @@ namespace prcScript
                 {
                     L.State.Encoding = Encoding.UTF8;
                     //set globals
-                    L["Param"] = new LuaParamGlobal();
+                    L["ParamGlobal"] = new LuaParamGlobal();
                     L["sandbox"] = Sandbox;
+                    L["hash40"] = new Func<string, ulong>(Hash40Util.StringToHash40);
 
                     L.DoString(Resources.LuaSandbox);
 

@@ -15,14 +15,28 @@ namespace prcScript
             {
                 if (Inner.TypeKey == ParamType.@struct || Inner.TypeKey == ParamType.list)
                     return null;
+                return (Inner as ParamValue).Value;
+            }
+            set
+            {
+                if (Inner.TypeKey == ParamType.@struct || Inner.TypeKey == ParamType.list)
+                    return;
+                (Inner as ParamValue).SetValue(value);
+            }
+        }
+
+        public string value_string
+        {
+            get
+            {
+                if (Inner.TypeKey == ParamType.@struct || Inner.TypeKey == ParamType.list)
+                    return null;
                 return (Inner as ParamValue).ToString(Program.HashToStringLabels);
             }
             set
             {
                 if (Inner.TypeKey == ParamType.@struct || Inner.TypeKey == ParamType.list)
                     return;
-                //To do: value.ToString() doesn't handle the case where the param is a hash40
-                //and the value is a ulong, because ulong formatting doesn't use 0x by default
                 (Inner as ParamValue).SetValue(value.ToString(), Program.StringToHashLabels);
             }
         }
