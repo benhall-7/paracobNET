@@ -14,6 +14,7 @@ namespace prcScript
 
         internal static OrderedDictionary<ulong, string> HashToStringLabels { get; set; }
         internal static OrderedDictionary<string, ulong> StringToHashLabels { get; set; }
+        internal static bool LabelsLoaded { get; set; } = false;
 
         internal static Lua L { get; set; }
 
@@ -41,6 +42,7 @@ namespace prcScript
                     case "-l":
                         HashToStringLabels = LabelIO.GetHashStringDict(args[++i]);
                         StringToHashLabels = LabelIO.GetStringHashDict(args[i]);
+                        LabelsLoaded = true;
                         break;
                     case "-s":
                     case "-safe":
@@ -70,8 +72,11 @@ namespace prcScript
                     L.State.Encoding = Encoding.UTF8;
                     //set globals
                     L["ParamGlobal"] = new LuaParamGlobal();
-                    L["sandbox"] = Sandbox;
-                    L["hash40"] = new Func<string, ulong>(Hash40Util.StringToHash40);
+                    L["sandboxed"] = Sandbox;
+                    L["labelled"] = LabelsLoaded;
+                    L["hash"] = new Func<string, ulong>(Hash40Util.StringToHash40);
+                    L["label"] = new Func<ulong, string>((hash) => Hash40Util.FormatToString(hash, HashToStringLabels));
+                    L["label2hash"] = new Func<string, ulong>((label) => Hash40Util.LabelToHash40(label, StringToHashLabels));
 
                     L.DoString(Resources.LuaSandbox);
 

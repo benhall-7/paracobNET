@@ -6,10 +6,16 @@ clock : function()
     <from os.clock>
 date : function()
     <from os.date>
-sandbox : boolean
+sandboxed : boolean
     <returns true if prcScript is run with the -s flag>
-hash40 : ulong
+labelled : boolean
+    <returns true if prcScript is run with the -l flag>
+hash : function
     <returns the hash of a string>
+label : function
+    <returns the label from a hash (assuming labels loaded)>
+label2hash : function
+    <returns the hash from a label (assuming labels loaded)>
 
 ParamGlobal : userdata
 |   <contains methods and properties to interact with params>
