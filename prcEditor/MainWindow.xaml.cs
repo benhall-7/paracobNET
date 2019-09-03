@@ -215,23 +215,49 @@ namespace prcEditor
         private void Window_ContentRendered(object sender, EventArgs e)
         {
             //load label dictionaries (and make it visible to user)
-            string labelFileName = "ParamLabels.csv";
+            string name = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ParamLabels.csv");
             WorkerQueue.Enqueue(new EnqueuableStatus(() =>
             {
-                if (File.Exists(labelFileName))
+                if (File.Exists(name))
                 {
                     IsOpenEnabled = false;
                     IsLabelSaveEnabled = false;
                     IsLabelEditEnabled = false;
 
-                    HashToStringLabels = LabelIO.GetHashStringDict(labelFileName);
-                    StringToHashLabels = LabelIO.GetStringHashDict(labelFileName);
+                    HashToStringLabels = LabelIO.GetHashStringDict(name);
+                    StringToHashLabels = LabelIO.GetStringHashDict(name);
 
                     IsOpenEnabled = true;
                     IsLabelSaveEnabled = true;
                     IsLabelEditEnabled = true;
                 }
             }, "Loading label dictionaries"));
+            if (Application.Current.Properties.Contains("OnStartupFile"))
+            {
+                OpenFile((string)Application.Current.Properties["OnStartupFile"]);
+            }
+        }
+
+        private void OpenFile(string file)
+        {
+            IsOpenEnabled = false;
+            IsSaveEnabled = false;
+
+            WorkerQueue.Enqueue(new EnqueuableStatus(() =>
+            {
+                PFile = new ParamFile();
+                try
+                {
+                    PFile.Open(file);
+                    ParamViewModel = new VM_ParamRoot(PFile.Root);
+                }
+                catch (InvalidHeaderException ex)
+                {
+                    Timer.SetMessage(ex.Message, 5000);
+                }
+                IsOpenEnabled = true;
+                IsSaveEnabled = true;
+            }, "Loading param file"));
         }
 
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
@@ -242,26 +268,7 @@ namespace prcEditor
             bool? result = ofd.ShowDialog();
             if (result == true)
             {
-                //ParamData.ItemsSource = null;
-                
-                IsOpenEnabled = false;
-                IsSaveEnabled = false;
-
-                WorkerQueue.Enqueue(new EnqueuableStatus(() =>
-                {
-                    PFile = new ParamFile();
-                    try
-                    {
-                        PFile.Open(ofd.FileName);
-                        ParamViewModel = new VM_ParamRoot(PFile.Root);
-                    }
-                    catch (InvalidHeaderException ex)
-                    {
-                        Timer.SetMessage(ex.Message, 5000);
-                    }
-                    IsOpenEnabled = true;
-                    IsSaveEnabled = true;
-                }, "Loading param file"));
+                OpenFile(ofd.FileName);
             }
         }
 

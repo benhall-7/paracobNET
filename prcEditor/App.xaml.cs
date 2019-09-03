@@ -23,5 +23,13 @@ namespace prcEditor
                 writer.WriteLine(e.StackTrace);
             }
         }
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            var args = e.Args;
+            if (args.Length > 0 && File.Exists(args[0]))
+                Current.Properties["OnStartupFile"] = args[0];
+            base.OnStartup(e);
+        }
     }
 }
