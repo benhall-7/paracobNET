@@ -302,7 +302,7 @@ namespace prcEditor
 
         private void SaveLabelButton_Click(object sender, RoutedEventArgs e)
         {
-            LabelIO.WriteLabels("ParamLabels.csv", HashToStringLabels);
+            LabelIO.WriteLabels(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ParamLabels.csv"), HashToStringLabels);
         }
 
         private void Param_TreeView_PreviewKeyDown(object sender, KeyEventArgs e)
