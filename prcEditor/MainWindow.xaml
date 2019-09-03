@@ -7,7 +7,7 @@
         xmlns:core="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:prcEditor"
         mc:Ignorable="d"
-        Title="prcEditor v2.0"
+        Title="prcEditor"
         Icon="Resources\FoxLogo.ico"
         Height="600" Width="800"
         ContentRendered="Window_ContentRendered">

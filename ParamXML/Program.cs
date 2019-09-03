@@ -10,7 +10,7 @@ namespace ParamXML
     class Program
     {
         static string HelpText = 
-            "ParamXML v2.0: Convert Ultimate param (.prc) files to XML format or back.\n" +
+            "ParamXML: Convert Ultimate param (.prc) files to XML format or back.\n" +
             "required: [input] ; -d / -a (disassemble/assemble)\n" +
             "optional: -h ; -help ; -o [output] ; -l [label file]";
         static BuildMode mode = BuildMode.Invalid;
