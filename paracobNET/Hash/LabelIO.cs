@@ -57,7 +57,7 @@ namespace paracobNET
         {
             List<string> lines = new List<string>();
             foreach (var label in labels)
-                lines.Add($"0x{label.Key.ToString("x8")},{label.Value}");
+                lines.Add($"0x{label.Key.ToString("x10")},{label.Value}");
             File.WriteAllLines(filepath, lines);
         }
     }
