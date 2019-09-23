@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using paracobNET;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -27,6 +28,11 @@ namespace prcEditor
 
         public static OrderedDictionary<ulong, string> HashToStringLabels { get; set; }
         public static OrderedDictionary<string, ulong> StringToHashLabels { get; set; }
+
+        private string BaseDirectory => AppDomain.CurrentDomain.BaseDirectory;
+        private IDictionary AppProperties => Application.Current.Properties;
+        private string LabelPath => Path.Combine(BaseDirectory, "ParamLabels.csv");
+        private const string ParamFilter = "Param files|*.prc;*.stdat;*.stprm|All files|*.*";
 
         #region PROPERTY_BINDING
 
@@ -185,57 +191,14 @@ namespace prcEditor
             OpenFileButton.DataContext = this;
             SaveFileButton.DataContext = this;
 
-            SaveLabelButton.DataContext = this;
             EditLabelButton.DataContext = this;
+            SaveLabelButton.DataContext = this;
 
             Param_TreeView.DataContext = this;
             ParamStruct_DataGrid.DataContext = this;
             ParamList_DataGrid.DataContext = this;
 
             KeyCtrl = false;
-        }
-
-        private void NotifyPropertyChanged(string propName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
-        }
-
-        private void WorkerStatusChangeEvent(object sender, StatusChangeEventArgs e)
-        {
-            WorkerThreadStatus = e.Message;
-        }
-
-        private void TimerMessageChangeEvent(object sender, TimedMsgChangedEventArgs e)
-        {
-            TimedMessage = e.Message;
-        }
-
-        #region EVENT_HANDLERS
-
-        private void Window_ContentRendered(object sender, EventArgs e)
-        {
-            //load label dictionaries (and make it visible to user)
-            string name = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ParamLabels.csv");
-            WorkerQueue.Enqueue(new EnqueuableStatus(() =>
-            {
-                if (File.Exists(name))
-                {
-                    IsOpenEnabled = false;
-                    IsLabelSaveEnabled = false;
-                    IsLabelEditEnabled = false;
-
-                    HashToStringLabels = LabelIO.GetHashStringDict(name);
-                    StringToHashLabels = LabelIO.GetStringHashDict(name);
-
-                    IsOpenEnabled = true;
-                    IsLabelSaveEnabled = true;
-                    IsLabelEditEnabled = true;
-                }
-            }, "Loading label dictionaries"));
-            if (Application.Current.Properties.Contains("OnStartupFile"))
-            {
-                OpenFile((string)Application.Current.Properties["OnStartupFile"]);
-            }
         }
 
         private void OpenFile(string file)
@@ -260,10 +223,77 @@ namespace prcEditor
             }, "Loading param file"));
         }
 
+        private void SaveFile(string file)
+        {
+            IsOpenEnabled = false;
+            IsSaveEnabled = false;
+
+            WorkerQueue.Enqueue(new EnqueuableStatus(() =>
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(file));
+                PFile.Save(file);
+                IsOpenEnabled = true;
+                IsSaveEnabled = true;
+            }, "Saving param file"));
+        }
+
+        private void OpenLabels()
+        {
+            WorkerQueue.Enqueue(new EnqueuableStatus(() =>
+            {
+                string name = LabelPath;
+                if (File.Exists(name))
+                {
+                    IsOpenEnabled = false;
+                    IsLabelSaveEnabled = false;
+                    IsLabelEditEnabled = false;
+
+                    HashToStringLabels = LabelIO.GetHashStringDict(name);
+                    StringToHashLabels = LabelIO.GetStringHashDict(name);
+
+                    IsOpenEnabled = true;
+                    IsLabelSaveEnabled = true;
+                    IsLabelEditEnabled = true;
+                }
+            }, "Loading label dictionaries"));
+        }
+
+        private void SaveLabels()
+        {
+            LabelIO.WriteLabels(LabelPath, HashToStringLabels);
+        }
+
+        private void NotifyPropertyChanged(string propName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+        }
+
+        private void WorkerStatusChangeEvent(object sender, StatusChangeEventArgs e)
+        {
+            WorkerThreadStatus = e.Message;
+        }
+
+        private void TimerMessageChangeEvent(object sender, TimedMsgChangedEventArgs e)
+        {
+            TimedMessage = e.Message;
+        }
+
+        #region EVENT_HANDLERS
+
+        private void Window_ContentRendered(object sender, EventArgs e)
+        {
+            //load label dictionaries (and make it visible to user)
+            OpenLabels();
+            if (AppProperties.Contains("OnStartupFile"))
+            {
+                OpenFile((string)AppProperties["OnStartupFile"]);
+            }
+        }
+
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "Param files|*.prc;*.stdat;*.stprm|All files|*.*";
+            ofd.Filter = ParamFilter;
 
             bool? result = ofd.ShowDialog();
             if (result == true)
@@ -275,21 +305,12 @@ namespace prcEditor
         private void SaveFileButton_Click(object sender, RoutedEventArgs e)
         {
             SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Filter = "Param files|*.prc;*.stdat;*.stprm|All files|*.*";
+            sfd.Filter = ParamFilter;
 
             bool? result = sfd.ShowDialog();
             if (result == true)
             {
-                IsOpenEnabled = false;
-                IsSaveEnabled = false;
-
-                WorkerQueue.Enqueue(new EnqueuableStatus(() =>
-                {
-                    Directory.CreateDirectory(Path.GetDirectoryName(sfd.FileName));
-                    PFile.Save(sfd.FileName);
-                    IsOpenEnabled = true;
-                    IsSaveEnabled = true;
-                }, "Saving param file"));
+                SaveFile(sfd.FileName);
             }
         }
 
@@ -302,7 +323,7 @@ namespace prcEditor
 
         private void SaveLabelButton_Click(object sender, RoutedEventArgs e)
         {
-            LabelIO.WriteLabels(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ParamLabels.csv"), HashToStringLabels);
+            SaveLabels();
         }
 
         private void Param_TreeView_PreviewKeyDown(object sender, KeyEventArgs e)

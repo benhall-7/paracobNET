@@ -13,10 +13,14 @@
         ContentRendered="Window_ContentRendered">
     <Window.Resources>
         <Style TargetType="Button">
-            <Setter Property="Margin" Value="2,2"/>
+            <Setter Property="Margin" Value="2"/>
             <Setter Property="Padding" Value="8,2"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style TargetType="MenuItem">
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Padding" Value="8,2"/>
         </Style>
         <DataTemplate x:Key="Hash40ComboBoxTemplate">
             <ComboBox IsEditable="True"
@@ -84,25 +88,28 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Row="0" Grid.ColumnSpan="3" Orientation="Horizontal">
-            <Button x:Name="OpenFileButton"
-                    Content="Open"
-                    Click="OpenFileButton_Click"
-                    IsEnabled="{Binding IsOpenEnabled}"/>
-            <Button x:Name="SaveFileButton"
-                    Content="Save"
-                    Click="SaveFileButton_Click"
-                    IsEnabled="{Binding IsSaveEnabled}"/>
-            <Rectangle VerticalAlignment="Stretch" Width="1" Margin="4" Stroke="Gray"/>
-            <Button x:Name="EditLabelButton"
-                    Content="Edit Labels"
-                    Click="EditLabelButton_Click"
-                    IsEnabled="{Binding IsLabelEditEnabled}"/>
-            <Button x:Name="SaveLabelButton"
-                    Content="Save Labels"
-                    Click="SaveLabelButton_Click"
-                    IsEnabled="{Binding IsLabelSaveEnabled}"/>
-        </StackPanel>
+        <Menu Grid.Row="0" Grid.ColumnSpan="3">
+            <MenuItem Header="File">
+                <MenuItem Header="Open"
+                          x:Name="OpenFileButton"
+                          Click="OpenFileButton_Click"
+                          IsEnabled="{Binding IsOpenEnabled}"/>
+                <MenuItem Header="Save"
+                          x:Name="SaveFileButton"
+                          Click="SaveFileButton_Click"
+                          IsEnabled="{Binding IsSaveEnabled}"/>
+            </MenuItem>
+            <MenuItem Header="Labels">
+                <MenuItem Header="Edit"
+                          x:Name="EditLabelButton"
+                          Click="EditLabelButton_Click"
+                          IsEnabled="{Binding IsLabelEditEnabled}"/>
+                <MenuItem Header="Save"
+                          x:Name="SaveLabelButton"
+                          Click="SaveLabelButton_Click"
+                          IsEnabled="{Binding IsLabelSaveEnabled}"/>
+            </MenuItem>
+        </Menu>
         <TreeView Grid.Row="1" Grid.Column="0"
                   x:Name="Param_TreeView" BorderThickness="0"
                   PreviewKeyDown="Param_TreeView_PreviewKeyDown"
