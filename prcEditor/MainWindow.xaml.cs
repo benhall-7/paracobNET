@@ -201,6 +201,11 @@ namespace prcEditor
             KeyCtrl = false;
         }
 
+        private void NotifyPropertyChanged(string propName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+        }
+
         private void OpenFile(string file)
         {
             IsOpenEnabled = false;
@@ -263,9 +268,236 @@ namespace prcEditor
             LabelIO.WriteLabels(LabelPath, HashToStringLabels);
         }
 
-        private void NotifyPropertyChanged(string propName)
+        //=========== TODO ===========
+        // These would greatly benefit
+        // from a functional approach
+        // and some extra interfaces.
+        private void OpenParamNode(TreeViewItem tvi)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+            if (tvi.Header is VM_ParamStruct str)
+            {
+                Struct_DataGrid_Source = str.Children;
+                List_DataGrid_Source = null;
+            }
+            else if (tvi.Header is VM_ParamList list)
+            {
+                List_DataGrid_Source = list.Children;
+                Struct_DataGrid_Source = null;
+            }
+            else if (tvi.Header is IStructChild strc)
+            {
+                Struct_DataGrid_Source = strc.Parent.Children;
+                List_DataGrid_Source = null;
+
+                ParamStruct_DataGrid.SelectedItem = strc;
+                ParamStruct_DataGrid.ScrollIntoView(strc);
+            }
+            else if (tvi.Header is IListChild listc)
+            {
+                List_DataGrid_Source = listc.Parent.Children;
+                Struct_DataGrid_Source = null;
+
+                ParamList_DataGrid.SelectedItem = listc;
+                ParamList_DataGrid.ScrollIntoView(listc);
+            }
+        }
+
+        private void DeleteParamNode(TreeViewItem tvi)
+        {
+            if (tvi.Header is IStructChild structChild)
+                structChild.Parent.RemoveAt(structChild.Index);
+            else if (tvi.Header is IListChild listChild)
+                listChild.Parent.RemoveAt(listChild.Index);
+        }
+
+        private void CopyParamNode(TreeViewItem tvi)
+        {
+            if (!KeyCtrl) return;
+
+            Clipboard.Clear();
+            if (tvi.Header is IStructChild structChild)
+            {
+                var data = new SerializableStructChild(structChild.Param.Clone(), structChild.Hash40);
+                Clipboard.SetDataObject(new DataObject(data), true);
+            }
+            else if (tvi.Header is IListChild listChild)
+            {
+                var data = new SerializableParam(listChild.Param.Clone());
+                Clipboard.SetDataObject(new DataObject(data), true);
+            }
+        }
+
+        private void CutParamNode(TreeViewItem tvi)
+        {
+            if (!KeyCtrl) return;
+
+            Clipboard.Clear();
+            if (tvi.Header is IStructChild structChild)
+            {
+                var data = new SerializableStructChild(structChild.Param.Clone(), structChild.Hash40);
+                Clipboard.SetDataObject(new DataObject(data), true);
+                structChild.Parent.RemoveAt(structChild.Index);
+            }
+            else if (tvi.Header is IListChild listChild)
+            {
+                var data = new SerializableParam(listChild.Param.Clone());
+                Clipboard.SetDataObject(new DataObject(data), true);
+                listChild.Parent.RemoveAt(listChild.Index);
+            }
+        }
+
+        private void PasteParamNode(TreeViewItem tvi)
+        {
+            if (!KeyCtrl) return;
+
+            IDataObject dataObject = Clipboard.GetDataObject();
+            if (dataObject.GetDataPresent(typeof(SerializableStructChild)))
+            {
+                var data = (SerializableStructChild)dataObject.GetData(typeof(SerializableStructChild));
+
+                if (tvi.Header is VM_ParamStruct str)
+                {
+                    try
+                    {
+                        str.Add(data.Param, data.Hash40);
+                        str.UpdateChildrenIndeces();
+                    }
+                    catch (ArgumentException)
+                    {
+                        LabelEditor le = new LabelEditor(true);
+                        bool? result = le.ShowDialog();
+                        if (result == true)
+                        {
+                            try
+                            {
+                                str.Add(data.Param, Hash40Util.LabelToHash40(le.Label, StringToHashLabels));
+                                str.UpdateChildrenIndeces();
+                            }
+                            catch
+                            {
+                                Timer.SetMessage("Paste operation failed (key " +
+                                    $"'{le.Label}' " +
+                                    $"already exists)", 3000);
+                            }
+                        }
+                        else
+                        {
+                            Timer.SetMessage("Paste operation failed (key " +
+                                $"'{Hash40Util.FormatToString(data.Hash40, HashToStringLabels)}' " +
+                                $"already exists)", 3000);
+                        }
+                    }
+                }
+                else if (tvi.Header is VM_ParamList list)
+                {
+                    list.Add(data.Param);
+                    list.UpdateChildrenIndeces();
+                }
+            }
+            else if (dataObject.GetDataPresent(typeof(SerializableParam)))
+            {
+                var data = (SerializableParam)dataObject.GetData(typeof(SerializableParam));
+
+                if (tvi.Header is VM_ParamStruct str)
+                {
+                    LabelEditor le = new LabelEditor(true);
+                    if (le.ShowDialog() == true)
+                    {
+                        try
+                        {
+                            str.Add(data.Param, StringToHashLabels[le.Label]);
+                            str.UpdateChildrenIndeces();
+                            str.UpdateHashes();
+                        }
+                        catch (ArgumentException)
+                        {
+                            Timer.SetMessage($"Paste operation failed (key '{le.Label}' already exists)", 3000);
+                        }
+                    }
+                }
+                else if (tvi.Header is VM_ParamList list)
+                {
+                    list.Add(data.Param);
+                    list.UpdateChildrenIndeces();
+                }
+            }
+        }
+
+        private void PasteParamNodeParent(TreeViewItem tvi)
+        {
+            if (!KeyCtrl) return;
+
+            IDataObject dataObject = Clipboard.GetDataObject();
+            if (dataObject.GetDataPresent(typeof(SerializableStructChild)))
+            {
+                var data = (SerializableStructChild)dataObject.GetData(typeof(SerializableStructChild));
+
+                if (tvi.Header is IStructChild structChild)
+                {
+                    try
+                    {
+                        structChild.Parent.Add(data.Param, data.Hash40);
+                        structChild.Parent.UpdateChildrenIndeces();
+                    }
+                    catch (ArgumentException)
+                    {
+                        LabelEditor le = new LabelEditor(true);
+                        bool? result = le.ShowDialog();
+                        if (result == true)
+                        {
+                            try
+                            {
+                                structChild.Parent.Add(data.Param, Hash40Util.LabelToHash40(le.Label, StringToHashLabels));
+                                structChild.Parent.UpdateChildrenIndeces();
+                            }
+                            catch
+                            {
+                                Timer.SetMessage("Paste operation failed (key " +
+                                    $"'{le.Label}' " +
+                                    $"already exists)", 3000);
+                            }
+                        }
+                        else
+                        {
+                            Timer.SetMessage("Paste operation failed (key " +
+                                $"'{Hash40Util.FormatToString(data.Hash40, HashToStringLabels)}' " +
+                                $"already exists)", 3000);
+                        }
+                    }
+                }
+                else if (tvi.Header is IListChild listChild)
+                {
+                    listChild.Parent.Add(data.Param);
+                    listChild.Parent.UpdateChildrenIndeces();
+                }
+            }
+            else if (dataObject.GetDataPresent(typeof(SerializableParam)))
+            {
+                var data = (SerializableParam)dataObject.GetData(typeof(SerializableParam));
+
+                if (tvi.Header is IStructChild structChild)
+                {
+                    LabelEditor le = new LabelEditor(true);
+                    if (le.ShowDialog() == true)
+                    {
+                        try
+                        {
+                            structChild.Parent.Add(data.Param, StringToHashLabels[le.Label]);
+                            structChild.Parent.UpdateChildrenIndeces();
+                            structChild.Parent.UpdateHashes();
+                        }
+                        catch (ArgumentException)
+                        {
+                            Timer.SetMessage($"Paste operation failed (key '{le.Label}' already exists)", 3000);
+                        }
+                    }
+                }
+                else if (tvi.Header is IListChild listChild)
+                {
+                    listChild.Parent.Add(data.Param);
+                    listChild.Parent.UpdateChildrenIndeces();
+                }
+            }
         }
 
         private void WorkerStatusChangeEvent(object sender, StatusChangeEventArgs e)
@@ -348,239 +580,30 @@ namespace prcEditor
         {
             if (!(sender is TreeViewItem tvi)) return;
 
-            e.Handled = true;//bubbling event, don't send the event upward
-
             switch (e.Key)
             {
                 case Key.Enter:
-                    {
-                        if (tvi.Header is VM_ParamStruct str)
-                        {
-                            Struct_DataGrid_Source = str.Children;
-                            List_DataGrid_Source = null;
-                        }
-                        else if (tvi.Header is VM_ParamList list)
-                        {
-                            List_DataGrid_Source = list.Children;
-                            Struct_DataGrid_Source = null;
-                        }
-                        else if (tvi.Header is IStructChild strc)
-                        {
-                            Struct_DataGrid_Source = strc.Parent.Children;
-                            List_DataGrid_Source = null;
-
-                            ParamStruct_DataGrid.SelectedItem = strc;
-                            ParamStruct_DataGrid.ScrollIntoView(strc);
-                        }
-                        else if (tvi.Header is IListChild listc)
-                        {
-                            List_DataGrid_Source = listc.Parent.Children;
-                            Struct_DataGrid_Source = null;
-
-                            ParamList_DataGrid.SelectedItem = listc;
-                            ParamList_DataGrid.ScrollIntoView(listc);
-                        }
-                    }
+                    OpenParamNode(tvi);
                     break;
                 case Key.Delete:
-                    {
-                        if (tvi.Header is IStructChild structChild)
-                            structChild.Parent.RemoveAt(structChild.Index);
-                        else if (tvi.Header is IListChild listChild)
-                            listChild.Parent.RemoveAt(listChild.Index);
-                    }
+                    DeleteParamNode(tvi);
                     break;
                 case Key.C:
-                    {
-                        if (!KeyCtrl) break;
-
-                        Clipboard.Clear();
-                        if (tvi.Header is IStructChild structChild)
-                        {
-                            var data = new SerializableStructChild(structChild.Param.Clone(), structChild.Hash40);
-                            Clipboard.SetDataObject(new DataObject(data), true);
-                        }
-                        else if (tvi.Header is IListChild listChild)
-                        {
-                            var data = new SerializableParam(listChild.Param.Clone());
-                            Clipboard.SetDataObject(new DataObject(data), true);
-                        }
-                    }
+                    CopyParamNode(tvi);
                     break;
                 case Key.X:
-                    {
-                        if (!KeyCtrl) break;
-
-                        Clipboard.Clear();
-                        if (tvi.Header is IStructChild structChild)
-                        {
-                            var data = new SerializableStructChild(structChild.Param.Clone(), structChild.Hash40);
-                            Clipboard.SetDataObject(new DataObject(data), true);
-                            structChild.Parent.RemoveAt(structChild.Index);
-                        }
-                        else if (tvi.Header is IListChild listChild)
-                        {
-                            var data = new SerializableParam(listChild.Param.Clone());
-                            Clipboard.SetDataObject(new DataObject(data), true);
-                            listChild.Parent.RemoveAt(listChild.Index);
-                        }
-                    }
+                    CutParamNode(tvi);
                     break;
-                case Key.V://paste into selected param
-                    {
-                        if (!KeyCtrl) break;
-
-                        IDataObject dataObject = Clipboard.GetDataObject();
-                        if (dataObject.GetDataPresent(typeof(SerializableStructChild)))
-                        {
-                            var data = (SerializableStructChild)dataObject.GetData(typeof(SerializableStructChild));
-
-                            if (tvi.Header is VM_ParamStruct str)
-                            {
-                                try
-                                {
-                                    str.Add(data.Param, data.Hash40);
-                                    str.UpdateChildrenIndeces();
-                                }
-                                catch (ArgumentException)
-                                {
-                                    LabelEditor le = new LabelEditor(true);
-                                    bool? result = le.ShowDialog();
-                                    if (result == true)
-                                    {
-                                        try
-                                        {
-                                            str.Add(data.Param, Hash40Util.LabelToHash40(le.Label, StringToHashLabels));
-                                            str.UpdateChildrenIndeces();
-                                        }
-                                        catch
-                                        {
-                                            Timer.SetMessage("Paste operation failed (key " +
-                                                $"'{le.Label}' " +
-                                                $"already exists)", 3000);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        Timer.SetMessage("Paste operation failed (key " +
-                                            $"'{Hash40Util.FormatToString(data.Hash40, HashToStringLabels)}' " +
-                                            $"already exists)", 3000);
-                                    }
-                                }
-                            }
-                            else if (tvi.Header is VM_ParamList list)
-                            {
-                                list.Add(data.Param);
-                                list.UpdateChildrenIndeces();
-                            }
-                        }
-                        else if (dataObject.GetDataPresent(typeof(SerializableParam)))
-                        {
-                            var data = (SerializableParam)dataObject.GetData(typeof(SerializableParam));
-
-                            if (tvi.Header is VM_ParamStruct str)
-                            {
-                                LabelEditor le = new LabelEditor(true);
-                                if (le.ShowDialog() == true)
-                                {
-                                    try
-                                    {
-                                        str.Add(data.Param, StringToHashLabels[le.Label]);
-                                        str.UpdateChildrenIndeces();
-                                        str.UpdateHashes();
-                                    }
-                                    catch (ArgumentException)
-                                    {
-                                        Timer.SetMessage($"Paste operation failed (key '{le.Label}' already exists)", 3000);
-                                    }
-                                }
-                            }
-                            else if (tvi.Header is VM_ParamList list)
-                            {
-                                list.Add(data.Param);
-                                list.UpdateChildrenIndeces();
-                            }
-                        }
-                    }
+                case Key.V:
+                    PasteParamNode(tvi);
                     break;
-                case Key.P://paste into parent of selected param
-                    {
-                        if (!KeyCtrl) break;
-
-                        IDataObject dataObject = Clipboard.GetDataObject();
-                        if (dataObject.GetDataPresent(typeof(SerializableStructChild)))
-                        {
-                            var data = (SerializableStructChild)dataObject.GetData(typeof(SerializableStructChild));
-
-                            if (tvi.Header is IStructChild structChild)
-                            {
-                                try
-                                {
-                                    structChild.Parent.Add(data.Param, data.Hash40);
-                                    structChild.Parent.UpdateChildrenIndeces();
-                                }
-                                catch (ArgumentException)
-                                {
-                                    LabelEditor le = new LabelEditor(true);
-                                    bool? result = le.ShowDialog();
-                                    if (result == true)
-                                    {
-                                        try
-                                        {
-                                            structChild.Parent.Add(data.Param, Hash40Util.LabelToHash40(le.Label, StringToHashLabels));
-                                            structChild.Parent.UpdateChildrenIndeces();
-                                        }
-                                        catch
-                                        {
-                                            Timer.SetMessage("Paste operation failed (key " +
-                                                $"'{le.Label}' " +
-                                                $"already exists)", 3000);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        Timer.SetMessage("Paste operation failed (key " +
-                                            $"'{Hash40Util.FormatToString(data.Hash40, HashToStringLabels)}' " +
-                                            $"already exists)", 3000);
-                                    }
-                                }
-                            }
-                            else if (tvi.Header is IListChild listChild)
-                            {
-                                listChild.Parent.Add(data.Param);
-                                listChild.Parent.UpdateChildrenIndeces();
-                            }
-                        }
-                        else if (dataObject.GetDataPresent(typeof(SerializableParam)))
-                        {
-                            var data = (SerializableParam)dataObject.GetData(typeof(SerializableParam));
-
-                            if (tvi.Header is IStructChild structChild)
-                            {
-                                LabelEditor le = new LabelEditor(true);
-                                if (le.ShowDialog() == true)
-                                {
-                                    try
-                                    {
-                                        structChild.Parent.Add(data.Param, StringToHashLabels[le.Label]);
-                                        structChild.Parent.UpdateChildrenIndeces();
-                                        structChild.Parent.UpdateHashes();
-                                    }
-                                    catch (ArgumentException)
-                                    {
-                                        Timer.SetMessage($"Paste operation failed (key '{le.Label}' already exists)", 3000);
-                                    }
-                                }
-                            }
-                            else if (tvi.Header is IListChild listChild)
-                            {
-                                listChild.Parent.Add(data.Param);
-                                listChild.Parent.UpdateChildrenIndeces();
-                            }
-                        }
-                    }
+                case Key.P:
+                    PasteParamNodeParent(tvi);
                     break;
             }
+
+            //TODO: Can this interfere with "global" key shortcuts?
+            e.Handled = true;//bubbling event, don't send the event upward
         }
 
         #endregion
