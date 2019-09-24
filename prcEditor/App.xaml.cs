@@ -17,10 +17,11 @@ namespace prcEditor
         static void ExceptionHandler(object sender, UnhandledExceptionEventArgs args)
         {
             Exception e = (Exception)args.ExceptionObject;
-            using (StreamWriter writer = new StreamWriter(File.OpenWrite("log.txt")))
+            using (StreamWriter writer = File.AppendText("log.txt"))
             {
-                writer.WriteLine(e.Message);
-                writer.WriteLine(e.StackTrace);
+                writer.WriteLine($"TIMESTAMP: {DateTime.Now.ToString()}");
+                writer.WriteLine(e.ToString());
+                writer.WriteLine("================================");
             }
         }
 
