@@ -61,7 +61,7 @@ namespace prcEditor.ViewModel
         public void UpdateChildrenIndeces()
         {
             for (int i = 0; i < Children.Count; i++)
-                Children[i].Index = i;
+                ((IChild)Children[i])._index = i;
         }
 
         public virtual void UpdateHashes()

@@ -230,7 +230,7 @@
                   ItemsSource="{Binding List_DataGrid_Source}"
                   Visibility="{Binding List_DataGrid_Visible}">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Index" Binding="{Binding Index_EventCaller}"/>
+                <DataGridTextColumn Header="Index" Binding="{Binding Index}"/>
                 <DataGridComboBoxColumn Header="Type"
                                         ItemsSource="{Binding Source={StaticResource ParamTypeEnum}}"
                                         SelectedItemBinding="{Binding Type}"/>
