@@ -75,7 +75,6 @@ namespace prcEditor.ViewModel
         // INTERFACES
         private interface IChild : IStructChild
         {
-            //TODO: access modifer to prevent it from being seen by external methods
             int _index { get; set; }
         }
 
@@ -84,16 +83,39 @@ namespace prcEditor.ViewModel
         {
             public VM_ParamStruct Parent { get; set; }
 
-            public int _index { get; set; }
-            public int Index
+            // EXPLANATION:
+            // __index:
+            //     is totally private, not part of any interface. It's just a backing field
+            // _index:
+            //     is exposed to the parent, but not outside because it's part of the private
+            //     interface "IChild". This lets the parent change index without invoking Index.
+            //     changes to this value notify the UI of a change to the Index value.
+            // Index:
+            //     is publically exposed and editable, invokes call to the parent to change
+            //     index of children.
+            int __index;
+            int IChild._index
             {
-                get { return _index; }
+                get => __index;
                 set
                 {
-                    if (value == _index)
+                    if (value == __index)
                         return;
-                    Parent.Children.Move(_index, value);
-                    Parent.Param.Nodes.Move(_index, value);
+                    __index = value;
+                    NotifyPropertyChanged(nameof(Index));
+                }
+            }
+            public int Index
+            {
+                get { return ((IChild)this)._index; }
+                set
+                {
+                    var old = Index;
+                    if (value == old)
+                        return;
+                    Parent.Children.Move(old, value);
+                    Parent.Param.Nodes.Move(old, value);
+                    Parent.UpdateChildrenIndeces();
                 }
             }
 
@@ -145,16 +167,29 @@ namespace prcEditor.ViewModel
         {
             public VM_ParamStruct Parent { get; set; }
 
-            public int _index { get; set; }
-            public int Index
+            int __index;
+            int IChild._index
             {
-                get { return _index; }
+                get => __index;
                 set
                 {
-                    if (value == _index)
+                    if (value == __index)
                         return;
-                    Parent.Children.Move(_index, value);
-                    Parent.Param.Nodes.Move(_index, value);
+                    __index = value;
+                    NotifyPropertyChanged(nameof(Index));
+                }
+            }
+            public int Index
+            {
+                get { return ((IChild)this)._index; }
+                set
+                {
+                    var old = Index;
+                    if (value == old)
+                        return;
+                    Parent.Children.Move(old, value);
+                    Parent.Param.Nodes.Move(old, value);
+                    Parent.UpdateChildrenIndeces();
                 }
             }
 
@@ -206,16 +241,29 @@ namespace prcEditor.ViewModel
         {
             public VM_ParamStruct Parent { get; set; }
 
-            public int _index { get; set; }
-            public int Index
+            int __index;
+            int IChild._index
             {
-                get { return _index; }
+                get => __index;
                 set
                 {
-                    if (value == _index)
+                    if (value == __index)
                         return;
-                    Parent.Children.Move(_index, value);
-                    Parent.Param.Nodes.Move(_index, value);
+                    __index = value;
+                    NotifyPropertyChanged(nameof(Index));
+                }
+            }
+            public int Index
+            {
+                get { return ((IChild)this)._index; }
+                set
+                {
+                    var old = Index;
+                    if (value == old)
+                        return;
+                    Parent.Children.Move(old, value);
+                    Parent.Param.Nodes.Move(old, value);
+                    Parent.UpdateChildrenIndeces();
                 }
             }
 

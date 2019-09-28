@@ -81,18 +81,31 @@ namespace prcEditor.ViewModel
         {
             public VM_ParamList Parent { get; set; }
 
-            public int _index { get; set; }
-            public int Index
+            int __index;
+            int IChild._index
             {
-                get { return _index; }
+                get => __index;
                 set
                 {
-                    if (value == _index)
+                    if (value == __index)
                         return;
-                    Parent.Children.Move(_index, value);
-                    var item = Parent.Param.Nodes[_index];
-                    Parent.Param.Nodes.RemoveAt(_index);
+                    __index = value;
+                    NotifyPropertyChanged(nameof(Index));
+                }
+            }
+            public int Index
+            {
+                get { return ((IChild)this)._index; }
+                set
+                {
+                    var old = Index;
+                    if (value == old)
+                        return;
+                    Parent.Children.Move(old, value);
+                    var item = Parent.Param.Nodes[old];
+                    Parent.Param.Nodes.RemoveAt(old);
                     Parent.Param.Nodes.Insert(value, item);
+                    Parent.UpdateChildrenIndeces();
                 }
             }
 
@@ -114,18 +127,31 @@ namespace prcEditor.ViewModel
         {
             public VM_ParamList Parent { get; set; }
 
-            public int _index { get; set; }
-            public int Index
+            int __index;
+            int IChild._index
             {
-                get { return _index; }
+                get => __index;
                 set
                 {
-                    if (value == _index)
+                    if (value == __index)
                         return;
-                    Parent.Children.Move(_index, value);
-                    var item = Parent.Param.Nodes[_index];
-                    Parent.Param.Nodes.RemoveAt(_index);
+                    __index = value;
+                    NotifyPropertyChanged(nameof(Index));
+                }
+            }
+            public int Index
+            {
+                get { return ((IChild)this)._index; }
+                set
+                {
+                    var old = Index;
+                    if (value == old)
+                        return;
+                    Parent.Children.Move(old, value);
+                    var item = Parent.Param.Nodes[old];
+                    Parent.Param.Nodes.RemoveAt(old);
                     Parent.Param.Nodes.Insert(value, item);
+                    Parent.UpdateChildrenIndeces();
                 }
             }
 
@@ -147,18 +173,31 @@ namespace prcEditor.ViewModel
         {
             public VM_ParamList Parent { get; set; }
 
-            public int _index { get; set; }
-            public int Index
+            int __index;
+            int IChild._index
             {
-                get { return _index; }
+                get => __index;
                 set
                 {
-                    if (value == _index)
+                    if (value == __index)
                         return;
-                    Parent.Children.Move(_index, value);
-                    var item = Parent.Param.Nodes[_index];
-                    Parent.Param.Nodes.RemoveAt(_index);
+                    __index = value;
+                    NotifyPropertyChanged(nameof(Index));
+                }
+            }
+            public int Index
+            {
+                get { return ((IChild)this)._index; }
+                set
+                {
+                    var old = Index;
+                    if (value == old)
+                        return;
+                    Parent.Children.Move(old, value);
+                    var item = Parent.Param.Nodes[old];
+                    Parent.Param.Nodes.RemoveAt(old);
                     Parent.Param.Nodes.Insert(value, item);
+                    Parent.UpdateChildrenIndeces();
                 }
             }
 
