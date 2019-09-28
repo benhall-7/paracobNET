@@ -141,5 +141,12 @@ namespace paracobNET
         {
             Add(new HashValuePair<T>(key, value));
         }
+
+        public void Move(int oldIndex, int newIndex)
+        {
+            var obj = this[oldIndex];
+            RemoveAt(oldIndex);
+            Insert(newIndex, obj);
+        }
     }
 }

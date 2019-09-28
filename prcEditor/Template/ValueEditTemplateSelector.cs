@@ -1,4 +1,5 @@
 ﻿using paracobNET;
+using prcEditor.ViewModel;
 using System.Windows;
 using System.Windows.Controls;
 

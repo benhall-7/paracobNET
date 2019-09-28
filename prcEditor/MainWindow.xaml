@@ -6,6 +6,7 @@
         xmlns:prc="clr-namespace:paracobNET;assembly=paracobNET"
         xmlns:core="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:prcEditor"
+        xmlns:loc_vm="clr-namespace:prcEditor.ViewModel"
         mc:Ignorable="d"
         Title="prcEditor"
         Icon="Resources\FoxLogo.ico"
@@ -123,45 +124,45 @@
                 </Style>
             </TreeView.ItemContainerStyle>
             <TreeView.Resources>
-                <HierarchicalDataTemplate DataType="{x:Type local:VM_ParamRoot}"
+                <HierarchicalDataTemplate DataType="{x:Type loc_vm:VM_ParamRoot}"
                                           ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="Resources\struct.png" Margin="0,2,4,2"/>
                         <TextBlock Text="{Binding Name}"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type local:VM_StructStruct}"
+                <HierarchicalDataTemplate DataType="{x:Type loc_vm:VM_ParamStruct+Struct}"
                                           ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="Resources\struct.png" Margin="0,2,4,2"/>
                         <TextBlock Text="{Binding Name}"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type local:VM_StructList}"
+                <HierarchicalDataTemplate DataType="{x:Type loc_vm:VM_ParamStruct+List}"
                                           ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="Resources\list.png" Margin="0,2,4,2"/>
                         <TextBlock Text="{Binding Name}"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
-                <DataTemplate DataType="{x:Type local:VM_StructValue}">
+                <DataTemplate DataType="{x:Type loc_vm:VM_ParamStruct+Value}">
                     <TextBlock Text="{Binding Name}"/>
                 </DataTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type local:VM_ListStruct}"
+                <HierarchicalDataTemplate DataType="{x:Type loc_vm:VM_ParamList+Struct}"
                                           ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="Resources\struct.png" Margin="0,2,4,2"/>
                         <TextBlock Text="{Binding Name}"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type local:VM_ListList}"
+                <HierarchicalDataTemplate DataType="{x:Type loc_vm:VM_ParamList+List}"
                                           ItemsSource="{Binding Children}">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="Resources\list.png" Margin="0,2,4,2"/>
                         <TextBlock Text="{Binding Name}"/>
                     </StackPanel>
                 </HierarchicalDataTemplate>
-                <DataTemplate DataType="{x:Type local:VM_ListValue}">
+                <DataTemplate DataType="{x:Type loc_vm:VM_ParamList+Value}">
                     <TextBlock Text="{Binding Name}"/>
                 </DataTemplate>
             </TreeView.Resources>
