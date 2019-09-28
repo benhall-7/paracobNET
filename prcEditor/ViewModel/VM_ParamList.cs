@@ -91,6 +91,7 @@ namespace prcEditor.ViewModel
                         return;
                     __index = value;
                     NotifyPropertyChanged(nameof(Index));
+                    NotifyPropertyChanged(nameof(Name));
                 }
             }
             public int Index
