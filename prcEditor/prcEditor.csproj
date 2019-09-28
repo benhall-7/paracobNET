@@ -75,13 +75,17 @@
     </Compile>
     <Compile Include="ViewModel\IParamChild.cs" />
     <Compile Include="ViewModel\VM_Param.cs" />
+    <Compile Include="ViewModel\VM_ParamList.cs" />
+    <Compile Include="ViewModel\VM_ParamRoot.cs" />
+    <Compile Include="ViewModel\VM_ParamStruct.cs" />
+    <Compile Include="ViewModel\VM_ParamValue.cs" />
     <Compile Include="Windows\LabelEditor.xaml.cs">
       <DependentUpon>LabelEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="Template\ValueEditTemplateSelector.cs" />
     <Compile Include="Template\ValueTemplateSelector.cs" />
     <Compile Include="ViewModel\Util.cs" />
-    <Compile Include="ViewModel\ParamViewModel.cs" />
+    <Compile Include="ViewModel\Clipboard.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
