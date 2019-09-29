@@ -27,9 +27,9 @@ before_build:
 build_script:
 - cmd: |-
     dotnet publish ParamXML -o %XML_DIR% 
-    dotnet publish ParamXML -o %XML_DIR_EXE% -r win-x64 -p:PublishSingleFile=true -p:PublishTrimmed=true -p:OutputType:exe
+    dotnet publish ParamXML -o %XML_DIR_EXE% -r win-x64 -p:PublishSingleFile=true -p:PublishTrimmed=true -p:OutputType=exe
     dotnet publish prcScript -o %SCRIPT_DIR%
-    dotnet publish prcScript -o %SCRIPT_DIR_EXE% -r win-x64 -p:PublishSingleFile=true -p:PublishTrimmed=true -p:OutputType:exe
+    dotnet publish prcScript -o %SCRIPT_DIR_EXE% -r win-x64 -p:PublishSingleFile=true -p:PublishTrimmed=true -p:OutputType=exe
     dotnet publish prcEditor -o %EDITOR_DIR%
 after_build:
 - cmd: |-
