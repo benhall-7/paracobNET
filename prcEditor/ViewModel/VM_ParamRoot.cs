@@ -10,5 +10,10 @@ namespace prcEditor.ViewModel
         public override string Name => "Root";
 
         public VM_ParamRoot(ParamStruct struc) : base(struc) { }
+
+        public new void UpdateHashes()
+        {
+            base.UpdateHashes();
+        }
     }
 }

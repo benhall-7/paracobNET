@@ -408,7 +408,7 @@ namespace prcEditor
                         {
                             str.Add(data.Param, StringToHashLabels[le.Label]);
                             str.UpdateChildrenIndeces();
-                            str.UpdateHashes();
+                            paramVM.UpdateHashes();
                         }
                         catch (ArgumentException)
                         {
@@ -485,7 +485,7 @@ namespace prcEditor
                         {
                             structChild.Parent.Add(data.Param, StringToHashLabels[le.Label]);
                             structChild.Parent.UpdateChildrenIndeces();
-                            structChild.Parent.UpdateHashes();
+                            paramVM.UpdateHashes();
                         }
                         catch (ArgumentException)
                         {

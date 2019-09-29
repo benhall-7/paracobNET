@@ -64,16 +64,17 @@ namespace prcEditor.ViewModel
                 ((IChild)Children[i])._index = i;
         }
 
-        public virtual void UpdateHashes()
+        protected void UpdateHashes()
         {
-            //foreach (var child in Children)
-            //    child.UpdateHashes();
+            foreach (var child in Children)
+                ((IChild)child).UpdateHashes();
         }
 
         // INTERFACES
         private interface IChild : IListChild
         {
             int _index { get; set; }
+            void UpdateHashes();
         }
 
         // SUB-CLASSES
@@ -117,10 +118,10 @@ namespace prcEditor.ViewModel
                 Parent = parent;
             }
 
-            public override void UpdateHashes()
+            void IChild.UpdateHashes()
             {
                 NotifyPropertyChanged(nameof(Name));
-                base.UpdateHashes();
+                UpdateHashes();
             }
         }
 
@@ -163,10 +164,10 @@ namespace prcEditor.ViewModel
                 Parent = parent;
             }
 
-            public override void UpdateHashes()
+            void IChild.UpdateHashes()
             {
                 NotifyPropertyChanged(nameof(Name));
-                base.UpdateHashes();
+                UpdateHashes();
             }
         }
 
@@ -209,10 +210,10 @@ namespace prcEditor.ViewModel
                 Parent = parent;
             }
 
-            public override void UpdateHashes()
+            void IChild.UpdateHashes()
             {
                 NotifyPropertyChanged(nameof(Name));
-                base.UpdateHashes();
+                UpdateHashes();
             }
         }
     }

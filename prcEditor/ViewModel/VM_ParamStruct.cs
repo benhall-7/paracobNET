@@ -64,18 +64,18 @@ namespace prcEditor.ViewModel
                 ((IChild)Children[i])._index = i;
         }
 
-        public virtual void UpdateHashes()
+        protected void UpdateHashes()
         {
+            //TODO: Is there a way to not make this public and still access the child?
             foreach (var child in Children)
-            {
-
-            }
+                ((IChild)child).UpdateHashes();
         }
 
         // INTERFACES
         private interface IChild : IStructChild
         {
             int _index { get; set; }
+            void UpdateHashes();
         }
 
         // SUB-CLASSES
@@ -155,11 +155,11 @@ namespace prcEditor.ViewModel
                 Parent = parent;
             }
 
-            public override void UpdateHashes()
+            void IChild.UpdateHashes()
             {
                 NotifyPropertyChanged(nameof(Key));
                 NotifyPropertyChanged(nameof(Name));
-                base.UpdateHashes();
+                UpdateHashes();
             }
         }
 
@@ -229,11 +229,11 @@ namespace prcEditor.ViewModel
                 Parent = parent;
             }
 
-            public override void UpdateHashes()
+            void IChild.UpdateHashes()
             {
                 NotifyPropertyChanged(nameof(Key));
                 NotifyPropertyChanged(nameof(Name));
-                base.UpdateHashes();
+                UpdateHashes();
             }
         }
 
@@ -303,11 +303,11 @@ namespace prcEditor.ViewModel
                 Parent = parent;
             }
 
-            public override void UpdateHashes()
+            void IChild.UpdateHashes()
             {
                 NotifyPropertyChanged(nameof(Key));
                 NotifyPropertyChanged(nameof(Name));
-                base.UpdateHashes();
+                UpdateHashes();
             }
         }
     }

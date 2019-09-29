@@ -41,7 +41,7 @@ namespace prcEditor.ViewModel
             Param = param;
         }
 
-        public virtual void UpdateHashes()
+        protected void UpdateHashes()
         {
             if (Param.TypeKey == ParamType.hash40)
             {
