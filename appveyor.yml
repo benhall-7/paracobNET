@@ -50,8 +50,8 @@ deploy:
   description: |-
     This build is updated every commit (if possible).
     Always recommended to use latest versions.
-    Datetime    $(TIMESTAMP)
-    Message     $(APPVEYOR_REPO_COMMIT_MESSAGE)
+    Datetime: $(TIMESTAMP)
+    Message: "$(APPVEYOR_REPO_COMMIT_MESSAGE)"
   auth_token:
     secure: HzJBzil1ZFH9SbYQowaI8czAc0tVGO//+TX3qZz7TwTg9pLCQXKEnCe5HWojNeZ7
   repository: BenHall-7/paracobNET
