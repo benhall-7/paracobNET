@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ParamXML", "ParamXML\ParamX
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "prcScript", "prcScript\prcScript.csproj", "{32EB625B-20B7-42F3-8EAB-15FFE28E3D41}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "prcEditorTest", "prcEditorTest\prcEditorTest.csproj", "{235D9487-055D-40A9-A780-CC27DC1CB299}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "prcEditor", "prcEditor\prcEditor.csproj", "{7A5190FF-59C9-44D5-8BD4-FAEF29CB37C9}"
 EndProject
 Global
@@ -31,10 +29,6 @@ Global
 		{32EB625B-20B7-42F3-8EAB-15FFE28E3D41}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32EB625B-20B7-42F3-8EAB-15FFE28E3D41}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32EB625B-20B7-42F3-8EAB-15FFE28E3D41}.Release|Any CPU.Build.0 = Release|Any CPU
-		{235D9487-055D-40A9-A780-CC27DC1CB299}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{235D9487-055D-40A9-A780-CC27DC1CB299}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{235D9487-055D-40A9-A780-CC27DC1CB299}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{235D9487-055D-40A9-A780-CC27DC1CB299}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7A5190FF-59C9-44D5-8BD4-FAEF29CB37C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7A5190FF-59C9-44D5-8BD4-FAEF29CB37C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A5190FF-59C9-44D5-8BD4-FAEF29CB37C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
