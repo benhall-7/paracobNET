@@ -4,36 +4,58 @@ configuration: Release
 #platform: Any CPU
 environment:
   TIMESTAMP: n/a
+  XML_DIR: builds\ParamXML
+  XML_DIR_EXE: builds\ParamXML-exe
+  SCRIPT_DIR: builds\prcScript
+  SCRIPT_DIR_EXE: builds\prcScript-exe
+  EDITOR_DIR: builds\prcEditor
+artifacts:
+  - path: ParamXML.zip
+    name: ParamXML
+  - path: ParamXML-exe.zip
+    name: ParamXML-exe
+  - path: prcScript.zip
+    name: prcScript
+  - path: prcScript-exe.zip
+    name: prcScript-exe
+  - path: prcEditor.zip
+    name: prcEditor
 before_build:
-- cmd: >-
+- cmd: |-
     set TIMESTAMP=%date% %time%
-     dotnet restore
-     dotnet publish -o build ParamXML
-     dotnet publish -o build prcScript
-build:
-  verbosity: minimal
-  project: prcEditor
+    dotnet restore
+build_script:
+- cmd: |-
+    dotnet publish ParamXML -o %XML_DIR% 
+    dotnet publish ParamXML -o %XML_DIR_EXE% -r win-x64 -p:PublishSingleFile=true -p:PublishTrimmed=true -p:OutputType:exe
+    dotnet publish prcScript -o %SCRIPT_DIR%
+    dotnet publish prcScript -o %SCRIPT_DIR_EXE% -r win-x64 -p:PublishSingleFile=true -p:PublishTrimmed=true -p:OutputType:exe
+    dotnet publish prcEditor -o %EDITOR_DIR%
 after_build:
-- cmd: >-
-    mkdir %APPVEYOR_BUILD_FOLDER%\build\ParamXML,%APPVEYOR_BUILD_FOLDER%\build\prcEditor,%APPVEYOR_BUILD_FOLDER%\build\prcScript
-     xcopy %APPVEYOR_BUILD_FOLDER%\ParamXML\build %APPVEYOR_BUILD_FOLDER%\build\ParamXML
-     xcopy %APPVEYOR_BUILD_FOLDER%\prcScript\build %APPVEYOR_BUILD_FOLDER%\build\prcScript /E
-     xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\paracobNET.dll %APPVEYOR_BUILD_FOLDER%\build\prcEditor
-     xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\paracobNET.pdb %APPVEYOR_BUILD_FOLDER%\build\prcEditor
-     xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\prcEditor.exe %APPVEYOR_BUILD_FOLDER%\build\prcEditor
-     xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\prcEditor.exe.config %APPVEYOR_BUILD_FOLDER%\build\prcEditor
-     xcopy %APPVEYOR_BUILD_FOLDER%\prcEditor\bin\%CONFIGURATION%\prcEditor.pdb %APPVEYOR_BUILD_FOLDER%\build\prcEditor
-     7z a paracobNET.zip .\build\*
-     appveyor PushArtifact paracobNET.zip
+- cmd: |-
+    7z a ParamXML.zip .\%XML_DIR%\*
+    7z a ParamXML-exe.zip .\%XML_DIR_EXE%\*
+    7z a prcScript.zip .\%SCRIPT_DIR%\*
+    7z a prcScript-exe.zip .\%SCRIPT_DIR_EXE%\*
+    7z a prcEditor.zip .\%EDITOR_DIR%\*
+    appveyor PushArtifact ParamXML.zip
+    appveyor PushArtifact ParamXML-exe.zip
+    appveyor PushArtifact prcScript.zip
+    appveyor PushArtifact prcScript-exe.zip
+    appveyor PushArtifact prcEditor.zip
 deploy:
 - provider: GitHub
-  tag: v2.∞
-  release: paracobNET (to-date)
-  description: 'Continuous-integration build, updated every commit. May be unstable.\nDate-time: $(TIMESTAMP)'
+  tag: v3.0
+  release: paracobNET
+  description: |-
+    This build is updated every commit (if possible).
+    Always recommended to use latest versions.
+    Datetime    $(TIMESTAMP)
+    Message     $(APPVEYOR_REPO_COMMIT_MESSAGE)
   auth_token:
     secure: HzJBzil1ZFH9SbYQowaI8czAc0tVGO//+TX3qZz7TwTg9pLCQXKEnCe5HWojNeZ7
   repository: BenHall-7/paracobNET
-  artifact: paracobNET.zip
+  artifact: ParamXML.zip, ParamXML-exe.zip, prcScript.zip, prcScript-exe.zip, prcEditor.zip
   force_update: true
   on:
     branch: master
