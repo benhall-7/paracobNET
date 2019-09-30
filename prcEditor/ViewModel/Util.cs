@@ -1,10 +1,7 @@
 ﻿using paracobNET;
-using System;
 
 namespace prcEditor.ViewModel
 {
-    //TODO: fully deprecated because of Default Interface Implementations.
-    //Awaiting update to NET 3.0
     static class Util
     {
         public static string GetStructChildName(IStructChild sc)
