@@ -9,7 +9,7 @@
         xmlns:loc_vm="clr-namespace:prcEditor.ViewModel"
         mc:Ignorable="d"
         Title="prcEditor"
-        Icon="Resources\FoxLogo.ico"
+        Icon="Resources\prcEditor.png"
         Height="600" Width="800"
         ContentRendered="Window_ContentRendered">
     <Window.Resources>
