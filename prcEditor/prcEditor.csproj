@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Resources\FoxLogo.ico" />
     <None Remove="Resources\list.png" />
     <None Remove="Resources\prcEditor.png" />
     <None Remove="Resources\struct.png" />
@@ -18,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\FoxLogo.ico" />
     <Resource Include="Resources\list.png" />
     <Resource Include="Resources\prcEditor.png" />
     <Resource Include="Resources\struct.png" />
