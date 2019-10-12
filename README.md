@@ -8,13 +8,15 @@ Param (.prc / .stprm / .stdat) class library for Smash Ultimate, written in C#, 
 
 - ParamLabels.csv from [param-labels repo](https://github.com/ultimate-research/param-labels)
 
-- If using non-exe build of `ParamXML` or `prcEditor`: NET Core runtime (version 3)
+- [.NET Core 3 runtime](https://dotnet.microsoft.com/download/dotnet-core/3.0)
+  - use `.NET Core Installer`
+  - for prcEditor, also use `.NET Core Desktop Installer`
 
 # prcEditor
 
 GUI for editing param files using a TreeView -> DataGrid format (Windows only)
 
-To load labels, place the label file in the same directory as the application. To open a selected param from the TreeView, press the "Enter" key
+To load labels, place the label file in the same directory as the application. To open a selected param from the TreeView, press the "Enter" keyboard key
 
 # ParamXML
 
