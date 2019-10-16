@@ -17,7 +17,7 @@ label : function
 label2hash : function
     <returns the hash from a label (assuming labels loaded)>
 
-ParamGlobal : userdata
+Lib : userdata
 |   <contains methods and properties to interact with params>
 +-> open_dir : string
 |       <gets or sets the directory root for opening params>

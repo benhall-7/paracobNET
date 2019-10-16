@@ -71,7 +71,7 @@ namespace prcScript
                 {
                     L.State.Encoding = Encoding.UTF8;
                     //set globals
-                    L["ParamGlobal"] = new LuaParamGlobal();
+                    L["Lib"] = new LuaParamGlobal();
                     L["sandboxed"] = Sandbox;
                     L["labelled"] = LabelsLoaded;
                     L["hash"] = new Func<string, ulong>(Hash40Util.StringToHash40);
