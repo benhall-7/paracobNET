@@ -1,27 +1,29 @@
 # paracobNET
 
-Param (.prc) class library for Smash Ultimate, and the central tool for other projects in this repository. Can open, manipulate, save, and create param files. Dependent on .NET Standard 2.0
+Param (.prc / .stprm / .stdat) class library for Smash Ultimate, written in C#, and the central tool for other projects in this repository. Can open, manipulate, save, and create param files. Dependent on .NET Standard 2.0
 
-# ParamXML
+## Prerequisites to run
 
-Command line program to convert params to XML format and back. To run requires the .NET Core version 2.1 runtime (https://dotnet.microsoft.com/download/dotnet-core/2.1). To build requires the SDK of the same version.
+- Download appropriate application from [Releases](https://github.com/BenHall-7/paracobNET/releases)
 
-### how to use:
+- ParamLabels.csv from [param-labels repo](https://github.com/ultimate-research/param-labels)
 
-With `dotnet` added to Path, you can run the program using a command such as `dotnet ParamXML.dll [args]`.
-
-Use `-h` or `-help` to see the help text, containing the required/optional args.
-
-Example: `dotnet ParamXML.dll -d fighter_param.prc -l ParamLabels.csv`
+- [.NET Core 3 runtime](https://dotnet.microsoft.com/download/dotnet-core/3.0)
+  - use `.NET Core Installer`
+  - for prcEditor, also use `.NET Core Desktop Installer`
 
 # prcEditor
 
-WPF Graphical User Interface for editing param files using a TreeView -> DataGrid format (Windows only). To build requires .NET Framework 4.6.1
+GUI for editing param files using a TreeView -> DataGrid format (Windows only)
 
-To load labels, place the label file (named "ParamLabels.csv") in the same directory as the application. To open a selected struct or list from the TreeView, press the "Enter" key. Additional features and documentation thereof are WIP.
+To load labels, place the label file in the same directory as the application. To open a selected param from the TreeView, press the "Enter" keyboard key
+
+# ParamXML
+
+Command line program to convert params to XML format and back. For help information use the `-h` argument.
 
 # prcScript
 
-Runs through .NET Core, so like ParamXML, use in the following way: `dotnet prcScript.dll [args]`.
+Interfaces param editing methods through a lua context. Script your edits!
 
-Interfaces param editing methods through a lua context. See `-h` for details. See the Wiki for an example.
+For help information use the `-h` argument. For for the API available in scripts, use  `-a`. See [the Wiki](https://github.com/BenHall-7/paracobNET/wiki/prcScript) for an example script.
