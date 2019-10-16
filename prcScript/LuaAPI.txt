@@ -8,7 +8,7 @@ date : function()
     <from os.date>
 sandboxed : boolean
     <returns true if prcScript is run with the -s flag>
-labelled : boolean
+labeled : boolean
     <returns true if prcScript is run with the -l flag>
 hash : function
     <returns the hash of a string>

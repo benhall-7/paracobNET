@@ -73,7 +73,7 @@ namespace prcScript
                     //set globals
                     L["Lib"] = new LuaParamGlobal();
                     L["sandboxed"] = Sandbox;
-                    L["labelled"] = LabelsLoaded;
+                    L["labeled"] = LabelsLoaded;
                     L["hash"] = new Func<string, ulong>(Hash40Util.StringToHash40);
                     L["label"] = new Func<ulong, string>((hash) => Hash40Util.FormatToString(hash, HashToStringLabels));
                     L["label2hash"] = new Func<string, ulong>((label) => Hash40Util.LabelToHash40(label, StringToHashLabels));
