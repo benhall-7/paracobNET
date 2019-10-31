@@ -111,62 +111,95 @@
                           IsEnabled="{Binding IsLabelSaveEnabled}"/>
             </MenuItem>
         </Menu>
-        <TreeView Grid.Row="1" Grid.Column="0"
-                  x:Name="Param_TreeView" BorderThickness="0"
-                  PreviewKeyDown="Param_TreeView_PreviewKeyDown"
-                  PreviewKeyUp="Param_TreeView_PreviewKeyUp"
-                  VirtualizingStackPanel.IsVirtualizing="True"
-                  VirtualizingStackPanel.VirtualizationMode="Recycling"
-                  ItemsSource="{Binding ParamViewModelList}">
-            <TreeView.ItemContainerStyle>
-                <Style TargetType="TreeViewItem">
-                    <EventSetter Event="KeyDown" Handler="TreeViewItem_KeyDown"/>
-                </Style>
-            </TreeView.ItemContainerStyle>
-            <TreeView.Resources>
-                <HierarchicalDataTemplate DataType="{x:Type loc_vm:VM_ParamRoot}"
-                                          ItemsSource="{Binding Children}">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="Resources\struct.png" Margin="0,2,4,2"/>
+        <Grid Grid.Row="1" Grid.Column="0"
+              Background="Transparent">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Row="0" Grid.Column="0"
+                     x:Name="FilterTextBlock"
+                     Padding="">
+            </TextBox>
+            <TextBlock Grid.Row="0" Grid.Column="0"
+                       IsHitTestVisible="False"
+                       Text="Filter..."
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Left"
+                       Foreground="DarkGray">
+                <TextBlock.Style>
+                    <Style TargetType="{x:Type TextBlock}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Text, ElementName=FilterTextBlock}" Value="">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+            <TreeView Grid.Row="1" Grid.Column="0"
+                      x:Name="Param_TreeView"
+                      BorderThickness="1"
+                      PreviewKeyDown="Param_TreeView_PreviewKeyDown"
+                      PreviewKeyUp="Param_TreeView_PreviewKeyUp"
+                      VirtualizingStackPanel.IsVirtualizing="True"
+                      VirtualizingStackPanel.VirtualizationMode="Recycling"
+                      ItemsSource="{Binding ParamViewModelList}">
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="TreeViewItem">
+                        <EventSetter Event="KeyDown" Handler="TreeViewItem_KeyDown"/>
+                    </Style>
+                </TreeView.ItemContainerStyle>
+                <TreeView.Resources>
+                    <HierarchicalDataTemplate DataType="{x:Type loc_vm:VM_ParamRoot}"
+                                              ItemsSource="{Binding Children}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="Resources\struct.png" Margin="0,2,4,2"/>
+                            <TextBlock Text="{Binding Name}"/>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type loc_vm:VM_ParamStruct+Struct}"
+                                              ItemsSource="{Binding Children}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="Resources\struct.png" Margin="0,2,4,2"/>
+                            <TextBlock Text="{Binding Name}"/>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type loc_vm:VM_ParamStruct+List}"
+                                              ItemsSource="{Binding Children}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="Resources\list.png" Margin="0,2,4,2"/>
+                            <TextBlock Text="{Binding Name}"/>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <DataTemplate DataType="{x:Type loc_vm:VM_ParamStruct+Value}">
                         <TextBlock Text="{Binding Name}"/>
-                    </StackPanel>
-                </HierarchicalDataTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type loc_vm:VM_ParamStruct+Struct}"
-                                          ItemsSource="{Binding Children}">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="Resources\struct.png" Margin="0,2,4,2"/>
+                    </DataTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type loc_vm:VM_ParamList+Struct}"
+                                              ItemsSource="{Binding Children}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="Resources\struct.png" Margin="0,2,4,2"/>
+                            <TextBlock Text="{Binding Name}"/>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type loc_vm:VM_ParamList+List}"
+                                              ItemsSource="{Binding Children}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="Resources\list.png" Margin="0,2,4,2"/>
+                            <TextBlock Text="{Binding Name}"/>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <DataTemplate DataType="{x:Type loc_vm:VM_ParamList+Value}">
                         <TextBlock Text="{Binding Name}"/>
-                    </StackPanel>
-                </HierarchicalDataTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type loc_vm:VM_ParamStruct+List}"
-                                          ItemsSource="{Binding Children}">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="Resources\list.png" Margin="0,2,4,2"/>
-                        <TextBlock Text="{Binding Name}"/>
-                    </StackPanel>
-                </HierarchicalDataTemplate>
-                <DataTemplate DataType="{x:Type loc_vm:VM_ParamStruct+Value}">
-                    <TextBlock Text="{Binding Name}"/>
-                </DataTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type loc_vm:VM_ParamList+Struct}"
-                                          ItemsSource="{Binding Children}">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="Resources\struct.png" Margin="0,2,4,2"/>
-                        <TextBlock Text="{Binding Name}"/>
-                    </StackPanel>
-                </HierarchicalDataTemplate>
-                <HierarchicalDataTemplate DataType="{x:Type loc_vm:VM_ParamList+List}"
-                                          ItemsSource="{Binding Children}">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="Resources\list.png" Margin="0,2,4,2"/>
-                        <TextBlock Text="{Binding Name}"/>
-                    </StackPanel>
-                </HierarchicalDataTemplate>
-                <DataTemplate DataType="{x:Type loc_vm:VM_ParamList+Value}">
-                    <TextBlock Text="{Binding Name}"/>
-                </DataTemplate>
-            </TreeView.Resources>
-        </TreeView>
+                    </DataTemplate>
+                </TreeView.Resources>
+            </TreeView>
+        </Grid>
+        
         <GridSplitter Grid.Row="1" Grid.Column="1"
                       HorizontalAlignment="Right"
                       VerticalAlignment="Stretch"
