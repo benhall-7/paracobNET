@@ -120,27 +120,19 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <TextBox Grid.Row="0" Grid.Column="0"
-                     x:Name="FilterTextBlock"
-                     Padding="">
-            </TextBox>
-            <TextBlock Grid.Row="0" Grid.Column="0"
-                       IsHitTestVisible="False"
-                       Text="Filter..."
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Left"
-                       Foreground="DarkGray">
-                <TextBlock.Style>
-                    <Style TargetType="{x:Type TextBlock}">
-                        <Setter Property="Visibility" Value="Collapsed"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Text, ElementName=FilterTextBlock}" Value="">
-                                <Setter Property="Visibility" Value="Visible"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Style>
-            </TextBlock>
+            <!-- START second grid -->
+            <Grid Grid.Row="0" Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Label Content="Filter:" Grid.Row="0" Grid.Column="0"/>
+                <TextBox x:Name="FilterTextBlock"
+                         Grid.Row="0" Grid.Column="1"
+                         VerticalAlignment="Center"/>
+            </Grid>
+            <!-- END second grid-->
+            
             <TreeView Grid.Row="1" Grid.Column="0"
                       x:Name="Param_TreeView"
                       BorderThickness="1"
