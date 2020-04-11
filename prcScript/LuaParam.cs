@@ -85,7 +85,7 @@ namespace prcScript
 
         public LuaTable to_table()
         {
-            var t = newtable();
+            var t = Resources.NewTable();
             t["type"] = type;
             switch (Inner.TypeKey)
             {
@@ -95,7 +95,7 @@ namespace prcScript
                         int lua_i = 1;
                         foreach (var n in s.Nodes)
                         {
-                            var t2 = newtable();
+                            var t2 = Resources.NewTable();
                             t2["hash"] = n.Key;
                             t2["param"] = new LuaParam(n.Value);
                             t[lua_i++] = t2;
@@ -120,11 +120,6 @@ namespace prcScript
         public LuaParam clone()
         {
             return new LuaParam(Inner.Clone());
-        }
-
-        private LuaTable newtable()
-        {
-            return Program.L.DoString(Resources.LuaNewTable)[0] as LuaTable;
         }
     }
 }

@@ -8,7 +8,7 @@ namespace prcScript
 {
     public class Program
     {
-        static List<string> LuaFiles { get; set; }
+        static List<(string, Range)> LuaFiles { get; set; }
         static bool Sandbox { get; set; } = false;
         static bool PrintedHelp { get; set; } = false;
 
@@ -20,7 +20,7 @@ namespace prcScript
 
         static void Main(string[] args)
         {
-            LuaFiles = new List<string>();
+            LuaFiles = new List<(string, Range)>();
             HashToStringLabels = new OrderedDictionary<ulong, string>();
             StringToHashLabels = new OrderedDictionary<string, ulong>();
             Resources.SetUp();
@@ -30,30 +30,39 @@ namespace prcScript
                 switch (args[i])
                 {
                     case "-h":
-                    case "-help":
+                    case "--help":
                         Console.WriteLine(Resources.Help);
                         PrintedHelp = true;
                         break;
                     case "-a":
-                    case "-api":
+                    case "--api":
                         Console.WriteLine(Resources.LuaAPI);
                         PrintedHelp = true;
                         break;
+                    case "-e":
+                    case "--env":
+                        var last_index = LuaFiles.Count - 1;
+                        if (LuaFiles.Count < 0)
+                            throw new Exception($"To apply environmental args, lua file must be listed first");
+                        var count = int.Parse(args[++i]);
+                        LuaFiles[last_index] = (LuaFiles[last_index].Item1, (i + 1)..(i + 1 + count));
+                        i += count;
+                        break;
                     case "-l":
+                    case "--label":
                         HashToStringLabels = LabelIO.GetHashStringDict(args[++i]);
                         StringToHashLabels = LabelIO.GetStringHashDict(args[i]);
                         LabelsLoaded = true;
                         break;
                     case "-s":
-                    case "-safe":
-                    case "-sandbox":
+                    case "--sandbox":
                         Sandbox = true;
                         break;
                     default:
                         if (args[i].StartsWith("-"))
                             throw new Exception($"unknown command {args[i]}");
                         else
-                            LuaFiles.Add(args[i]);
+                            LuaFiles.Add((args[i], 0..0));
                         break;
                 }
             }
@@ -65,11 +74,12 @@ namespace prcScript
                 return;
             }
 
-            foreach (var file in LuaFiles)
+            foreach (var file_args in LuaFiles)
             {
                 using (L = new Lua())
                 {
                     L.State.Encoding = Encoding.UTF8;
+
                     //set globals
                     L["Lib"] = new LuaParamGlobal();
                     L["sandboxed"] = Sandbox;
@@ -78,9 +88,24 @@ namespace prcScript
                     L["label"] = new Func<ulong, string>((hash) => Hash40Util.FormatToString(hash, HashToStringLabels));
                     L["label2hash"] = new Func<string, ulong>((label) => Hash40Util.LabelToHash40(label, StringToHashLabels));
 
+                    // Environment args passed to lua
+                    var range = file_args.Item2;
+                    var range_size = range.End.Value - range.Start.Value;
+                    if (range_size > 0)
+                    {
+                        var l_args = Resources.NewTable();
+
+                        for (int i = 1; i <= range_size; i++)
+                        {
+                            l_args[i] = args[range.Start.Value + i - 1];
+                        }
+
+                        L["arg"] = l_args;
+                    }
+
                     L.DoString(Resources.LuaSandbox);
 
-                    L.DoFile(file);
+                    L.DoFile(file_args.Item1);
                 }
             }
         }

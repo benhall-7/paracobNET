@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Reflection;
+using NLua;
 
 namespace prcScript
 {
@@ -20,6 +21,11 @@ namespace prcScript
             LuaAPI = GetString("LuaAPI.txt");
             LuaSandbox = GetString("sandbox.lua");
             LuaNewTable = "return {}";
+        }
+
+        public static LuaTable NewTable()
+        {
+            return Program.L.DoString(LuaNewTable)[0] as LuaTable;
         }
 
         private static string GetString(string resPath)

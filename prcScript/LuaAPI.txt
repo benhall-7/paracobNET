@@ -1,5 +1,7 @@
 ﻿[Globals]
 
+arg : table
+    environment args supplied by prcScript
 time : function()
     <from os.time>
 clock : function()
