@@ -29,37 +29,81 @@ namespace prcScript
         /// </summary>
         /// <param name="path">Relative or absolute path of file to open</param>
         /// <returns>LuaParam object corresponding to param file's root struct</returns>
-        public LuaParam open(string path)
+        public void open(string path, out LuaParam file, out string err)
         {
+            err = null;
+            file = null;
             last_dir = path;
 
             ParamFile pfile = new ParamFile();
             string fix1 = OpenDir.Replace('/', '\\');
             string fix2 = path.Replace('/', '\\');
             string real = Path.Combine(fix1, fix2);
-            pfile.Open(real);
-            return new LuaParam(pfile.Root);
+
+            try { pfile.Open(real); }
+            catch
+            {
+                err = $"Unable to open the file '{real}'";
+                return;
+            }
+
+            file = new LuaParam(pfile.Root);
         }
 
-        public void save(LuaParam param)
+        public void save(LuaParam param, out bool result, out string err)
         {
-            save(param, last_dir);
+            save(param, last_dir, out result, out err);
         }
-        public void save(LuaParam param, string path)
+        public void save(LuaParam param, string path, out bool result, out string err)
         {
-            var conversion = (ParamStruct)param.Inner;
+            result = false;
+            err = null;
+
+            ParamStruct conversion;
+            try { conversion = (ParamStruct)param.Inner; }
+            catch
+            {
+                err = $"'save' requires a ParamStruct. Received: {param?.Inner.TypeKey}";
+                return;
+            }
             ParamFile pfile = new ParamFile(conversion);
             string fix1 = SaveDir.Replace('/', '\\');
             string fix2 = path.Replace('/', '\\');
             string real = Path.Combine(fix1, fix2);
-            Directory.CreateDirectory(Path.GetDirectoryName(real));
-            pfile.Save(real);
+
+            try { Directory.CreateDirectory(Path.GetDirectoryName(real)); }
+            catch (Exception e)
+            {
+                err = e.Message;
+                return;
+            }
+            try { pfile.Save(real); }
+            catch (Exception e)
+            {
+                err = e.Message;
+                return;
+            }
+
+            result = true;
         }
 
-        public static LuaParam table2param(LuaTable table)
+        public static void table2param(LuaTable table, out LuaParam param, out string err)
         {
-            string type = (string)table["type"];
-            ParamType ptype = (ParamType)Enum.Parse(typeof(ParamType), type);
+            param = null;
+            err = null;
+
+            ParamType ptype;
+            try
+            {
+                var type = (string)table["type"];
+                ptype = (ParamType)Enum.Parse(typeof(ParamType), type);
+            }
+            catch
+            {
+                err = "Table is missing a 'type' field, or the 'type' field is not a valid paramType";
+                return;
+            }
+            
             switch (ptype)
             {
                 case ParamType.@struct:
@@ -68,24 +112,49 @@ namespace prcScript
                         int lua_i = 1;
                         while (table[lua_i++] is LuaTable t)
                         {
-                            var key = (ulong)t["hash"];
-                            var value = ((LuaParam)t["param"]).Inner;
+                            ulong key;
+                            IParam value;
+                            try
+                            {
+                                key = (ulong)t["hash"];
+                                value = ((LuaParam)t["param"]).Inner;
+                            }
+                            catch
+                            {
+                                err = "Inner table for ParamStruct must have 'hash' (number) and 'param' (LuaParam userdata) fields";
+                                return;
+                            }
                             s.Nodes.Add(key, value);
                         }
-                        return new LuaParam(s);
+                        param = new LuaParam(s);
                     }
+                    break;
                 case ParamType.list:
                     {
                         var l = new ParamList();
                         int lua_i = 1;
                         while (table[lua_i++] is LuaParam p)
                             l.Nodes.Add(p.Inner);
-                        return new LuaParam(l);
+                        param = new LuaParam(l);
                     }
+                    break;
                 default:
-                    var v = new ParamValue(ptype);
-                    v.SetValue(table["value"].ToString(), Program.StringToHashLabels);
-                    return new LuaParam(v);
+                    {
+                        var v = new ParamValue(ptype);
+                        var value = table["value"].ToString();
+                        try
+                        {
+                            v.SetValue(value, Program.StringToHashLabels);
+                        }
+                        catch
+                        {
+                            err = $"Unable to set param value using given value '{value}'";
+                            return;
+                        }
+
+                        param = new LuaParam(v);
+                    }
+                    break;
             }
         }
     }
