@@ -46,41 +46,68 @@ namespace prcScript
             Inner = inner;
         }
 
-        public LuaParam by_hash(ulong hash)
+        public void by_hash(ulong hash, out LuaParam param, out string err)
         {
+            param = null;
+            err = null;
             if (Inner is ParamStruct s)
-                return new LuaParam(s.Nodes[hash]);
-            return null;
+            {
+                try { param = new LuaParam(s.Nodes[hash]); }
+                catch { err = $"Unable to get param with hash 0x{hash:x8}"; }
+                return;
+            }
+            err = "Unable to index param by hash; must be a ParamStruct";
         }
 
-        public LuaParam by_label(string label)
+        public void by_label(string label, out LuaParam param, out string err)
         {
+            param = null;
+            err = null;
             if (Inner is ParamStruct s)
             {
                 IParam child;
                 //if the label isn't in the dictionary, catch it and convert directly to hash40 instead
-                try { child = s.Nodes[label, Program.StringToHashLabels]; }
-                catch (InvalidLabelException)
+                try
                 {
-                    //if the string as hash40 isn't present it will throw an exception
-                    //stating that the string is not found, which is good behavior!
-                    child = s.Nodes[label];
+                    child = s.Nodes[label, Program.StringToHashLabels];
+                    param = new LuaParam(child);
                 }
-                return new LuaParam(child);
+                catch
+                {
+                    err = $"Unable to index by given label '{label}'\n" +
+                        "Either labels are not loaded, or they do not include this string\n" +
+                        "Try adding the label, or indexing by its hash instead, using 'hash'.";
+                }
+                return;
             }
-            return null;
+            err = "Unable to index param by label; must be a ParamStruct";
         }
 
-        public LuaParam by_index(int index)
+        public void by_index(int index, out LuaParam param, out string err)
         {
-            switch (Inner.TypeKey)
+            param = null;
+            err = null;
+            try
             {
-                case ParamType.@struct:
-                    return new LuaParam((Inner as ParamStruct).Nodes[index].Value);
-                case ParamType.list:
-                    return new LuaParam((Inner as ParamList).Nodes[index]);
+                switch (Inner.TypeKey)
+                {
+                    case ParamType.@struct:
+                        param = new LuaParam((Inner as ParamStruct).Nodes[index].Value);
+                        break;
+                    case ParamType.list:
+                        param = new LuaParam((Inner as ParamList).Nodes[index]);
+                        break;
+                    default:
+                        err = "Unable to index param by position; must be a ParamStruct or a ParamList";
+                        break;
+                }
+                return;
             }
-            return null;
+            catch
+            {
+                err = $"Unable to index param with given value '{index}'";
+                return;
+            }
         }
 
         public LuaTable to_table()
