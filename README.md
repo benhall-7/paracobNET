@@ -2,6 +2,8 @@
 
 Param (.prc / .stprm / .stdat) class library for Smash Ultimate, written in C#, and the central tool for other projects in this repository. Can open, manipulate, save, and create param files. Dependent on .NET Standard 2.0
 
+**Note**: for a faster, stand-alone alternative of ParamXML, see: https://github.com/ultimate-research/prc-rs/ 
+
 ## Prerequisites to run
 
 - Download appropriate application from [Releases](https://github.com/BenHall-7/paracobNET/releases)
