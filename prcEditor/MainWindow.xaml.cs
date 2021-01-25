@@ -601,6 +601,10 @@ namespace prcEditor
                 case Key.P:
                     PasteParamNodeParent(tvi);
                     break;
+                case Key.D:
+                    CopyParamNode(tvi);
+                    PasteParamNodeParent(tvi);
+                    break;
             }
 
             //TODO: Can this interfere with "global" key shortcuts?
