@@ -1,18 +1,8 @@
 ﻿using paracobNET;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using System.Globalization;
 
 namespace prcEditor
@@ -55,7 +45,7 @@ namespace prcEditor
             }
         }
 
-        private bool autoCalcHash = false;
+        private bool autoCalcHash = true;
         public bool AutoCalculateHash
         {
             get { return autoCalcHash; }

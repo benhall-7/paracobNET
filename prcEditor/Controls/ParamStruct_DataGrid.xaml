@@ -1,0 +1,60 @@
+﻿<UserControl x:Class="prcEditor.Windows.ParamStruct_DataGrid"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:main="clr-namespace:prcEditor"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <DataGrid x:Name="Struct_DataGrid"
+              Grid.Row="1" Grid.Column="2"
+              BorderThickness="0"
+              Background="White"
+              AlternatingRowBackground="LightBlue"
+              AutoGenerateColumns="False"
+              CanUserSortColumns="False"
+              SelectionMode="Extended"
+              SelectionUnit="CellOrRowHeader"
+              ItemsSource="{Binding Struct_DataGrid_Source}">
+        <DataGrid.Columns>
+            <DataGridTemplateColumn Header="Key" ClipboardContentBinding="{Binding Key}">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Key}" Margin="2,0,2,0"/>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+                <DataGridTemplateColumn.CellEditingTemplate>
+                    <DataTemplate>
+                        <ComboBox IsEditable="True"
+                                  ItemsSource="{x:Static main:MainWindow.StringLabels}"
+                                  SelectedItem="{Binding Key}"
+                                  Text="{Binding Key}">
+                            <ComboBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <VirtualizingStackPanel/>
+                                </ItemsPanelTemplate>
+                            </ComboBox.ItemsPanel>
+                        </ComboBox>
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellEditingTemplate>
+            </DataGridTemplateColumn>
+            <DataGridComboBoxColumn Header="Type"
+                                    ItemsSource="{Binding Source={StaticResource ParamTypeEnum}}"
+                                    SelectedItemBinding="{Binding Type}"/>
+            <DataGridTemplateColumn Header="Value" Width="*"
+                                    CellTemplateSelector="{StaticResource CellValueTemplateSel}"
+                                    CellEditingTemplateSelector="{StaticResource CellValueEditTemplateSel}"
+                                    ClipboardContentBinding="{Binding Value}"/>
+        </DataGrid.Columns>
+        <DataGrid.Resources>
+            <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="Gray"/>
+        </DataGrid.Resources>
+    </DataGrid>
+</UserControl>
