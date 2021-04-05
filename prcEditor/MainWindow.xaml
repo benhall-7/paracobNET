@@ -41,10 +41,12 @@
         <Menu Grid.Row="0">
             <MenuItem Header="File">
                 <MenuItem Header="Open"
+                          InputGestureText="Ctrl O"
                           x:Name="OpenFileButton"
                           Click="OpenFileButton_Click"
                           IsEnabled="{Binding IsOpenEnabled}"/>
                 <MenuItem Header="Save"
+                          InputGestureText="Ctrl S"
                           x:Name="SaveFileButton"
                           Click="SaveFileButton_Click"
                           IsEnabled="{Binding IsSaveEnabled}"/>
