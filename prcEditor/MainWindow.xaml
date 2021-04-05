@@ -10,7 +10,10 @@
         Title="prcEditor"
         Icon="Resources\prcEditor.png"
         Height="600" Width="800"
-        ContentRendered="Window_ContentRendered">
+        ContentRendered="Window_ContentRendered"
+        PreviewKeyDown="Window_PreviewKeyDown"
+        PreviewKeyUp="Window_PreviewKeyUp"
+        KeyDown="Window_KeyDown">
     <Window.Resources>
         <Style TargetType="Button">
             <Setter Property="Margin" Value="2"/>

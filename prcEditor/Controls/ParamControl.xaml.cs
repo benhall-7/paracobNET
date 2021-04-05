@@ -145,8 +145,6 @@ namespace prcEditor.Windows
 
         private void CopyParamNode(TreeViewItem tvi)
         {
-            if (!KeyCtrl) return;
-
             Clipboard.Clear();
             if (tvi.Header is IStructChild structChild)
             {
@@ -162,8 +160,6 @@ namespace prcEditor.Windows
 
         private void CutParamNode(TreeViewItem tvi)
         {
-            if (!KeyCtrl) return;
-
             Clipboard.Clear();
             if (tvi.Header is IStructChild structChild)
             {
@@ -181,8 +177,6 @@ namespace prcEditor.Windows
 
         private void PasteParamNode(TreeViewItem tvi)
         {
-            if (!KeyCtrl) return;
-
             IDataObject dataObject = Clipboard.GetDataObject();
             if (dataObject.GetDataPresent(typeof(SerializableStructChild)))
             {
@@ -258,8 +252,6 @@ namespace prcEditor.Windows
 
         private void PasteParamNodeParent(TreeViewItem tvi)
         {
-            if (!KeyCtrl) return;
-
             IDataObject dataObject = Clipboard.GetDataObject();
             if (dataObject.GetDataPresent(typeof(SerializableStructChild)))
             {
@@ -335,18 +327,6 @@ namespace prcEditor.Windows
 
         #region EVENT_HANDLERS
 
-        private void Param_TreeView_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
-                KeyCtrl = true;
-        }
-
-        private void Param_TreeView_PreviewKeyUp(object sender, KeyEventArgs e)
-        {
-            if (e.KeyboardDevice.IsKeyUp(Key.LeftCtrl) && e.KeyboardDevice.IsKeyUp(Key.RightCtrl))
-                KeyCtrl = false;
-        }
-
         private void TreeViewItem_KeyDown(object sender, KeyEventArgs e)
         {
             if (!(sender is TreeViewItem tvi)) return;
@@ -360,25 +340,37 @@ namespace prcEditor.Windows
                     DeleteParamNode(tvi);
                     break;
                 case Key.C:
+                    // early return still allows bubbling this way
+                    if (!KeyCtrl)
+                        return;
                     CopyParamNode(tvi);
                     break;
                 case Key.X:
+                    if (!KeyCtrl)
+                        return;
                     CutParamNode(tvi);
                     break;
                 case Key.V:
+                    if (!KeyCtrl)
+                        return;
                     PasteParamNode(tvi);
                     break;
                 case Key.P:
+                    if (!KeyCtrl)
+                        return;
                     PasteParamNodeParent(tvi);
                     break;
                 case Key.D:
+                    if (!KeyCtrl)
+                        return;
                     CopyParamNode(tvi);
                     PasteParamNodeParent(tvi);
                     break;
+                default:
+                    return;
             }
 
-            //TODO: Can this interfere with "global" key shortcuts?
-            e.Handled = true;//bubbling event, don't send the event upward
+            e.Handled = true;
         }
 
         #endregion

@@ -18,8 +18,6 @@
         </Grid.ColumnDefinitions>
         <TreeView Grid.Row="1" Grid.Column="0"
                   x:Name="Param_TreeView" BorderThickness="0"
-                  PreviewKeyDown="Param_TreeView_PreviewKeyDown"
-                  PreviewKeyUp="Param_TreeView_PreviewKeyUp"
                   VirtualizingStackPanel.IsVirtualizing="True"
                   VirtualizingStackPanel.VirtualizationMode="Recycling"
                   ItemsSource="{Binding ParamViewModelList}">

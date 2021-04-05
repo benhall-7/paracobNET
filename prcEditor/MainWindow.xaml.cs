@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace prcEditor
 {
@@ -170,6 +171,30 @@ namespace prcEditor
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }
 
+        private void OpenFileDialog()
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = ParamFilter;
+
+            bool? result = ofd.ShowDialog();
+            if (result == true)
+            {
+                OpenFile(ofd.FileName);
+            }
+        }
+
+        private void SaveFileDialog()
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = ParamFilter;
+
+            bool? result = sfd.ShowDialog();
+            if (result == true)
+            {
+                SaveFile(sfd.FileName);
+            }
+        }
+
         private void OpenFile(string file)
         {
             IsOpenEnabled = false;
@@ -257,26 +282,12 @@ namespace prcEditor
 
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = ParamFilter;
-
-            bool? result = ofd.ShowDialog();
-            if (result == true)
-            {
-                OpenFile(ofd.FileName);
-            }
+            OpenFileDialog();
         }
 
         private void SaveFileButton_Click(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Filter = ParamFilter;
-
-            bool? result = sfd.ShowDialog();
-            if (result == true)
-            {
-                SaveFile(sfd.FileName);
-            }
+            SaveFileDialog();
         }
 
         private void EditLabelButton_Click(object sender, RoutedEventArgs e)
@@ -295,5 +306,38 @@ namespace prcEditor
         }
 
         #endregion
+
+        private void Window_PreviewKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.KeyboardDevice.IsKeyUp(Key.LeftCtrl) && e.KeyboardDevice.IsKeyUp(Key.RightCtrl))
+                KeyCtrl = false;
+        }
+
+        private void Window_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.LeftCtrl || e.Key == Key.RightCtrl)
+                KeyCtrl = true;
+        }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.O:
+                    if (!KeyCtrl || !IsOpenEnabled)
+                        return;
+                    OpenFileDialog();
+                    break;
+                case Key.S:
+                    if (!KeyCtrl || !IsSaveEnabled)
+                        return;
+                    SaveFileDialog();
+                    break;
+                default:
+                    return;
+            }
+
+            e.Handled = true;
+        }
     }
 }
