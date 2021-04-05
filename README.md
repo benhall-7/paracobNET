@@ -18,8 +18,6 @@ Param (.prc / .stprm / .stdat) class library for Smash Ultimate, written in C#, 
 
 GUI for editing param files using a TreeView -> DataGrid format (Windows only)
 
-To load labels, place the label file in the same directory as the application. To open a selected param from the TreeView, press the "Enter" keyboard key
-
 # ParamXML
 
 Command line program to convert params to XML format and back. For help information use the `-h` argument.
