@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Net;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -133,6 +134,17 @@ namespace prcEditor
             }
         }
 
+        private bool isLabelDownloadEnabled = true;
+        public bool IsLabelDownloadEnabled
+        {
+            get { return isLabelDownloadEnabled; }
+            set
+            {
+                isLabelDownloadEnabled = value;
+                NotifyPropertyChanged(nameof(IsLabelDownloadEnabled));
+            }
+        }
+
         #endregion
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -162,6 +174,7 @@ namespace prcEditor
 
             EditLabelButton.DataContext = this;
             SaveLabelButton.DataContext = this;
+            DownloadLabelButton.DataContext = this;
 
             KeyCtrl = false;
         }
@@ -242,13 +255,18 @@ namespace prcEditor
                     IsOpenEnabled = false;
                     IsLabelSaveEnabled = false;
                     IsLabelEditEnabled = false;
+                    IsLabelDownloadEnabled = false;
 
                     HashToStringLabels = LabelIO.GetHashStringDict(name);
                     StringToHashLabels = LabelIO.GetStringHashDict(name);
-
-                    IsOpenEnabled = true;
-                    IsLabelSaveEnabled = true;
-                    IsLabelEditEnabled = true;
+                }
+                IsOpenEnabled = true;
+                IsLabelSaveEnabled = true;
+                IsLabelEditEnabled = true;
+                IsLabelDownloadEnabled = true;
+                if (body is ParamControl pc)
+                {
+                    pc.ParamViewModel.UpdateHashes();
                 }
             }, "Loading label dictionaries"));
         }
@@ -338,6 +356,34 @@ namespace prcEditor
             }
 
             e.Handled = true;
+        }
+
+        private void DownloadLabelButton_Click(object sender, RoutedEventArgs e)
+        {
+            IsOpenEnabled = false;
+            IsLabelEditEnabled = false;
+            IsLabelSaveEnabled = false;
+            IsLabelDownloadEnabled = false;
+            string ParamLabels = "https://github.com/ultimate-research/param-labels/raw/master/ParamLabels.csv";
+            using (WebClient wc = new WebClient())
+            {
+                WorkerQueue.Enqueue(new EnqueuableStatus(() =>
+                {
+                    try
+                    {
+                        wc.DownloadFile(ParamLabels, LabelPath);
+                        OpenLabels();
+                    }
+                    catch (Exception e)
+                    {
+                        Timer.SetMessage(e.Message, 5000);
+                        IsOpenEnabled = true;
+                        IsLabelSaveEnabled = true;
+                        IsLabelEditEnabled = true;
+                        IsLabelDownloadEnabled = true;
+                    }
+                }, "Downloading labels from source"));
+            }
         }
     }
 }

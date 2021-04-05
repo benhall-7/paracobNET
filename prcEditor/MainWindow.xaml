@@ -58,6 +58,10 @@
                           x:Name="SaveLabelButton"
                           Click="SaveLabelButton_Click"
                           IsEnabled="{Binding IsLabelSaveEnabled}"/>
+                <MenuItem Header="Download"
+                          x:Name="DownloadLabelButton"
+                          Click="DownloadLabelButton_Click"
+                          IsEnabled="{Binding IsLabelDownloadEnabled}"/>
             </MenuItem>
         </Menu>
         <ContentControl x:Name="BodyContent" Grid.Row="1" Content="{Binding Body}"/>
