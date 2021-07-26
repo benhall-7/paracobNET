@@ -1,7 +1,7 @@
 version: '{build}'
 image: Visual Studio 2019
 configuration: Release
-#platform: Any CPU
+platform: Any CPU
 environment:
   TIMESTAMP: n/a
   XML_DIR: builds\ParamXML
