@@ -33,7 +33,7 @@ namespace prcEditor
         private string BaseDirectory => AppDomain.CurrentDomain.BaseDirectory;
         private IDictionary AppProperties => Application.Current.Properties;
         private string LabelPath => Path.Combine(BaseDirectory, "ParamLabels.csv");
-        private const string ParamFilter = "Param files|*.prc;*.stdat;*.stprm|All files|*.*";
+        private const string ParamFilter = "Param files|*.prc;*.prcx;*.stdat;*.stdatx;*.stprm;*.stprmx|All files|*.*";
 
         #region PROPERTY_BINDING
 
@@ -55,7 +55,7 @@ namespace prcEditor
         {
             get { return StringToHashLabels.Keys; }
         }
-        
+
         public string StatusMessage
         {
             get
