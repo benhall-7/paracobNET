@@ -1,4 +1,4 @@
-version: '{build}'
+version: "{build}"
 image: Visual Studio 2019
 configuration: Release
 platform: Any CPU
@@ -21,41 +21,41 @@ artifacts:
   - path: prcEditor.zip
     name: prcEditor
 before_build:
-- cmd: |-
-    set TIMESTAMP=%date% %time%
-    dotnet restore
+  - cmd: |-
+      set TIMESTAMP=%date% %time%
+      dotnet restore
 build_script:
-- cmd: |-
-    dotnet publish ParamXML -o %XML_DIR% 
-    dotnet publish ParamXML -o %XML_DIR_EXE% -r win-x64 -p:PublishSingleFile=true -p:PublishTrimmed=true
-    dotnet publish prcScript -o %SCRIPT_DIR%
-    dotnet publish prcScript -o %SCRIPT_DIR_EXE% -r win-x64 -p:PublishSingleFile=true -p:PublishTrimmed=true
-    dotnet publish prcEditor -o %EDITOR_DIR%
+  - cmd: |-
+      dotnet publish ParamXML -o %XML_DIR% 
+      dotnet publish ParamXML -o %XML_DIR_EXE% -r win-x64 -p:PublishSingleFile=true -p:PublishTrimmed=true
+      dotnet publish prcScript -o %SCRIPT_DIR%
+      dotnet publish prcScript -o %SCRIPT_DIR_EXE% -r win-x64 -p:PublishSingleFile=true -p:PublishTrimmed=true
+      dotnet publish prcEditor -o %EDITOR_DIR%
 after_build:
-- cmd: |-
-    7z a ParamXML.zip .\%XML_DIR%\*
-    7z a ParamXML-exe.zip .\%XML_DIR_EXE%\*
-    7z a prcScript.zip .\%SCRIPT_DIR%\*
-    7z a prcScript-exe.zip .\%SCRIPT_DIR_EXE%\*
-    7z a prcEditor.zip .\%EDITOR_DIR%\*
-    appveyor PushArtifact ParamXML.zip
-    appveyor PushArtifact ParamXML-exe.zip
-    appveyor PushArtifact prcScript.zip
-    appveyor PushArtifact prcScript-exe.zip
-    appveyor PushArtifact prcEditor.zip
+  - cmd: |-
+      7z a ParamXML.zip .\%XML_DIR%\*
+      7z a ParamXML-exe.zip .\%XML_DIR_EXE%\*
+      7z a prcScript.zip .\%SCRIPT_DIR%\*
+      7z a prcScript-exe.zip .\%SCRIPT_DIR_EXE%\*
+      7z a prcEditor.zip .\%EDITOR_DIR%\*
+      appveyor PushArtifact ParamXML.zip
+      appveyor PushArtifact ParamXML-exe.zip
+      appveyor PushArtifact prcScript.zip
+      appveyor PushArtifact prcScript-exe.zip
+      appveyor PushArtifact prcEditor.zip
 deploy:
-- provider: GitHub
-  tag: v3.0
-  release: paracobNET
-  description: |-
-    This build is updated every commit (if possible).
-    Always recommended to use latest versions.
-    Datetime: $(TIMESTAMP)
-    Message: "$(APPVEYOR_REPO_COMMIT_MESSAGE)"
-  auth_token:
-    secure: HzJBzil1ZFH9SbYQowaI8czAc0tVGO//+TX3qZz7TwTg9pLCQXKEnCe5HWojNeZ7
-  repository: BenHall-7/paracobNET
-  artifact: ParamXML.zip, ParamXML-exe.zip, prcScript.zip, prcScript-exe.zip, prcEditor.zip
-  force_update: true
-  on:
-    branch: master
+  - provider: GitHub
+    tag: v3.0
+    release: paracobNET
+    description: |-
+      This build is updated every commit (if possible).
+      Always recommended to use latest versions.
+      Datetime: $(TIMESTAMP)
+      Message: "$(APPVEYOR_REPO_COMMIT_MESSAGE)"
+    auth_token:
+      secure: Q4YsFTSGOKQfn5CqfhjRIXVUXUWfN8+4DXZhSqAgcF/naMaOjCq+qXyJq2gyPpjMTf9V/uji1hwWyJUowj7pGTcvJ5n/vCDGxr94lsPmcuNrCF9/f6wJGaL4ytlGMprS
+    repository: BenHall-7/paracobNET
+    artifact: ParamXML.zip, ParamXML-exe.zip, prcScript.zip, prcScript-exe.zip, prcEditor.zip
+    force_update: true
+    on:
+      branch: master
