@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
-namespace paracobNET
+﻿namespace paracobNET
 {
     internal class Disassembler
     {
@@ -25,7 +20,7 @@ namespace paracobNET
             RefEntries = new Dictionary<int, IOrderedEnumerable<KeyValuePair<int, int>>>();
         }
 
-        public ParamStruct Start()
+        public ParamMapNode Start()
         {
             using (Reader = new BinaryReader(File.OpenRead(Filepath)))
             {
@@ -46,10 +41,10 @@ namespace paracobNET
                 SetHashTable();
 
                 Reader.BaseStream.Seek(ParamStart, SeekOrigin.Begin);
-                if ((ParamType)Reader.ReadByte() == ParamType.@struct)
+                if ((ParamType)Reader.ReadByte() == ParamType.Map)
                 {
                     Reader.BaseStream.Position -= 1;
-                    return Read() as ParamStruct;
+                    return Read() as ParamMapNode;
                 }
                 else
                     throw new InvalidDataException("File does not have a root");
@@ -66,13 +61,13 @@ namespace paracobNET
             IParam param;
             switch (type)
             {
-                case ParamType.@struct:
+                case ParamType.Map:
                     {
                         int startPos = (int)Reader.BaseStream.Position - 1;
                         int size = Reader.ReadInt32();
                         int structRefOffset = Reader.ReadInt32();
 
-                        var str = new ParamStruct(size);
+                        var str = new ParamMapNode(size);
 
                         IOrderedEnumerable<KeyValuePair<int, int>> hashOffsets;
                         if (RefEntries.TryGetValue(structRefOffset, out var refEntry))
@@ -102,13 +97,13 @@ namespace paracobNET
                         param = str;
                         break;
                     }
-                case ParamType.list:
+                case ParamType.Array:
                     {
                         int startPos = (int)Reader.BaseStream.Position - 1;
                         int count = Reader.ReadInt32();
                         uint[] offsets = new uint[count];
 
-                        var list = new ParamList(count);
+                        var list = new ParamArrayNode(count);
 
                         //all elements should be the same type but it's not enforced
 
@@ -118,7 +113,7 @@ namespace paracobNET
                         for (int i = 0; i < count; i++)
                         {
                             Reader.BaseStream.Position = startPos + offsets[i];
-                            list.Nodes.Add(Read());
+                            list.Entries.Add(Read());
                         }
 
                         param = list;
@@ -126,39 +121,39 @@ namespace paracobNET
                     }
                 default:
                     {
-                        var value = new ParamValue(type);
+                        var value = new ParamValueNode(type);
                         object v = null;
 
                         switch (type)
                         {
-                            case ParamType.@bool:
+                            case ParamType.Bool:
                                 v = Reader.ReadByte() != 0;
                                 break;
-                            case ParamType.@sbyte:
+                            case ParamType.I8:
                                 v = Reader.ReadSByte();
                                 break;
-                            case ParamType.@byte:
+                            case ParamType.U8:
                                 v = Reader.ReadByte();
                                 break;
-                            case ParamType.@short:
+                            case ParamType.I16:
                                 v = Reader.ReadInt16();
                                 break;
-                            case ParamType.@ushort:
+                            case ParamType.U16:
                                 v = Reader.ReadUInt16();
                                 break;
-                            case ParamType.@int:
+                            case ParamType.I32:
                                 v = Reader.ReadInt32();
                                 break;
-                            case ParamType.@uint:
+                            case ParamType.U32:
                                 v = Reader.ReadUInt32();
                                 break;
-                            case ParamType.@float:
+                            case ParamType.Float:
                                 v = Reader.ReadSingle();
                                 break;
-                            case ParamType.hash40:
+                            case ParamType.Hash40:
                                 v = HashTable[Reader.ReadUInt32()];
                                 break;
-                            case ParamType.@string:
+                            case ParamType.String:
                                 long returnTo = Reader.BaseStream.Position;
                                 Reader.BaseStream.Seek(RefStart + Reader.ReadInt32(), SeekOrigin.Begin);
                                 string s = ""; char c;

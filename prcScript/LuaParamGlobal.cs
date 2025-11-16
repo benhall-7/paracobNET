@@ -106,7 +106,7 @@ namespace prcScript
             
             switch (ptype)
             {
-                case ParamType.@struct:
+                case ParamType.Map:
                     {
                         var s = new ParamStruct();
                         int lua_i = 1;
@@ -129,7 +129,7 @@ namespace prcScript
                         param = new LuaParam(s);
                     }
                     break;
-                case ParamType.list:
+                case ParamType.Vec:
                     {
                         var l = new ParamList();
                         int lua_i = 1;

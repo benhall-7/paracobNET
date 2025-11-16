@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace paracobNET
+﻿namespace paracobNET
 {
     [Serializable]
     public class Hash40Pairs<T> : List<HashValuePair<T>>

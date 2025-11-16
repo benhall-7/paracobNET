@@ -13,13 +13,13 @@ namespace prcScript
         {
             get
             {
-                if (Inner.TypeKey == ParamType.@struct || Inner.TypeKey == ParamType.list)
+                if (Inner.TypeKey == ParamType.Map || Inner.TypeKey == ParamType.Vec)
                     return null;
                 return (Inner as ParamValue).Value;
             }
             set
             {
-                if (Inner.TypeKey == ParamType.@struct || Inner.TypeKey == ParamType.list)
+                if (Inner.TypeKey == ParamType.Map || Inner.TypeKey == ParamType.Vec)
                     return;
                 (Inner as ParamValue).SetValue(value);
             }
@@ -29,13 +29,13 @@ namespace prcScript
         {
             get
             {
-                if (Inner.TypeKey == ParamType.@struct || Inner.TypeKey == ParamType.list)
+                if (Inner.TypeKey == ParamType.Map || Inner.TypeKey == ParamType.Vec)
                     return null;
                 return (Inner as ParamValue).ToString(Program.HashToStringLabels);
             }
             set
             {
-                if (Inner.TypeKey == ParamType.@struct || Inner.TypeKey == ParamType.list)
+                if (Inner.TypeKey == ParamType.Map || Inner.TypeKey == ParamType.Vec)
                     return;
                 (Inner as ParamValue).SetValue(value.ToString(), Program.StringToHashLabels);
             }
@@ -91,10 +91,10 @@ namespace prcScript
             {
                 switch (Inner.TypeKey)
                 {
-                    case ParamType.@struct:
+                    case ParamType.Map:
                         param = new LuaParam((Inner as ParamStruct).Nodes[index].Value);
                         break;
-                    case ParamType.list:
+                    case ParamType.Vec:
                         param = new LuaParam((Inner as ParamList).Nodes[index]);
                         break;
                     default:
@@ -116,7 +116,7 @@ namespace prcScript
             t["type"] = type;
             switch (Inner.TypeKey)
             {
-                case ParamType.@struct:
+                case ParamType.Map:
                     {
                         var s = Inner as ParamStruct;
                         int lua_i = 1;
@@ -129,7 +129,7 @@ namespace prcScript
                         }
                     }
                     break;
-                case ParamType.list:
+                case ParamType.Vec:
                     {
                         var l = Inner as ParamList;
                         int lua_i = 1;

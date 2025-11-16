@@ -24,17 +24,17 @@ namespace prcEditor
 
             switch (param.TypeKey)
             {
-                case ParamType.@bool:
+                case ParamType.Bool:
                     return BooleanTemplate;
-                case ParamType.@sbyte:
-                case ParamType.@byte:
-                case ParamType.@short:
-                case ParamType.@ushort:
-                case ParamType.@int:
-                case ParamType.@uint:
-                case ParamType.@float:
-                case ParamType.hash40:
-                case ParamType.@string:
+                case ParamType.I8:
+                case ParamType.U8:
+                case ParamType.I16:
+                case ParamType.U16:
+                case ParamType.I32:
+                case ParamType.U32:
+                case ParamType.F32:
+                case ParamType.Hash40:
+                case ParamType.String:
                     return StandardTemplate;
                 default:
                     return BlankTemplate;

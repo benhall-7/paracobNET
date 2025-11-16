@@ -1,15 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace paracobNET
+﻿namespace paracobNET
 {
     internal class RefTableEntry
     {
         public int RefTableOffset { get; set; }
-        public List<KeyValuePair<int, int>> HashOffsets { get; set; }
-        public ParamStruct CorrespondingStruct { get; set; }
+        public required List<KeyValuePair<int, int>> HashOffsets { get; set; }
+        public required ParamMapNode CorrespondingStruct { get; set; }
 
-        public RefTableEntry(ParamStruct correspondingStruct)
+        public RefTableEntry(ParamMapNode correspondingStruct)
         {
             CorrespondingStruct = correspondingStruct;
             HashOffsets = new List<KeyValuePair<int, int>>();

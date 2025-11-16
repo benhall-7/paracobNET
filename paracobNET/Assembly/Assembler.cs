@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
-namespace paracobNET
+﻿namespace paracobNET
 {
     internal class Assembler
     {
-        ParamStruct Root { get; set; }
+        ParamMapNode Root { get; set; }
         string Filepath { get; set; }
 
         FileStream FileStream { get; set; }
@@ -19,21 +14,21 @@ namespace paracobNET
 
         List<ulong> AsmHashTable { get; set; }//list of hashes appended to
         List<object> AsmRefEntries { get; set; }//reference entry classes, and strings
-        Dictionary<ParamStruct, RefTableEntry> StructRefEntries { get; set; }
+        Dictionary<ParamMapNode, RefTableEntry> StructRefEntries { get; set; }
 
-        List<Tuple<int, ParamStruct>> UnresolvedStructs { get; set; }
+        List<Tuple<int, ParamMapNode>> UnresolvedStructs { get; set; }
         List<Tuple<int, string>> UnresolvedStrings { get; set; }
         Dictionary<string, int> RefStringEntries { get; set; }
 
-        public Assembler(string filepath, ParamStruct root)
+        public Assembler(string filepath, ParamMapNode root)
         {
             Root = root;
             Filepath = filepath;
 
             AsmHashTable = new List<ulong>();
             AsmRefEntries = new List<object>();
-            StructRefEntries = new Dictionary<ParamStruct, RefTableEntry>();
-            UnresolvedStructs = new List<Tuple<int, ParamStruct>>();
+            StructRefEntries = new Dictionary<ParamMapNode, RefTableEntry>();
+            UnresolvedStructs = new List<Tuple<int, ParamMapNode>>();
             UnresolvedStrings = new List<Tuple<int, string>>();
             RefStringEntries = new Dictionary<string, int>();
         }
@@ -70,13 +65,13 @@ namespace paracobNET
 
         private void Write(IParam param)
         {
-            ParamType type = param.TypeKey;
+            ParamType type = param.Type;
             WriterParam.Write((byte)type);
             switch (type)
             {
-                case ParamType.@struct:
+                case ParamType.Map:
                     {
-                        var str = param as ParamStruct;
+                        var str = param as ParamMapNode;
                         var entry = new RefTableEntry(str); 
                         StructRefEntries.Add(str, entry);
                         AsmRefEntries.Add(entry);//reserve a space in the file's RefEntries so they stay in order
@@ -84,7 +79,7 @@ namespace paracobNET
                         var start = WriterParam.BaseStream.Position - 1;
                         WriterParam.Write(str.Nodes.Count);
 
-                        UnresolvedStructs.Add(new Tuple<int, ParamStruct>((int)WriterParam.BaseStream.Position, str));
+                        UnresolvedStructs.Add(new Tuple<int, ParamMapNode>((int)WriterParam.BaseStream.Position, str));
                         WriterParam.Write(0);
 
                         foreach (var node in str.Nodes.OrderBy(x => x.Key))
@@ -97,11 +92,11 @@ namespace paracobNET
                         }
                         break;
                     }
-                case ParamType.list:
+                case ParamType.Array:
                     {
-                        var list = param as ParamList;
+                        var list = param as ParamArrayNode;
                         var startPos = WriterParam.BaseStream.Position - 1;
-                        int count = list.Nodes.Count;
+                        int count = list.Entries.Count;
 
                         WriterParam.Write(count);
 
@@ -110,7 +105,7 @@ namespace paracobNET
                         WriterParam.BaseStream.Seek(4 * count, SeekOrigin.Current);
                         for (int i = 0; i < count; i++)
                         {
-                            var node = list.Nodes[i];
+                            var node = list.Entries[i];
                             offsets[i] = (int)(WriterParam.BaseStream.Position - startPos);
                             Write(node);
                         }
@@ -124,37 +119,37 @@ namespace paracobNET
                     }
                 default:
                     {
-                        object value = (param as ParamValue).Value;
+                        object value = (param as ParamValueNode).Value;
                         switch (type)
                         {
-                            case ParamType.@bool:
+                            case ParamType.Bool:
                                 WriterParam.Write((bool)value);
                                 break;
-                            case ParamType.@sbyte:
+                            case ParamType.I8:
                                 WriterParam.Write((sbyte)value);
                                 break;
-                            case ParamType.@byte:
+                            case ParamType.U8:
                                 WriterParam.Write((byte)value);
                                 break;
-                            case ParamType.@short:
+                            case ParamType.I16:
                                 WriterParam.Write((short)value);
                                 break;
-                            case ParamType.@ushort:
+                            case ParamType.U16:
                                 WriterParam.Write((ushort)value);
                                 break;
-                            case ParamType.@int:
+                            case ParamType.I32:
                                 WriterParam.Write((int)value);
                                 break;
-                            case ParamType.@uint:
+                            case ParamType.U32:
                                 WriterParam.Write((uint)value);
                                 break;
-                            case ParamType.@float:
+                            case ParamType.Float:
                                 WriterParam.Write((float)value);
                                 break;
-                            case ParamType.hash40:
+                            case ParamType.Hash40:
                                 WriterParam.Write(AsmHashTable.IndexOf((ulong)value));
                                 break;
-                            case ParamType.@string:
+                            case ParamType.String:
                                 string word = (string)value;
                                 UnresolvedStrings.Add(new Tuple<int, string>((int)WriterParam.BaseStream.Position, word));
 
@@ -170,21 +165,21 @@ namespace paracobNET
 
         private void IterateHashes(IParam param)
         {
-            switch (param.TypeKey)
+            switch (param.Type)
             {
-                case ParamType.@struct:
-                    foreach (var item in (param as ParamStruct).Nodes)
+                case ParamType.Map:
+                    foreach (var item in (param as ParamMapNode).Nodes)
                     {
                         WriteHash(item.Key);
                         IterateHashes(item.Value);
                     }
                     break;
-                case ParamType.list:
-                    foreach (var item in (param as ParamList).Nodes)
+                case ParamType.Array:
+                    foreach (var item in (param as ParamArrayNode).Entries)
                         IterateHashes(item);
                     break;
-                case ParamType.hash40:
-                    WriteHash((ulong)(param as ParamValue).Value);
+                case ParamType.Hash40:
+                    WriteHash((ulong)(param as ParamValueNode).Value);
                     break;
             }
         }

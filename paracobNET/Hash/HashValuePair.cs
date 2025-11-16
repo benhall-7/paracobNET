@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace paracobNET
+﻿namespace paracobNET
 {
     [Serializable]
     public class HashValuePair<T>

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace paracobNET
 {
@@ -25,7 +24,7 @@ namespace paracobNET
         }
         public static ulong StringToHash40(string word)
         {
-            return (ulong)word.Length << 32 | CRC.CRC32(word);
+            return (ulong)word.Length << 32 | Crc.Crc32(word);
         }
         public static ulong LabelToHash40(string hash40, IDictionary<string, ulong> labels)
         {

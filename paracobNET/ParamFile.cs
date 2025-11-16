@@ -1,17 +1,15 @@
-﻿using System;
-
-namespace paracobNET
+﻿namespace paracobNET
 {
     public class ParamFile
     {
         public const string Magic = "paracobn";
-        public ParamStruct Root { get; set; }
+        public ParamMapNode Root { get; set; }
 
         public ParamFile()
         {
-            Root = new ParamStruct();
+            Root = new ParamMapNode([]);
         }
-        public ParamFile(ParamStruct root)
+        public ParamFile(ParamMapNode root)
         {
             Root = root;
         }

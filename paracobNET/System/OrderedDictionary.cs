@@ -1,9 +1,6 @@
 ﻿//This file implements a modified version of a class originally represented here https://gist.github.com/hickford/5137384
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace paracobNET
 {

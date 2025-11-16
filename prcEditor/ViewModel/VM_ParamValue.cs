@@ -43,7 +43,7 @@ namespace prcEditor.ViewModel
 
         protected void UpdateHashes()
         {
-            if (Param.TypeKey == ParamType.hash40)
+            if (Param.TypeKey == ParamType.Hash40)
             {
                 NotifyPropertyChanged(nameof(Value));
             }

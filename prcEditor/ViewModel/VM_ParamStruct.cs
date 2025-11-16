@@ -32,10 +32,10 @@ namespace prcEditor.ViewModel
         {
             switch (param.TypeKey)
             {
-                case ParamType.@struct:
+                case ParamType.Map:
                     Children.Add(new Struct(param as ParamStruct, this));
                     break;
-                case ParamType.list:
+                case ParamType.Vec:
                     Children.Add(new List(param as ParamList, this));
                     break;
                 default:

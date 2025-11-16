@@ -124,20 +124,20 @@ namespace ParamXML
 
         static XmlNode Param2Node(IParam param)
         {
-            switch (param.TypeKey)
+            switch (param.Type)
             {
-                case ParamType.@struct:
-                    return ParamStruct2Node(param as ParamStruct);
-                case ParamType.list:
-                    return ParamArray2Node(param as ParamList);
+                case ParamType.Map:
+                    return ParamStruct2Node(param as ParamMapNode);
+                case ParamType.Array:
+                    return ParamArray2Node(param as ParamArrayNode);
                 default:
-                    return ParamValue2Node(param as ParamValue);
+                    return ParamValue2Node(param as ParamValueNode);
             }
         }
 
-        static XmlNode ParamStruct2Node(ParamStruct structure)
+        static XmlNode ParamStruct2Node(ParamMapNode structure)
         {
-            XmlNode xmlNode = xml.CreateElement(ParamType.@struct.ToString());
+            XmlNode xmlNode = xml.CreateElement(ParamType.Map.ToString());
             foreach (var node in structure.Nodes)
             {
                 XmlNode childNode = Param2Node(node.Value);
@@ -149,15 +149,15 @@ namespace ParamXML
             return xmlNode;
         }
 
-        static XmlNode ParamArray2Node(ParamList array)
+        static XmlNode ParamArray2Node(ParamArrayNode array)
         {
-            XmlNode xmlNode = xml.CreateElement(ParamType.list.ToString());
+            XmlNode xmlNode = xml.CreateElement(ParamType.Array.ToString());
             XmlAttribute mainAttr = xml.CreateAttribute("size");
-            mainAttr.Value = array.Nodes.Count.ToString();
+            mainAttr.Value = array.Entries.Count.ToString();
             xmlNode.Attributes.Append(mainAttr);
-            for (int i = 0; i < array.Nodes.Count; i++)
+            for (int i = 0; i < array.Entries.Count; i++)
             {
-                XmlNode childNode = Param2Node(array.Nodes[i]);
+                XmlNode childNode = Param2Node(array.Entries[i]);
                 XmlAttribute attr = xml.CreateAttribute("index");
                 attr.Value = i.ToString();
                 childNode.Attributes.Append(attr);
@@ -166,9 +166,9 @@ namespace ParamXML
             return xmlNode;
         }
 
-        static XmlNode ParamValue2Node(ParamValue value)
+        static XmlNode ParamValue2Node(ParamValueNode value)
         {
-            XmlNode xmlNode = xml.CreateElement(value.TypeKey.ToString());
+            XmlNode xmlNode = xml.CreateElement(value.Type.ToString());
             XmlText text = xml.CreateTextNode(value.ToString(hashToStringLabels));
             xmlNode.AppendChild(text);
             return xmlNode;
@@ -183,9 +183,9 @@ namespace ParamXML
                 ParamType type = (ParamType)Enum.Parse(typeof(ParamType), node.Name);
                 switch (type)
                 {
-                    case ParamType.@struct:
+                    case ParamType.Map:
                         return Node2ParamStruct(node);
-                    case ParamType.list:
+                    case ParamType.Array:
                         return Node2ParamArray(node);
                     default:
                         return Node2ParamValue(node, type);
@@ -205,7 +205,7 @@ namespace ParamXML
             }
         }
 
-        static ParamStruct Node2ParamStruct(XmlNode node)
+        static ParamMapNode Node2ParamStruct(XmlNode node)
         {
             Hash40Pairs<IParam> childParams = new Hash40Pairs<IParam>();
             foreach (XmlNode child in node.ChildNodes)
@@ -213,7 +213,7 @@ namespace ParamXML
             return new ParamStruct(childParams);
         }
 
-        static ParamList Node2ParamArray(XmlNode node)
+        static ParamArrayNode Node2ParamArray(XmlNode node)
         {
             int count = node.ChildNodes.Count;
             List<IParam> children = new List<IParam>(count);
@@ -222,9 +222,9 @@ namespace ParamXML
             return new ParamList(children);
         }
 
-        static ParamValue Node2ParamValue(XmlNode node, ParamType type)
+        static ParamValueNode Node2ParamValue(XmlNode node, ParamType type)
         {
-            ParamValue param = new ParamValue(type);
+            ParamValueNode param = new ParamValueNode(type);
             param.SetValue(node.InnerText, stringToHashLabels);
             return param;
         }

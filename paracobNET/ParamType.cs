@@ -1,18 +1,18 @@
-﻿namespace paracobNET
+﻿namespace paracobNET;
+
+public enum ParamType : byte
 {
-    public enum ParamType : byte
-    {
-        @bool = 1,
-        @sbyte,
-        @byte,
-        @short,
-        @ushort,
-        @int,
-        @uint,
-        @float,
-        hash40,
-        @string,
-        list,
-        @struct
-    }
+    Bool = 1,
+    I8,
+    U8,
+    I16,
+    U16,
+    I32,
+    U32,
+    Float,
+    Hash40,
+    String,
+    Array,
+    Map
 }
+
