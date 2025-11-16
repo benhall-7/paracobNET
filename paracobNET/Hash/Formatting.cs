@@ -14,4 +14,24 @@ public static class Hash40FormattingExtensions
 
         return hash.ToString();
     }
+
+    // TODO: is this really necessary?
+    /// <summary>
+    /// Returns the Hash40 for this string if it is a valid hex value or label, otherwise throws an exception.
+    /// </summary>
+    public static Hash40 FromLabelOrHex(
+        string str,
+        IReadOnlyDictionary<string, Hash40>? labels)
+    {
+        if (str.StartsWith("0x") &&
+            ulong.TryParse(str.Substring(2), System.Globalization.NumberStyles.HexNumber, null, out ulong val))
+        {
+            return new Hash40(val);
+        }
+
+        if (labels != null && labels.TryGetValue(str, out var hash))
+            return hash;
+
+        throw new InvalidLabelException($"The provided string is not valid hexadecimal and has no matching label", str);
+    }
 }
