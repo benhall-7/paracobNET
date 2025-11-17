@@ -10,6 +10,10 @@ public class ParamMapNode : ParamNode
 
     public IList<KeyValuePair<Hash40, ParamNode>> Entries => _entries;
 
+    public ParamMapNode(int capacity)
+    {
+        _entries = new List<KeyValuePair<Hash40, ParamNode>>(capacity);
+    }
     public ParamMapNode(IEnumerable<KeyValuePair<Hash40, ParamNode>> entries)
     {
         _entries = [.. entries];

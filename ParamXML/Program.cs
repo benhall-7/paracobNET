@@ -14,7 +14,7 @@ namespace ParamXML
             "required: [input] ; -d / -a (disassemble/assemble)\n" +
             "optional: -h ; -help ; -o [output] ; -l [label file]";
         static BuildMode mode = BuildMode.Invalid;
-        static ParamFile file { get; set; }
+        static ParamContainer file { get; set; }
         static XmlDocument xml { get; set; }
         static string labelName { get; set; }
         static OrderedDictionary<ulong, string> hashToStringLabels { get; set; }
@@ -71,8 +71,8 @@ namespace ParamXML
 
                     Console.WriteLine("Initializing...");
                     stopwatch.Start();
-                    file = new ParamFile();
-                    file.Open(input);
+                    file = new ParamContainer();
+                    file.OpenFile(input);
 
                     Console.WriteLine("Disassembling...");
                     xml = new XmlDocument();
@@ -100,13 +100,13 @@ namespace ParamXML
                     stopwatch.Start();
                     xml = new XmlDocument();
                     xml.Load(input);
-                    file = new ParamFile(Node2ParamStruct(xml.DocumentElement));
+                    file = new ParamContainer(Node2ParamStruct(xml.DocumentElement));
 
                     Console.WriteLine("Assembling...");
                     var dirname = Path.GetDirectoryName(output);
                     if (!string.IsNullOrEmpty(dirname))
                         Directory.CreateDirectory(dirname);
-                    file.Save(output);
+                    file.SaveFile(output);
 
                     stopwatch.Stop();
                     Console.WriteLine("Finished in {0} seconds", stopwatch.Elapsed.TotalSeconds);

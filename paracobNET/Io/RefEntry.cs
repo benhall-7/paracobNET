@@ -1,24 +1,26 @@
 ﻿namespace paracobNET;
 
-internal class RefTableEntry
+internal abstract record RefEntry;
+
+internal sealed record RefOffsetEntry(RefOffsetEntryData Entry) : RefEntry;
+
+internal sealed record RefStringEntry(string Value) : RefEntry;
+
+internal class RefOffsetEntryData
 {
     public int RefTableOffset { get; set; }
-    public required List<KeyValuePair<int, int>> HashOffsets { get; set; }
-    public required ParamMapNode CorrespondingStruct { get; set; }
+    public List<KeyValuePair<int, int>> HashOffsets { get; set; }
+    public ParamMapNode CorrespondingMapNode { get; set; }
 
-    public RefTableEntry(ParamMapNode correspondingStruct)
+    public RefOffsetEntryData(ParamMapNode correspondingMapNode)
     {
-        CorrespondingStruct = correspondingStruct;
-        HashOffsets = new List<KeyValuePair<int, int>>();
-    }
-    public RefTableEntry()
-    {
+        CorrespondingMapNode = correspondingMapNode;
         HashOffsets = new List<KeyValuePair<int, int>>();
     }
 
     public override bool Equals(object other)
     {
-        if (!(other is RefTableEntry entry))
+        if (!(other is RefOffsetEntryData entry))
             return false;
         if (base.Equals(entry))
             return true;

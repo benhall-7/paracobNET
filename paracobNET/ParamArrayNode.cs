@@ -15,6 +15,11 @@ public sealed class ParamArrayNode : ParamNode
         _items = new List<ParamNode>();
     }
 
+    public ParamArrayNode(int capacity)
+    {
+        _items = new List<ParamNode>(capacity);
+    }
+
     public ParamArrayNode(IEnumerable<ParamNode> items)
     {
         _items = [.. items];
