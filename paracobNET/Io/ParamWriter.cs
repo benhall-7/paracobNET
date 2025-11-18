@@ -49,7 +49,6 @@ internal sealed class Assembler
             writer.BaseStream.Position = 0;
             writer.BaseStream.CopyTo(destination);
         }
-
     }
 
     private void Write(ParamNode param, BinaryWriter paramWriter, BinaryWriter hashWriter, BinaryWriter refWriter)
@@ -106,49 +105,40 @@ internal sealed class Assembler
 
                     break;
                 }
-            default:
-                {
-                    // object value = (param as ParamValueNode).Value;
-                    switch (param as ParamValueNode)
-                    {
-                        case ParamBoolNode boolNode:
-                            paramWriter.Write(boolNode.Value);
-                            break;
-                        case ParamI8Node i8Node:
-                            paramWriter.Write(i8Node.Value);
-                            break;
-                        case ParamU8Node u8Node:
-                            paramWriter.Write(u8Node.Value);
-                            break;
-                        case ParamI16Node i16Node:
-                            paramWriter.Write(i16Node.Value);
-                            break;
-                        case ParamU16Node u16Node:
-                            paramWriter.Write(u16Node.Value);
-                            break;
-                        case ParamI32Node i32Node:
-                            paramWriter.Write(i32Node.Value);
-                            break;
-                        case ParamU32Node u32Node:
-                            paramWriter.Write(u32Node.Value);
-                            break;
-                        case ParamFloatNode floatNode:
-                            paramWriter.Write(floatNode.Value);
-                            break;
-                        case ParamHash40Node hash40Node:
-                            paramWriter.Write(_hashTable.IndexOf(hash40Node.Value));
-                            break;
-                        case ParamStringNode stringNode:
-                            string word = stringNode.Value;
-                            _unresolvedStrings.Add(((int)paramWriter.BaseStream.Position, word));
+            case ParamBoolNode boolNode:
+                paramWriter.Write(boolNode.Value);
+                break;
+            case ParamI8Node i8Node:
+                paramWriter.Write(i8Node.Value);
+                break;
+            case ParamU8Node u8Node:
+                paramWriter.Write(u8Node.Value);
+                break;
+            case ParamI16Node i16Node:
+                paramWriter.Write(i16Node.Value);
+                break;
+            case ParamU16Node u16Node:
+                paramWriter.Write(u16Node.Value);
+                break;
+            case ParamI32Node i32Node:
+                paramWriter.Write(i32Node.Value);
+                break;
+            case ParamU32Node u32Node:
+                paramWriter.Write(u32Node.Value);
+                break;
+            case ParamFloatNode floatNode:
+                paramWriter.Write(floatNode.Value);
+                break;
+            case ParamHash40Node hash40Node:
+                paramWriter.Write(_hashTable.IndexOf(hash40Node.Value));
+                break;
+            case ParamStringNode stringNode:
+                string word = stringNode.Value;
+                _unresolvedStrings.Add(((int)paramWriter.BaseStream.Position, word));
 
-                            AppendRefTableString(word);
-                            paramWriter.Write(0);
-                            break;
-                    }
-
-                    break;
-                }
+                AppendRefTableString(word);
+                paramWriter.Write(0);
+                break;
         }
     }
 

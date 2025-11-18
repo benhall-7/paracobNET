@@ -1,0 +1,65 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="https://github.com/avaloniaui"
+        xmlns:vm="clr-namespace:perky.ViewModels;assembly=perky"
+        xmlns:paracobNET="clr-namespace:paracobNET;assembly=paracobNET"
+        x:Class="perky.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Width="1000" Height="700"
+        Title="perky">
+
+    <DockPanel>
+
+        <!-- Menu -->
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open..."
+                          Command="{Binding OpenFileCommand}" />
+                <MenuItem Header="_Save"
+                          Command="{Binding SaveFileCommand}"
+                          IsEnabled="{Binding HasDocument}" />
+            </MenuItem>
+
+            <MenuItem Header="_Labels" IsEnabled="{Binding HasDocument}">
+                <MenuItem Header="_Load labels..."
+                          Command="{Binding LoadLabelsCommand}" />
+                <!-- Later: Download from GitHub -->
+            </MenuItem>
+        </Menu>
+
+        <!-- Main content -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="3*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: TreeView -->
+            <TreeView Grid.Column="0"
+                      ItemsSource="{Binding Root.Children}"
+                      SelectedItem="{Binding SelectedNode, Mode=TwoWay}">
+                <TreeView.ItemTemplate>
+                    <TreeDataTemplate DataType="vm:ParamTreeNodeViewModel"
+                                              ItemsSource="{Binding Children}">
+                        <TextBlock Text="{Binding DisplayName}" />
+                    </TreeDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+
+            <!-- Right: Detail panel (focused param) -->
+            <ContentControl Grid.Column="1"
+                            Content="{Binding FocusedParam}">
+                <ContentControl.ContentTemplate>
+                    <DataTemplate DataType="{x:Type paracobNET:ParamNode}">
+                        <StackPanel Margin="8">
+                            <TextBlock Text="Focused Param" FontWeight="Bold" />
+                            <TextBlock Text="{Binding Type}" />
+                            <!-- TODO: later replace with table layout depending on node type -->
+                        </StackPanel>
+                    </DataTemplate>
+                </ContentControl.ContentTemplate>
+            </ContentControl>
+
+        </Grid>
+    </DockPanel>
+</Window>

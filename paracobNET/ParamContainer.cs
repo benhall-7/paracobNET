@@ -31,7 +31,7 @@
         public void SaveFile(string filepath)
         {
             if (filepath == null) throw new ArgumentNullException(nameof(filepath));
-            var file = File.OpenWrite(filepath);
+            using var file = File.Create(filepath);
             ParamWriter.Write(this, file);
         }
 
