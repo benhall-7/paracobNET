@@ -6,15 +6,15 @@ namespace perky.Services;
 
 public static class ParamTreeBuilder
 {
-    public static ParamTreeNodeViewModel BuildContainer(ParamContainer container, string? rootName = null)
+    public static ParamTreeNodeViewModel BuildContainer(ParamContainer container, Labels labels)
     {
-        var name = rootName ?? "(Container)";
-        return BuildNode(container.Root, name);
+        var accessor = new NoAccessor();
+        return BuildNode(container.Root, accessor, labels);
     }
 
-    private static ParamTreeNodeViewModel BuildNode(ParamNode node, string displayName)
+    private static ParamTreeNodeViewModel BuildNode(ParamNode node, Accessor accessor, Labels labels)
     {
-        var vm = new ParamTreeNodeViewModel(node, displayName);
+        var vm = new ParamTreeNodeViewModel(node, accessor, labels);
 
         switch (node)
         {
@@ -23,8 +23,8 @@ public static class ParamTreeBuilder
                     for (int i = 0; i < arrayNode.Count; i++)
                     {
                         var child = arrayNode[i];
-                        var childName = $"[{i}]";
-                        vm.Children.Add(BuildNode(child, childName));
+                        var indexAccessor = new IndexAccessor(i);
+                        vm.Children.Add(BuildNode(child, indexAccessor, labels));
                     }
                     break;
                 }
@@ -33,8 +33,8 @@ public static class ParamTreeBuilder
                     foreach (var entry in mapNode.Entries)
                     {
                         // TODO: Use Hash40 formatting extension to get string representation
-                        var keyLabel = entry.Key.ToString();
-                        vm.Children.Add(BuildNode(entry.Value, keyLabel));
+                        var hash40Accessor = new Hash40Accessor(entry.Key);
+                        vm.Children.Add(BuildNode(entry.Value, hash40Accessor, labels));
                     }
                     break;
                 }

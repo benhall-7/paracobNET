@@ -18,6 +18,8 @@ public class MainWindowViewModel : INotifyPropertyChanged
     private ParamTreeNodeViewModel? _selectedNode;
     private ParamContainer? _container;
 
+    public Labels Labels { get; } = new();
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public ParamTreeNodeViewModel? Root
@@ -90,10 +92,10 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
         // Load via your library – adjust to your actual API name
         // e.g. ParamSerializer.Load(path) returning ParamMapNode
-        ParamContainer rootNode = new ParamContainer(path);
+        ParamContainer container = new ParamContainer(path);
 
-        _container = rootNode;
-        Root = ParamTreeBuilder.BuildContainer(rootNode, System.IO.Path.GetFileName(path));
+        _container = container;
+        Root = ParamTreeBuilder.BuildContainer(container, Labels);
         SelectedNode = Root;
     }
 
@@ -123,11 +125,23 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
     private async Task LoadLabelsAsync()
     {
-        // TODO: later:
-        // - open labels file (or download from GitHub)
-        // - build a Dictionary<Hash40, string>
-        // - rebuild the Root tree with ParamTreeBuilder.Build(rootNode, labels)
-        await Task.CompletedTask;
+        var result = await _owner.StorageProvider.OpenFilePickerAsync(
+            new FilePickerOpenOptions
+            {
+                AllowMultiple = false,
+                FileTypeFilter =
+                [
+                    new FilePickerFileType("Label files") { Patterns = ["*.csv"] },
+                    new FilePickerFileType("All files") { Patterns = ["*"] }
+                ]
+            }
+        );
+
+        if (result is null || result.Count == 0)
+            return;
+
+        var path = result[0].Path.LocalPath;
+        Labels.LoadFromFile(path);
     }
 
     protected void OnPropertyChanged([CallerMemberName] string? name = null) =>
