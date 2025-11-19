@@ -33,7 +33,7 @@ jobs:
 
       - name: Publish ParamXML
         run: |
-          dotnet publish src/ParamXML/ParamXML.csproj \
+          dotnet publish ParamXML/ParamXML.csproj \
             -c Release \
             -r ${{ matrix.rid }} \
             --self-contained true \
@@ -42,7 +42,7 @@ jobs:
 
       - name: Publish prcEditor
         run: |
-          dotnet publish src/prcEditor/prcEditor.csproj \
+          dotnet publish prcEditor/prcEditor.csproj \
             -c Release \
             -r ${{ matrix.rid }} \
             --self-contained true \
