@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="paracobNET/paracobNET.csproj" />
+  <Project Path="ParamXML/ParamXML.csproj" />
+  <Project Path="prcEditor/prcEditor.csproj" />
+  <!-- <Project Path="prcEditor/prcEditorOld.csproj" /> -->
+  <!-- <Project Path="prcScript/prcScriptOld.csproj" /> -->
+</Solution>

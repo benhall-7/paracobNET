@@ -1,0 +1,126 @@
+<Window xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="https://github.com/avaloniaui"
+    xmlns:vm="clr-namespace:prcEditor.ViewModels;assembly=prcEditor"
+    xmlns:paracobNET="clr-namespace:paracobNET;assembly=paracobNET"
+    xmlns:i="using:Avalonia.Xaml.Interactivity"
+    xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
+    x:Class="prcEditor.Views.MainWindow"
+    x:DataType="vm:MainWindowViewModel"
+    Width="1000" Height="700"
+    Title="prcEditor!"
+    Icon="avares://prcEditor/Assets/logo.png"
+    Focusable="True">
+
+    <Window.DataTemplates>
+        <!-- Bool -> CheckBox -->
+        <DataTemplate DataType="{x:Type vm:BoolEditorViewModel}">
+            <CheckBox IsChecked="{Binding Value, Mode=TwoWay}" />
+        </DataTemplate>
+
+        <!-- Numeric/String -> TextBox with commit on blur / Enter -->
+        <DataTemplate DataType="{x:Type vm:NumericOrStringEditorViewModel}">
+            <TextBox Text="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                <TextBox.KeyBindings>
+                    <KeyBinding Gesture="Enter"
+                        Command="{Binding CommitCommand}" />
+                </TextBox.KeyBindings>
+
+                <i:Interaction.Behaviors>
+                    <ia:EventTriggerBehavior EventName="LostFocus">
+                        <ia:InvokeCommandAction Command="{Binding CommitCommand}" />
+                    </ia:EventTriggerBehavior>
+                </i:Interaction.Behaviors>
+            </TextBox>
+        </DataTemplate>
+
+        <!-- Hash40 -> AutoComplete input control -->
+        <DataTemplate DataType="{x:Type vm:Hash40EditorViewModel}">
+            <AutoCompleteBox Text="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                ItemsSource="{Binding Suggestions}"
+                MinimumPrefixLength="1">
+                <AutoCompleteBox.AttachedToVisualTree>
+                    <!-- Optionally: hook KeyDown for Enter to call Commit -->
+                </AutoCompleteBox.AttachedToVisualTree>
+
+                <AutoCompleteBox.KeyBindings>
+                    <KeyBinding Gesture="Enter"
+                        Command="{Binding CommitCommand}" />
+                </AutoCompleteBox.KeyBindings>
+            </AutoCompleteBox>
+        </DataTemplate>
+
+        <!-- Arrays/Maps -> Empty / disabled -->
+        <DataTemplate DataType="{x:Type vm:DisabledEditorViewModel}">
+            <TextBlock Text="{Binding Display}" IsEnabled="False" />
+        </DataTemplate>
+    </Window.DataTemplates>
+
+    <DockPanel>
+
+        <!-- Menu -->
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open..."
+                    Command="{Binding OpenFileCommand}" />
+                <MenuItem Header="_Save"
+                    Command="{Binding SaveFileCommand}"
+                    IsEnabled="{Binding HasDocument}" />
+            </MenuItem>
+
+            <MenuItem Header="_Labels" IsEnabled="{Binding HasDocument}">
+                <MenuItem Header="_Load labels..."
+                    Command="{Binding LoadLabelsCommand}" />
+                <!-- Later: Download from GitHub -->
+            </MenuItem>
+        </Menu>
+
+        <!-- Main content -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="3*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: TreeView -->
+            <TreeView Grid.Column="0"
+                ItemsSource="{Binding Root.Children}"
+                SelectedItem="{Binding SelectedNode, Mode=TwoWay}">
+                <TreeView.ItemTemplate>
+                    <TreeDataTemplate DataType="vm:ParamTreeNodeViewModel"
+                        ItemsSource="{Binding Children}">
+                        <TextBlock Text="{Binding DisplayName}" />
+                    </TreeDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+
+            <!-- Right: Detail panel (focused param) -->
+            <DataGrid Grid.Column="1"
+                ItemsSource="{Binding Rows}"
+                AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Index"
+                        Binding="{Binding AccessorText}"
+                        IsReadOnly="True" />
+
+                    <DataGridTextColumn Header="Type"
+                        Binding="{Binding TypeText}"
+                        IsReadOnly="True" />
+
+                    <DataGridTemplateColumn Header="Value">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ContentControl Content="{Binding ValueEditor}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <ContentControl Content="{Binding ValueEditor}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </DockPanel>
+</Window>

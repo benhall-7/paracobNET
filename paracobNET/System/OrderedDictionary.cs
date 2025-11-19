@@ -1,9 +1,6 @@
 ﻿//This file implements a modified version of a class originally represented here https://gist.github.com/hickford/5137384
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace paracobNET
 {
@@ -12,7 +9,7 @@ namespace paracobNET
     /// </summary>
     /// <typeparam name="TKey">The type of keys</typeparam>
     /// <typeparam name="TValue">The type of values</typeparam>
-    public interface IOrderedDictionary<TKey, TValue> : IDictionary<TKey, TValue>
+    public interface IOrderedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IReadOnlyDictionary<TKey, TValue>
     {
         /// <summary>
         /// The value of the element at the given index.
@@ -41,7 +38,7 @@ namespace paracobNET
     /// <typeparam name="TKey">The type of keys. Musn't be <see cref="int"/></typeparam>
     /// <typeparam name="TValue">The type of values.</typeparam>
     [Serializable]
-    public class OrderedDictionary<TKey, TValue> : IOrderedDictionary<TKey, TValue>
+    public class OrderedDictionary<TKey, TValue> : IOrderedDictionary<TKey, TValue>, IReadOnlyDictionary<TKey, TValue>
     {
         /// <summary>
         /// An unordered dictionary of key pairs.
@@ -93,6 +90,10 @@ namespace paracobNET
         /// The values in the dictionary, in order.
         /// </summary>
         public ICollection<TValue> Values => fKeys.Select(key => fDictionary[key]).ToArray();
+
+        IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => Keys;
+
+        IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values => Values;
 
         /// <summary>
         /// The value at the given index.

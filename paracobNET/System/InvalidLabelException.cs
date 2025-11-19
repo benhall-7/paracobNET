@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace paracobNET
+﻿namespace paracobNET
 {
     public class InvalidLabelException : Exception
     {

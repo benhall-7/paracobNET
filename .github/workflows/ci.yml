@@ -1,0 +1,98 @@
+name: Build & Publish paracobNET Tools
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build (matrix runtimes)
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        rid: [win-x64, linux-x64, osx-x64]
+
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.x"
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Publish ParamXML
+        run: |
+          dotnet publish src/ParamXML/ParamXML.csproj \
+            -c Release \
+            -r ${{ matrix.rid }} \
+            --self-contained true \
+            -p:PublishSingleFile=false \
+            -o artifacts/ParamXML-${{ matrix.rid }}
+
+      - name: Publish prcEditor
+        run: |
+          dotnet publish src/prcEditor/prcEditor.csproj \
+            -c Release \
+            -r ${{ matrix.rid }} \
+            --self-contained true \
+            -p:PublishSingleFile=false \
+            -o artifacts/prcEditor-${{ matrix.rid }}
+
+      - name: Package artifacts
+        run: |
+          cd artifacts
+
+          zip -r ../ParamXML-${{ matrix.rid }}.zip ParamXML-${{ matrix.rid }}
+          zip -r ../prcEditor-${{ matrix.rid }}.zip prcEditor-${{ matrix.rid }}
+
+      - name: Upload artifacts (ParamXML)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ParamXML-${{ matrix.rid }}
+          path: ParamXML-${{ matrix.rid }}.zip
+
+      - name: Upload artifacts (prcEditor)
+        uses: actions/upload-artifact@v4
+        with:
+          name: prcEditor-${{ matrix.rid }}
+          path: prcEditor-${{ matrix.rid }}.zip
+
+  release:
+    name: Release latest version of code
+    runs-on: ubuntu-latest
+    needs: build
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: List artifacts (for debug)
+        run: ls -R ./artifacts
+
+      - name: Ensure 'dotnet-10' release exists
+        run: |
+          if ! gh release view dotnet-10 >/dev/null 2>&1; then
+            gh release create dotnet-10 \
+              --title "paracobNET with .NET 10" \
+              --notes "Updated on every push to master"
+          fi
+
+      - name: Upload assets to 'dotnet-10' release
+        run: |
+          gh release upload dotnet-10 ./artifacts/**/ParamXML-*.zip ./artifacts/**/prcEditor-*.zip --clobber
