@@ -37,7 +37,7 @@ jobs:
             -c Release \
             -r ${{ matrix.rid }} \
             --self-contained true \
-            -p:PublishSingleFile=false \
+            -p:PublishSingleFile=true \
             -o artifacts/ParamXML-${{ matrix.rid }}
 
       - name: Publish prcEditor
@@ -46,7 +46,7 @@ jobs:
             -c Release \
             -r ${{ matrix.rid }} \
             --self-contained true \
-            -p:PublishSingleFile=false \
+            -p:PublishSingleFile=true \
             -o artifacts/prcEditor-${{ matrix.rid }}
 
       - name: Package artifacts
