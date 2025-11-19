@@ -21,6 +21,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
     public Labels Labels { get; } = new();
 
     public event PropertyChangedEventHandler? PropertyChanged;
+    private event Action? SelectedNodeChanged;
 
     public ParamTreeNodeViewModel? Root
     {
@@ -49,12 +50,12 @@ public class MainWindowViewModel : INotifyPropertyChanged
             {
                 _selectedNode = value;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(FocusedParam));
+                SelectedNodeChanged?.Invoke();
             }
         }
     }
 
-    public ParamNode? FocusedParam => SelectedNode?.Node;
+    public ObservableCollection<DataGridRowViewModel> Rows { get; } = new();
 
     // Commands
     public RelayCommand OpenFileCommand { get; }
@@ -68,6 +69,13 @@ public class MainWindowViewModel : INotifyPropertyChanged
         OpenFileCommand = new RelayCommand(async _ => await OpenFileAsync(), _ => true);
         SaveFileCommand = new RelayCommand(async _ => await SaveFileAsync(), _ => HasDocument);
         LoadLabelsCommand = new RelayCommand(async _ => await LoadLabelsAsync(), _ => HasDocument);
+
+        SelectedNodeChanged += OnUpdateSelectedParam;
+    }
+
+    ~MainWindowViewModel()
+    {
+        SelectedNodeChanged -= OnUpdateSelectedParam;
     }
 
     private async Task OpenFileAsync()
@@ -142,6 +150,27 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
         var path = result[0].Path.LocalPath;
         Labels.LoadFromFile(path);
+    }
+
+    private void OnUpdateSelectedParam()
+    {
+        Rows.Clear();
+        if (SelectedNode != null)
+        {
+            switch (SelectedNode.Node)
+            {
+                case ParamArrayNode:
+                case ParamMapNode:
+                    foreach (var child in SelectedNode.Children)
+                    {
+                        Rows.Add(new DataGridRowViewModel(child.Accessor, child.Node, Labels));
+                    }
+                    break;
+                default:
+                    Rows.Add(new DataGridRowViewModel(SelectedNode.Accessor, SelectedNode.Node, Labels));
+                    break;
+            }
+        }
     }
 
     protected void OnPropertyChanged([CallerMemberName] string? name = null) =>

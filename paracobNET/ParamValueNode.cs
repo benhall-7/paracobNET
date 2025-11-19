@@ -1,15 +1,10 @@
 ﻿namespace paracobNET;
 
-public abstract class ParamValueNode : ParamNode
-{
-    // possible shared functions can go here
-}
-
-public sealed class ParamBoolNode : ParamValueNode
+public sealed class ParamBoolNode : ParamNode
 {
     public override ParamType Type => ParamType.Bool;
 
-    public bool Value { get; init; }
+    public bool Value { get; set; }
 
     public ParamBoolNode(bool value)
     {
@@ -19,11 +14,11 @@ public sealed class ParamBoolNode : ParamValueNode
     public override ParamNode Clone() => new ParamBoolNode(Value);
 }
 
-public sealed class ParamI8Node : ParamValueNode
+public sealed class ParamI8Node : ParamNode
 {
     public override ParamType Type => ParamType.I8;
 
-    public sbyte Value { get; init; }
+    public sbyte Value { get; set; }
 
     public ParamI8Node(sbyte value)
     {
@@ -33,11 +28,11 @@ public sealed class ParamI8Node : ParamValueNode
     public override ParamNode Clone() => new ParamI8Node(Value);
 }
 
-public sealed class ParamU8Node : ParamValueNode
+public sealed class ParamU8Node : ParamNode
 {
     public override ParamType Type => ParamType.U8;
 
-    public byte Value { get; init; }
+    public byte Value { get; set; }
 
     public ParamU8Node(byte value)
     {
@@ -47,11 +42,11 @@ public sealed class ParamU8Node : ParamValueNode
     public override ParamNode Clone() => new ParamU8Node(Value);
 }
 
-public sealed class ParamI16Node : ParamValueNode
+public sealed class ParamI16Node : ParamNode
 {
     public override ParamType Type => ParamType.I16;
 
-    public short Value { get; init; }
+    public short Value { get; set; }
 
     public ParamI16Node(short value)
     {
@@ -61,11 +56,11 @@ public sealed class ParamI16Node : ParamValueNode
     public override ParamNode Clone() => new ParamI16Node(Value);
 }
 
-public sealed class ParamU16Node : ParamValueNode
+public sealed class ParamU16Node : ParamNode
 {
     public override ParamType Type => ParamType.U16;
 
-    public ushort Value { get; init; }
+    public ushort Value { get; set; }
 
     public ParamU16Node(ushort value)
     {
@@ -75,11 +70,11 @@ public sealed class ParamU16Node : ParamValueNode
     public override ParamNode Clone() => new ParamU16Node(Value);
 }
 
-public sealed class ParamI32Node : ParamValueNode
+public sealed class ParamI32Node : ParamNode
 {
     public override ParamType Type => ParamType.I32;
 
-    public int Value { get; init; }
+    public int Value { get; set; }
 
     public ParamI32Node(int value)
     {
@@ -89,11 +84,11 @@ public sealed class ParamI32Node : ParamValueNode
     public override ParamNode Clone() => new ParamI32Node(Value);
 }
 
-public sealed class ParamU32Node : ParamValueNode
+public sealed class ParamU32Node : ParamNode
 {
     public override ParamType Type => ParamType.U32;
 
-    public uint Value { get; init; }
+    public uint Value { get; set; }
     public ParamU32Node(uint value)
     {
         Value = value;
@@ -102,11 +97,11 @@ public sealed class ParamU32Node : ParamValueNode
     public override ParamNode Clone() => new ParamU32Node(Value);
 }
 
-public sealed class ParamFloatNode : ParamValueNode
+public sealed class ParamFloatNode : ParamNode
 {
     public override ParamType Type => ParamType.Float;
 
-    public float Value { get; init; }
+    public float Value { get; set; }
 
     public ParamFloatNode(float value)
     {
@@ -116,11 +111,11 @@ public sealed class ParamFloatNode : ParamValueNode
     public override ParamNode Clone() => new ParamFloatNode(Value);
 }
 
-public sealed class ParamHash40Node : ParamValueNode
+public sealed class ParamHash40Node : ParamNode
 {
     public override ParamType Type => ParamType.Hash40;
 
-    public Hash40 Value { get; init; }
+    public Hash40 Value { get; set; }
 
     public ParamHash40Node(Hash40 value)
     {
@@ -130,11 +125,11 @@ public sealed class ParamHash40Node : ParamValueNode
     public override ParamNode Clone() => new ParamHash40Node(Value);
 }
 
-public sealed class ParamStringNode : ParamValueNode
+public sealed class ParamStringNode : ParamNode
 {
     public override ParamType Type => ParamType.String;
 
-    public string Value { get; init; }
+    public string Value { get; set; }
 
     public ParamStringNode(string value)
     {

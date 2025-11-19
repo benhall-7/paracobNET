@@ -1,12 +1,51 @@
 <Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="https://github.com/avaloniaui"
-        xmlns:vm="clr-namespace:perky.ViewModels;assembly=perky"
-        xmlns:paracobNET="clr-namespace:paracobNET;assembly=paracobNET"
-        x:Class="perky.Views.MainWindow"
-        x:DataType="vm:MainWindowViewModel"
-        Width="1000" Height="700"
-        Title="perky">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="https://github.com/avaloniaui"
+    xmlns:vm="clr-namespace:perky.ViewModels;assembly=perky"
+    xmlns:paracobNET="clr-namespace:paracobNET;assembly=paracobNET"
+    x:Class="perky.Views.MainWindow"
+    x:DataType="vm:MainWindowViewModel"
+    Width="1000" Height="700"
+    Title="perky!"
+    Icon="avares://perky/Assets/logo.png">
+
+    <Window.DataTemplates>
+        <!-- Bool -> CheckBox -->
+        <DataTemplate DataType="{x:Type vm:BoolEditorViewModel}">
+            <CheckBox IsChecked="{Binding Value, Mode=TwoWay}" />
+        </DataTemplate>
+
+        <!-- Numeric/String -> TextBox with commit on blur / Enter -->
+        <DataTemplate DataType="{x:Type vm:NumericOrStringEditorViewModel}">
+            <TextBox Text="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
+                <TextBox.KeyBindings>
+                    <KeyBinding Gesture="Enter"
+                        Command="{Binding CommitCommand}" />
+                </TextBox.KeyBindings>
+            </TextBox>
+        </DataTemplate>
+
+        <!-- Hash40 -> AutoComplete input control -->
+        <DataTemplate DataType="{x:Type vm:Hash40EditorViewModel}">
+            <AutoCompleteBox Text="{Binding Text, Mode=TwoWay}"
+                ItemsSource="{Binding Suggestions}"
+                MinimumPrefixLength="1">
+                <AutoCompleteBox.AttachedToVisualTree>
+                    <!-- Optionally: hook KeyDown for Enter to call Commit -->
+                </AutoCompleteBox.AttachedToVisualTree>
+
+                <AutoCompleteBox.KeyBindings>
+                    <KeyBinding Gesture="Enter"
+                        Command="{Binding CommitCommand}" />
+                </AutoCompleteBox.KeyBindings>
+            </AutoCompleteBox>
+        </DataTemplate>
+
+        <!-- Arrays/Maps -> Empty / disabled -->
+        <DataTemplate DataType="{x:Type vm:DisabledEditorViewModel}">
+            <TextBlock Text="{Binding Display}" IsEnabled="False" />
+        </DataTemplate>
+    </Window.DataTemplates>
 
     <DockPanel>
 
@@ -14,15 +53,15 @@
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
                 <MenuItem Header="_Open..."
-                          Command="{Binding OpenFileCommand}" />
+                    Command="{Binding OpenFileCommand}" />
                 <MenuItem Header="_Save"
-                          Command="{Binding SaveFileCommand}"
-                          IsEnabled="{Binding HasDocument}" />
+                    Command="{Binding SaveFileCommand}"
+                    IsEnabled="{Binding HasDocument}" />
             </MenuItem>
 
             <MenuItem Header="_Labels" IsEnabled="{Binding HasDocument}">
                 <MenuItem Header="_Load labels..."
-                          Command="{Binding LoadLabelsCommand}" />
+                    Command="{Binding LoadLabelsCommand}" />
                 <!-- Later: Download from GitHub -->
             </MenuItem>
         </Menu>
@@ -36,30 +75,43 @@
 
             <!-- Left: TreeView -->
             <TreeView Grid.Column="0"
-                      ItemsSource="{Binding Root.Children}"
-                      SelectedItem="{Binding SelectedNode, Mode=TwoWay}">
+                ItemsSource="{Binding Root.Children}"
+                SelectedItem="{Binding SelectedNode, Mode=TwoWay}">
                 <TreeView.ItemTemplate>
                     <TreeDataTemplate DataType="vm:ParamTreeNodeViewModel"
-                                              ItemsSource="{Binding Children}">
+                        ItemsSource="{Binding Children}">
                         <TextBlock Text="{Binding DisplayName}" />
                     </TreeDataTemplate>
                 </TreeView.ItemTemplate>
             </TreeView>
 
             <!-- Right: Detail panel (focused param) -->
-            <ContentControl Grid.Column="1"
-                            Content="{Binding FocusedParam}">
-                <ContentControl.ContentTemplate>
-                    <DataTemplate DataType="{x:Type paracobNET:ParamNode}">
-                        <StackPanel Margin="8">
-                            <TextBlock Text="Focused Param" FontWeight="Bold" />
-                            <TextBlock Text="{Binding Type}" />
-                            <!-- TODO: later replace with table layout depending on node type -->
-                        </StackPanel>
-                    </DataTemplate>
-                </ContentControl.ContentTemplate>
-            </ContentControl>
+            <DataGrid Grid.Column="1"
+                ItemsSource="{Binding Rows}"
+                AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Index"
+                        Binding="{Binding AccessorText}"
+                        IsReadOnly="True" />
 
+                    <DataGridTextColumn Header="Type"
+                        Binding="{Binding TypeText}"
+                        IsReadOnly="True" />
+
+                    <DataGridTemplateColumn Header="Value">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ContentControl Content="{Binding ValueEditor}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <ContentControl Content="{Binding ValueEditor}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
         </Grid>
     </DockPanel>
 </Window>
