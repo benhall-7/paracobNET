@@ -1,8 +1,8 @@
 using paracobNET;
 using paracobNET.Hash40FormattingExtensions;
-using perky.ViewModels;
+using prcEditor.ViewModels;
 
-namespace perky.Services;
+namespace prcEditor.Services;
 
 public static class ParamTreeBuilder
 {

@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Input;
 
-namespace perky.Services;
+namespace prcEditor.Services;
 
 public sealed class RelayCommand : ICommand
 {

@@ -2,9 +2,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using paracobNET;
-using perky.Services;
+using prcEditor.Services;
 
-namespace perky.ViewModels;
+namespace prcEditor.ViewModels;
 
 public abstract record Accessor;
 

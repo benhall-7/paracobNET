@@ -7,9 +7,9 @@ using System.Windows.Input;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using paracobNET;
-using perky.Services;
+using prcEditor.Services;
 
-namespace perky.ViewModels;
+namespace prcEditor.ViewModels;
 
 public class MainWindowViewModel : INotifyPropertyChanged
 {

@@ -1,9 +1,9 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using paracobNET;
-using perky.Services;
+using prcEditor.Services;
 
-namespace perky.ViewModels;
+namespace prcEditor.ViewModels;
 
 public class DataGridRowViewModel : INotifyPropertyChanged
 {

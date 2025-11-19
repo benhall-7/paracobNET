@@ -1,9 +1,9 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using perky.Views;
+using prcEditor.Views;
 
-namespace perky;
+namespace prcEditor;
 
 public partial class App : Application
 {

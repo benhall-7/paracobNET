@@ -7,9 +7,9 @@ using System.Runtime.CompilerServices;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using paracobNET;
 using paracobNET.Hash40FormattingExtensions;
-using perky.Services;
+using prcEditor.Services;
 
-namespace perky.ViewModels;
+namespace prcEditor.ViewModels;
 
 public abstract class ValueEditorViewModel : INotifyPropertyChanged
 {

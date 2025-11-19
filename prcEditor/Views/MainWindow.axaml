@@ -1,13 +1,16 @@
 <Window xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="https://github.com/avaloniaui"
-    xmlns:vm="clr-namespace:perky.ViewModels;assembly=perky"
+    xmlns:vm="clr-namespace:prcEditor.ViewModels;assembly=prcEditor"
     xmlns:paracobNET="clr-namespace:paracobNET;assembly=paracobNET"
-    x:Class="perky.Views.MainWindow"
+    xmlns:i="using:Avalonia.Xaml.Interactivity"
+    xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
+    x:Class="prcEditor.Views.MainWindow"
     x:DataType="vm:MainWindowViewModel"
     Width="1000" Height="700"
-    Title="perky!"
-    Icon="avares://perky/Assets/logo.png">
+    Title="prcEditor!"
+    Icon="avares://prcEditor/Assets/logo.png"
+    Focusable="True">
 
     <Window.DataTemplates>
         <!-- Bool -> CheckBox -->
@@ -17,17 +20,23 @@
 
         <!-- Numeric/String -> TextBox with commit on blur / Enter -->
         <DataTemplate DataType="{x:Type vm:NumericOrStringEditorViewModel}">
-            <TextBox Text="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=LostFocus}">
+            <TextBox Text="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                 <TextBox.KeyBindings>
                     <KeyBinding Gesture="Enter"
                         Command="{Binding CommitCommand}" />
                 </TextBox.KeyBindings>
+
+                <i:Interaction.Behaviors>
+                    <ia:EventTriggerBehavior EventName="LostFocus">
+                        <ia:InvokeCommandAction Command="{Binding CommitCommand}" />
+                    </ia:EventTriggerBehavior>
+                </i:Interaction.Behaviors>
             </TextBox>
         </DataTemplate>
 
         <!-- Hash40 -> AutoComplete input control -->
         <DataTemplate DataType="{x:Type vm:Hash40EditorViewModel}">
-            <AutoCompleteBox Text="{Binding Text, Mode=TwoWay}"
+            <AutoCompleteBox Text="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 ItemsSource="{Binding Suggestions}"
                 MinimumPrefixLength="1">
                 <AutoCompleteBox.AttachedToVisualTree>

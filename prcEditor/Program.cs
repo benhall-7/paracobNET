@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using System;
 
-namespace perky;
+namespace prcEditor;
 
 class Program
 {

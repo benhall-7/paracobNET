@@ -1,9 +1,9 @@
 using System;
 using paracobNET;
 using paracobNET.Hash40FormattingExtensions;
-using perky.ViewModels;
+using prcEditor.ViewModels;
 
-namespace perky.Services;
+namespace prcEditor.Services;
 
 public class Labels
 {

@@ -1,7 +1,7 @@
 using Avalonia.Controls;
-using perky.ViewModels;
+using prcEditor.ViewModels;
 
-namespace perky.Views;
+namespace prcEditor.Views;
 
 public partial class MainWindow : Window
 {
