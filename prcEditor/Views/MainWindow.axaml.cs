@@ -8,6 +8,9 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        DataContext = new MainWindowViewModel(this);
+        var viewModel = new MainWindowViewModel(this);
+        DataContext = viewModel;
+
+        Opened += (_, _) => viewModel.OnWindowOpened();
     }
 }

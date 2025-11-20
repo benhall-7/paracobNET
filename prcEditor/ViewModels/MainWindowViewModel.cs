@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -68,7 +69,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
         OpenFileCommand = new RelayCommand(async _ => await OpenFileAsync(), _ => true);
         SaveFileCommand = new RelayCommand(async _ => await SaveFileAsync(), _ => HasDocument);
-        LoadLabelsCommand = new RelayCommand(async _ => await LoadLabelsAsync(), _ => HasDocument);
+        LoadLabelsCommand = new RelayCommand(async _ => await LoadLabelsAsync(), _ => true);
 
         SelectedNodeChanged += OnUpdateSelectedParam;
     }
@@ -169,6 +170,24 @@ public class MainWindowViewModel : INotifyPropertyChanged
                 default:
                     Rows.Add(new DataGridRowViewModel(SelectedNode.Accessor, SelectedNode.Node, Labels));
                     break;
+            }
+        }
+    }
+
+    public void OnWindowOpened()
+    {
+        var baseDir = AppContext.BaseDirectory;
+        var labelsPath = Path.Combine(baseDir, "ParamLabels.csv");
+
+        if (File.Exists(labelsPath))
+        {
+            try
+            {
+                Labels.LoadFromFile(labelsPath);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to load default labels: {ex}");
             }
         }
     }

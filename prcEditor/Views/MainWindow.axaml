@@ -75,7 +75,7 @@
                     IsEnabled="{Binding HasDocument}" />
             </MenuItem>
 
-            <MenuItem Header="_Labels" IsEnabled="{Binding HasDocument}">
+            <MenuItem Header="_Labels">
                 <MenuItem Header="_Load labels..."
                     Command="{Binding LoadLabelsCommand}" />
                 <!-- Later: Download from GitHub -->
