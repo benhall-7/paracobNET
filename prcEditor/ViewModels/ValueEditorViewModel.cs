@@ -89,7 +89,6 @@ public sealed class NumericOrStringEditorViewModel : ValueEditorViewModel
         try
         {
             var parsed = Parse(_text, _paramType);
-            Console.WriteLine($"Parsed value: {parsed}");
             _set(parsed);
         }
         catch

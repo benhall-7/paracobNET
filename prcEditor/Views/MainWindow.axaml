@@ -48,6 +48,12 @@
                     <KeyBinding Gesture="Enter"
                         Command="{Binding CommitCommand}" />
                 </AutoCompleteBox.KeyBindings>
+
+                <i:Interaction.Behaviors>
+                    <ia:EventTriggerBehavior EventName="LostFocus">
+                        <ia:InvokeCommandAction Command="{Binding CommitCommand}" />
+                    </ia:EventTriggerBehavior>
+                </i:Interaction.Behaviors>
             </AutoCompleteBox>
         </DataTemplate>
 
