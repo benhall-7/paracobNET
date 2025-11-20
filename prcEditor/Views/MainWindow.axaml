@@ -38,6 +38,7 @@
         <DataTemplate DataType="{x:Type vm:Hash40EditorViewModel}">
             <AutoCompleteBox Text="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 ItemsSource="{Binding Suggestions}"
+                IsDropDownOpen="{Binding IsDropDownOpen, Mode=TwoWay}"
                 MinimumPrefixLength="1">
                 <AutoCompleteBox.AttachedToVisualTree>
                     <!-- Optionally: hook KeyDown for Enter to call Commit -->

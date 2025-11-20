@@ -124,8 +124,32 @@ public sealed class Hash40EditorViewModel : ValueEditorViewModel
     private readonly ParamHash40Node _node;
     private readonly Labels _labels;
     private string _text;
+    public string Text
+    {
+        get => _text;
+        set
+        {
+            if (_text == value) return;
+            _text = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private bool _isDropDownOpen;
+    public bool IsDropDownOpen
+    {
+        get => _isDropDownOpen;
+        set
+        {
+            if (_isDropDownOpen == value) return;
+            _isDropDownOpen = value;
+            OnPropertyChanged();
+        }
+    }
 
     public RelayCommand CommitCommand { get; }
+
+    public IReadOnlyList<string> Suggestions => ((IReadOnlyDictionary<string, Hash40>)_labels.StringToHashLabels).Keys.ToList();
 
     public Hash40EditorViewModel(ParamHash40Node node, Labels labels)
     {
@@ -142,24 +166,12 @@ public sealed class Hash40EditorViewModel : ValueEditorViewModel
         _labels.LabelsChanged -= OnLabelsChanged;
     }
 
-    public string Text
-    {
-        get => _text;
-        set
-        {
-            if (_text == value) return;
-            _text = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public IReadOnlyList<string> Suggestions => ((IReadOnlyDictionary<string, Hash40>)_labels.StringToHashLabels).Keys.ToList();
-
     public void Commit()
     {
         try
         {
             _node.Value = Hash40FormattingExtensions.FromLabelOrHex(Text, _labels.StringToHashLabels);
+            IsDropDownOpen = false;
         }
         catch
         {
@@ -174,6 +186,7 @@ public sealed class Hash40EditorViewModel : ValueEditorViewModel
     {
         _text = _node.Value.ToLabelOrHex(_labels.HashToStringLabels);
         OnPropertyChanged(nameof(Text));
+        OnPropertyChanged(nameof(Suggestions));
     }
 }
 
