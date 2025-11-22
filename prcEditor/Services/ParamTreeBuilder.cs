@@ -1,5 +1,4 @@
 using paracobNET;
-using paracobNET.Hash40FormattingExtensions;
 using prcEditor.ViewModels;
 
 namespace prcEditor.Services;
@@ -9,12 +8,12 @@ public static class ParamTreeBuilder
     public static ParamTreeNodeViewModel BuildContainer(ParamContainer container, Labels labels)
     {
         var accessor = new NoAccessor();
-        return BuildNode(container.Root, accessor, labels);
+        return BuildNode(container.Root, null, accessor, labels);
     }
 
-    private static ParamTreeNodeViewModel BuildNode(ParamNode node, Accessor accessor, Labels labels)
+    private static ParamTreeNodeViewModel BuildNode(ParamNode node, ParamTreeNodeViewModel? parent, Accessor accessor, Labels labels)
     {
-        var vm = new ParamTreeNodeViewModel(node, accessor, labels);
+        var vm = new ParamTreeNodeViewModel(node, parent, accessor, labels);
 
         switch (node)
         {
@@ -24,7 +23,7 @@ public static class ParamTreeBuilder
                     {
                         var child = arrayNode[i];
                         var indexAccessor = new IndexAccessor(i);
-                        vm.Children.Add(BuildNode(child, indexAccessor, labels));
+                        vm.Children.Add(BuildNode(child, vm, indexAccessor, labels));
                     }
                     break;
                 }
@@ -32,9 +31,8 @@ public static class ParamTreeBuilder
                 {
                     foreach (var entry in mapNode.Entries)
                     {
-                        // TODO: Use Hash40 formatting extension to get string representation
                         var hash40Accessor = new Hash40Accessor(entry.Key);
-                        vm.Children.Add(BuildNode(entry.Value, hash40Accessor, labels));
+                        vm.Children.Add(BuildNode(entry.Value, vm, hash40Accessor, labels));
                     }
                     break;
                 }

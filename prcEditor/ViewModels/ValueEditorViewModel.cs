@@ -6,7 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using paracobNET;
-using paracobNET.Hash40FormattingExtensions;
+using paracobNET.Extensions;
 using prcEditor.Services;
 
 namespace prcEditor.ViewModels;
@@ -169,7 +169,7 @@ public sealed class Hash40EditorViewModel : ValueEditorViewModel
     {
         try
         {
-            _node.Value = Hash40FormattingExtensions.FromLabelOrHex(Text, _labels.StringToHashLabels);
+            _node.Value = Extensions.FromLabelOrHex(Text, _labels.StringToHashLabels);
             IsDropDownOpen = false;
         }
         catch

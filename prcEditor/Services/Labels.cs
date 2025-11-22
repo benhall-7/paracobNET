@@ -1,6 +1,6 @@
 using System;
 using paracobNET;
-using paracobNET.Hash40FormattingExtensions;
+using paracobNET.Extensions;
 using prcEditor.ViewModels;
 
 namespace prcEditor.Services;

@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="https://github.com/avaloniaui"
+    xmlns:views="clr-namespace:prcEditor.Views"
     xmlns:vm="clr-namespace:prcEditor.ViewModels;assembly=prcEditor"
     xmlns:paracobNET="clr-namespace:paracobNET;assembly=paracobNET"
     xmlns:i="using:Avalonia.Xaml.Interactivity"
@@ -86,6 +87,7 @@
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2" />
                 <ColumnDefinition Width="3*" />
             </Grid.ColumnDefinitions>
 
@@ -93,6 +95,13 @@
             <TreeView Grid.Column="0"
                 ItemsSource="{Binding Root.Children}"
                 SelectedItem="{Binding SelectedNode, Mode=TwoWay}">
+
+                <TreeView.Styles>
+                    <Style Selector="TreeViewItem" x:DataType="vm:ParamTreeNodeViewModel">
+                        <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                    </Style>
+                </TreeView.Styles>
+
                 <TreeView.ItemTemplate>
                     <TreeDataTemplate DataType="vm:ParamTreeNodeViewModel"
                         ItemsSource="{Binding Children}">
@@ -101,33 +110,42 @@
                 </TreeView.ItemTemplate>
             </TreeView>
 
-            <!-- Right: Detail panel (focused param) -->
-            <DataGrid Grid.Column="1"
-                ItemsSource="{Binding Rows}"
-                AutoGenerateColumns="False">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Index"
-                        Binding="{Binding AccessorText}"
-                        IsReadOnly="True" />
+            <GridSplitter Grid.Column="1" Background="Gray" />
 
-                    <DataGridTextColumn Header="Type"
-                        Binding="{Binding TypeText}"
-                        IsReadOnly="True" />
+            <!-- Right: Search panel and data grid -->
+            <Grid Grid.Column="2" RowDefinitions="*,2,2*">
+                <views:ParamSearch Grid.Row="0"
+                    DataContext="{Binding ParamSearch}" />
 
-                    <DataGridTemplateColumn Header="Value">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <ContentControl Content="{Binding ValueEditor}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <ContentControl Content="{Binding ValueEditor}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
-            </DataGrid>
+                <GridSplitter Grid.Row="1" Background="Gray" />
+
+                <DataGrid Grid.Row="2"
+                    ItemsSource="{Binding Rows}"
+                    AutoGenerateColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Index"
+                            Binding="{Binding AccessorText}"
+                            IsReadOnly="True" />
+
+                        <DataGridTextColumn Header="Type"
+                            Binding="{Binding TypeText}"
+                            IsReadOnly="True" />
+
+                        <DataGridTemplateColumn Header="Value">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ContentControl Content="{Binding ValueEditor}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                            <DataGridTemplateColumn.CellEditingTemplate>
+                                <DataTemplate>
+                                    <ContentControl Content="{Binding ValueEditor}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellEditingTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
         </Grid>
     </DockPanel>
 </Window>

@@ -16,14 +16,29 @@ public class MainWindowViewModel : INotifyPropertyChanged
 {
     private readonly Window _owner; // for dialogs
     private ParamTreeNodeViewModel? _root;
+    private ParamSearchViewModel _paramSearch;
     private ParamTreeNodeViewModel? _selectedNode;
     private ParamContainer? _container;
 
     public Labels Labels { get; } = new();
 
+    public ParamSearchViewModel ParamSearch
+    {
+        get => _paramSearch;
+        set
+        {
+            if (!ReferenceEquals(_paramSearch, value))
+            {
+                _paramSearch = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
     private event Action? SelectedNodeChanged;
 
+    public event EventHandler? RootChanged;
     public ParamTreeNodeViewModel? Root
     {
         get => _root;
@@ -36,11 +51,10 @@ public class MainWindowViewModel : INotifyPropertyChanged
                 OnPropertyChanged(nameof(HasDocument));
                 SaveFileCommand.RaiseCanExecuteChanged();
                 LoadLabelsCommand.RaiseCanExecuteChanged();
+                RootChanged?.Invoke(this, EventArgs.Empty);
             }
         }
     }
-
-    public bool HasDocument => Root is not null;
 
     public ParamTreeNodeViewModel? SelectedNode
     {
@@ -58,6 +72,8 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
     public ObservableCollection<DataGridRowViewModel> Rows { get; } = new();
 
+    public bool HasDocument => Root is not null;
+
     // Commands
     public RelayCommand OpenFileCommand { get; }
     public RelayCommand SaveFileCommand { get; }
@@ -67,16 +83,23 @@ public class MainWindowViewModel : INotifyPropertyChanged
     {
         _owner = owner;
 
+        _paramSearch = new ParamSearchViewModel(
+            root: _root,
+            labels: Labels,
+            selectNode: node => SelectedNode = node);
+
         OpenFileCommand = new RelayCommand(async _ => await OpenFileAsync(), _ => true);
         SaveFileCommand = new RelayCommand(async _ => await SaveFileAsync(), _ => HasDocument);
         LoadLabelsCommand = new RelayCommand(async _ => await LoadLabelsAsync(), _ => true);
 
-        SelectedNodeChanged += OnUpdateSelectedParam;
+        SelectedNodeChanged += OnUpdateSelectedNode;
+        RootChanged += OnRootChanged;
     }
 
     ~MainWindowViewModel()
     {
-        SelectedNodeChanged -= OnUpdateSelectedParam;
+        SelectedNodeChanged -= OnUpdateSelectedNode;
+        RootChanged -= OnRootChanged;
     }
 
     private async Task OpenFileAsync()
@@ -105,7 +128,6 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
         _container = container;
         Root = ParamTreeBuilder.BuildContainer(container, Labels);
-        SelectedNode = Root;
     }
 
     private async Task SaveFileAsync()
@@ -153,8 +175,18 @@ public class MainWindowViewModel : INotifyPropertyChanged
         Labels.LoadFromFile(path);
     }
 
-    private void OnUpdateSelectedParam()
+    private void OnRootChanged(object? sender, EventArgs e)
     {
+        SelectedNode = Root;
+        ParamSearch = new ParamSearchViewModel(
+            root: _root,
+            labels: Labels,
+            selectNode: node => SelectedNode = node);
+    }
+
+    private void OnUpdateSelectedNode()
+    {
+        SelectedNode?.ExpandParents();
         Rows.Clear();
         if (SelectedNode != null)
         {

@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using paracobNET;
+using paracobNET.Extensions;
 using prcEditor.Services;
 
 namespace prcEditor.ViewModels;

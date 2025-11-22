@@ -1,9 +1,6 @@
 ﻿using paracobNET;
-using paracobNET.Hash40FormattingExtensions;
-using System;
-using System.Collections.Generic;
+using paracobNET.Extensions;
 using System.Diagnostics;
-using System.IO;
 using System.Xml;
 
 namespace ParamXML
@@ -320,7 +317,7 @@ namespace ParamXML
             var entries = new List<KeyValuePair<Hash40, ParamNode>>(node.ChildNodes.Count);
             foreach (XmlNode child in node.ChildNodes)
                 entries.Add(new KeyValuePair<Hash40, ParamNode>(
-                    Hash40FormattingExtensions.FromLabelOrHex(child.Attributes["hash"].Value, stringToHashLabels),
+                    Extensions.FromLabelOrHex(child.Attributes["hash"].Value, stringToHashLabels),
                     NodeToParam(child)));
             return new ParamMapNode(entries);
         }
@@ -375,7 +372,7 @@ namespace ParamXML
 
         static ParamHash40Node NodeToParamHash40(XmlNode node)
         {
-            return new ParamHash40Node(Hash40FormattingExtensions.FromLabelOrHex(node.InnerText, stringToHashLabels));
+            return new ParamHash40Node(Extensions.FromLabelOrHex(node.InnerText, stringToHashLabels));
         }
 
         static ParamStringNode NodeToParamString(XmlNode node)
