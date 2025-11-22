@@ -86,9 +86,9 @@
         <!-- Main content -->
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*" />
-                <ColumnDefinition Width="2" />
-                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="2*" MinWidth="200" />
+                <ColumnDefinition Width="1" />
+                <ColumnDefinition Width="3*" MinWidth="400" />
             </Grid.ColumnDefinitions>
 
             <!-- Left: TreeView -->
@@ -110,14 +110,20 @@
                 </TreeView.ItemTemplate>
             </TreeView>
 
-            <GridSplitter Grid.Column="1" Background="Gray" />
+            <GridSplitter Grid.Column="1" Background="LightGray" />
 
             <!-- Right: Search panel and data grid -->
-            <Grid Grid.Column="2" RowDefinitions="*,2,2*">
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" MinHeight="100" />
+                    <RowDefinition Height="1" />
+                    <RowDefinition Height="2*" MinHeight="200" />
+                </Grid.RowDefinitions>
+
                 <views:ParamSearch Grid.Row="0"
                     DataContext="{Binding ParamSearch}" />
 
-                <GridSplitter Grid.Row="1" Background="Gray" />
+                <GridSplitter Grid.Row="1" Background="LightGray" />
 
                 <DataGrid Grid.Row="2"
                     ItemsSource="{Binding Rows}"
