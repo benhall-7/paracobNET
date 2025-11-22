@@ -87,7 +87,7 @@
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*" MinWidth="200" />
-                <ColumnDefinition Width="1" />
+                <ColumnDefinition Width="2" />
                 <ColumnDefinition Width="3*" MinWidth="400" />
             </Grid.ColumnDefinitions>
 
@@ -113,20 +113,10 @@
             <GridSplitter Grid.Column="1" Background="LightGray" />
 
             <!-- Right: Search panel and data grid -->
-            <Grid Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" MinHeight="100" />
-                    <RowDefinition Height="1" />
-                    <RowDefinition Height="2*" MinHeight="200" />
-                </Grid.RowDefinitions>
+            <StackPanel Grid.Column="2">
+                <views:ParamSearch DataContext="{Binding ParamSearch}" />
 
-                <views:ParamSearch Grid.Row="0"
-                    DataContext="{Binding ParamSearch}" />
-
-                <GridSplitter Grid.Row="1" Background="LightGray" />
-
-                <DataGrid Grid.Row="2"
-                    ItemsSource="{Binding Rows}"
+                <DataGrid ItemsSource="{Binding Rows}"
                     AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Index"
@@ -151,7 +141,7 @@
                         </DataGridTemplateColumn>
                     </DataGrid.Columns>
                 </DataGrid>
-            </Grid>
+            </StackPanel>
         </Grid>
     </DockPanel>
 </Window>
