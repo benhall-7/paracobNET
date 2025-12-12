@@ -113,10 +113,10 @@
             <GridSplitter Grid.Column="1" Background="LightGray" />
 
             <!-- Right: Search panel and data grid -->
-            <StackPanel Grid.Column="2">
-                <views:ParamSearch DataContext="{Binding ParamSearch}" />
+            <Grid Grid.Column="2" RowDefinitions="Auto,*">
+                <views:ParamSearch Grid.Row="0" DataContext="{Binding ParamSearch}" />
 
-                <DataGrid ItemsSource="{Binding Rows}"
+                <DataGrid Grid.Row="1" ItemsSource="{Binding Rows}"
                     AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Index"
@@ -141,7 +141,7 @@
                         </DataGridTemplateColumn>
                     </DataGrid.Columns>
                 </DataGrid>
-            </StackPanel>
+            </Grid>
         </Grid>
     </DockPanel>
 </Window>
