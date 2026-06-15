@@ -18,7 +18,7 @@
                     <!-- Search bar -->
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <TextBox Width="180"
-                            Watermark="Search hash / label"
+                            PlaceholderText="Search hash / label"
                             Text="{Binding Query, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                             <TextBox.KeyBindings>
                                 <KeyBinding Gesture="Enter"

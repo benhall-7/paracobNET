@@ -14,7 +14,12 @@ public static class ParamTreeBuilder
     private static ParamTreeNodeViewModel BuildNode(ParamNode node, ParamTreeNodeViewModel? parent, Accessor accessor, Labels labels)
     {
         var vm = new ParamTreeNodeViewModel(node, parent, accessor, labels);
+        BuildChildren(vm, node, labels);
+        return vm;
+    }
 
+    public static void BuildChildren(ParamTreeNodeViewModel parent, ParamNode node, Labels labels)
+    {
         switch (node)
         {
             case ParamArrayNode arrayNode:
@@ -23,7 +28,7 @@ public static class ParamTreeBuilder
                     {
                         var child = arrayNode[i];
                         var indexAccessor = new IndexAccessor(i);
-                        vm.Children.Add(BuildNode(child, vm, indexAccessor, labels));
+                        parent.Children.Add(BuildNode(child, parent, indexAccessor, labels));
                     }
                     break;
                 }
@@ -32,14 +37,12 @@ public static class ParamTreeBuilder
                     foreach (var entry in mapNode.Entries)
                     {
                         var hash40Accessor = new Hash40Accessor(entry.Key);
-                        vm.Children.Add(BuildNode(entry.Value, vm, hash40Accessor, labels));
+                        parent.Children.Add(BuildNode(entry.Value, parent, hash40Accessor, labels));
                     }
                     break;
                 }
             default:
                 break;
         }
-
-        return vm;
     }
 }

@@ -4,8 +4,6 @@
     xmlns:views="clr-namespace:prcEditor.Views"
     xmlns:vm="clr-namespace:prcEditor.ViewModels;assembly=prcEditor"
     xmlns:paracobNET="clr-namespace:paracobNET;assembly=paracobNET"
-    xmlns:i="using:Avalonia.Xaml.Interactivity"
-    xmlns:ia="using:Avalonia.Xaml.Interactions.Core"
     x:Class="prcEditor.Views.MainWindow"
     x:DataType="vm:MainWindowViewModel"
     Width="1000" Height="700"
@@ -21,17 +19,12 @@
 
         <!-- Numeric/String -> TextBox with commit on blur / Enter -->
         <DataTemplate DataType="{x:Type vm:NumericOrStringEditorViewModel}">
-            <TextBox Text="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            <TextBox Text="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                LostFocus="CommitValueEditorOnLostFocus">
                 <TextBox.KeyBindings>
                     <KeyBinding Gesture="Enter"
                         Command="{Binding CommitCommand}" />
                 </TextBox.KeyBindings>
-
-                <i:Interaction.Behaviors>
-                    <ia:EventTriggerBehavior EventName="LostFocus">
-                        <ia:InvokeCommandAction Command="{Binding CommitCommand}" />
-                    </ia:EventTriggerBehavior>
-                </i:Interaction.Behaviors>
             </TextBox>
         </DataTemplate>
 
@@ -40,7 +33,8 @@
             <AutoCompleteBox Text="{Binding Text, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 ItemsSource="{Binding Suggestions}"
                 IsDropDownOpen="{Binding IsDropDownOpen, Mode=TwoWay}"
-                MinimumPrefixLength="1">
+                MinimumPrefixLength="1"
+                LostFocus="CommitValueEditorOnLostFocus">
                 <AutoCompleteBox.AttachedToVisualTree>
                     <!-- Optionally: hook KeyDown for Enter to call Commit -->
                 </AutoCompleteBox.AttachedToVisualTree>
@@ -49,12 +43,6 @@
                     <KeyBinding Gesture="Enter"
                         Command="{Binding CommitCommand}" />
                 </AutoCompleteBox.KeyBindings>
-
-                <i:Interaction.Behaviors>
-                    <ia:EventTriggerBehavior EventName="LostFocus">
-                        <ia:InvokeCommandAction Command="{Binding CommitCommand}" />
-                    </ia:EventTriggerBehavior>
-                </i:Interaction.Behaviors>
             </AutoCompleteBox>
         </DataTemplate>
 
@@ -73,7 +61,7 @@
                     Command="{Binding OpenFileCommand}" />
                 <MenuItem Header="_Save"
                     Command="{Binding SaveFileCommand}"
-                    IsEnabled="{Binding HasDocument}" />
+                    IsEnabled="{Binding CanSaveDocument}" />
             </MenuItem>
 
             <MenuItem Header="_Labels">
@@ -94,7 +82,16 @@
             <!-- Left: TreeView -->
             <TreeView Grid.Column="0"
                 ItemsSource="{Binding Root.Children}"
-                SelectedItem="{Binding SelectedNode, Mode=TwoWay}">
+                SelectedItem="{Binding SelectedNode, Mode=TwoWay}"
+                IsEnabled="{Binding IsMainUiEnabled}">
+
+                <TreeView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Edit as XML"
+                            Command="{Binding EditSelectedNodeAsXmlCommand}"
+                            IsEnabled="{Binding CanEditSelectedNodeAsXml}" />
+                    </ContextMenu>
+                </TreeView.ContextMenu>
 
                 <TreeView.Styles>
                     <Style Selector="TreeViewItem" x:DataType="vm:ParamTreeNodeViewModel">
@@ -113,7 +110,8 @@
             <GridSplitter Grid.Column="1" Background="LightGray" />
 
             <!-- Right: Search panel and data grid -->
-            <Grid Grid.Column="2" RowDefinitions="Auto,*">
+            <Grid Grid.Column="2" RowDefinitions="Auto,*"
+                IsVisible="{Binding IsMainUiEnabled}">
                 <views:ParamSearch Grid.Row="0" DataContext="{Binding ParamSearch}" />
 
                 <DataGrid Grid.Row="1" ItemsSource="{Binding Rows}"
@@ -142,6 +140,69 @@
                     </DataGrid.Columns>
                 </DataGrid>
             </Grid>
+
+            <!-- Right: XML edit session -->
+            <Border Grid.Column="2"
+                Padding="8"
+                IsVisible="{Binding IsXmlEditSessionActive}">
+                <ContentControl Content="{Binding ActiveXmlEditSession}">
+                    <ContentControl.ContentTemplate>
+                        <DataTemplate DataType="{x:Type vm:XmlEditSessionViewModel}"
+                            x:DataType="vm:XmlEditSessionViewModel">
+                            <Grid RowDefinitions="*,*"
+                                RowSpacing="8">
+                                <Grid Grid.Row="0"
+                                    RowDefinitions="Auto,Auto,Auto,*,Auto"
+                                    RowSpacing="8">
+                                    <TextBlock Grid.Row="0"
+                                        FontSize="18"
+                                        FontWeight="SemiBold"
+                                        Text="XML editor" />
+
+                                    <StackPanel Grid.Row="1" Spacing="4">
+                                        <TextBlock Text="Temp file" />
+                                        <Border Background="LightGray" Padding="4">
+                                            <SelectableTextBlock Text="{Binding FilePath}"
+                                                TextWrapping="Wrap" />
+                                        </Border>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="2" Spacing="4">
+                                        <TextBlock Text="Param path" />
+                                        <Border Background="LightGray" Padding="4">
+                                            <SelectableTextBlock Text="{Binding TargetText}"
+                                                TextWrapping="Wrap" />
+                                        </Border>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Row="4"
+                                        Orientation="Horizontal"
+                                        HorizontalAlignment="Center"
+                                        Spacing="8">
+                                        <Button Content="Commit"
+                                            MinWidth="90"
+                                            Command="{Binding CommitCommand}" />
+                                        <Button Content="Check"
+                                            MinWidth="90"
+                                            Command="{Binding CheckCommand}" />
+                                        <Button Content="Cancel"
+                                            MinWidth="90"
+                                            Command="{Binding CancelCommand}" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <Border Grid.Row="1"
+                                    BorderThickness="1"
+                                    BorderBrush="LightGray"
+                                    Padding="12">
+                                    <TextBlock Text="{Binding Status}"
+                                        TextWrapping="Wrap" />
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </ContentControl.ContentTemplate>
+                </ContentControl>
+            </Border>
         </Grid>
     </DockPanel>
 </Window>

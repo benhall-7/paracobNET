@@ -16,7 +16,18 @@ public sealed record NoAccessor() : Accessor;
 public class ParamTreeNodeViewModel : INotifyPropertyChanged
 {
     private Labels _labels { get; }
-    public ParamNode Node { get; }
+    private ParamNode _node;
+    public ParamNode Node
+    {
+        get => _node;
+        private set
+        {
+            if (ReferenceEquals(_node, value)) return;
+            _node = value;
+            OnPropertyChanged();
+        }
+    }
+
     public ParamTreeNodeViewModel? Parent { get; }
     public Accessor Accessor { get; }
     public ObservableCollection<ParamTreeNodeViewModel> Children { get; } = new();
@@ -41,7 +52,7 @@ public class ParamTreeNodeViewModel : INotifyPropertyChanged
 
     public ParamTreeNodeViewModel(ParamNode node, ParamTreeNodeViewModel? parent, Accessor accessor, Labels labels)
     {
-        Node = node;
+        _node = node;
         Accessor = accessor;
         Parent = parent;
 
@@ -57,6 +68,13 @@ public class ParamTreeNodeViewModel : INotifyPropertyChanged
     public void ExpandParents()
     {
         Parent?.Expand();
+    }
+
+    public void ReplaceNode(ParamNode node)
+    {
+        Node = node;
+        Children.Clear();
+        ParamTreeBuilder.BuildChildren(this, node, _labels);
     }
 
     private void Expand()
